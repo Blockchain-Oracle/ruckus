@@ -9,10 +9,12 @@ import type { GameSceneProps } from '@/engine/types.ts';
 import { playPoolEvents, setPoolBackdrop } from './audio/sfx.ts';
 import { SURFACE_Y, simY } from './config.ts';
 import { applyHeldKeys, attachPoolKeys } from './input/keys.ts';
-import { setAimAngle } from './match/aim.ts';
+import { aim, setAimAngle } from './match/aim.ts';
+import { thinkBot } from './match/bot.ts';
 import { resetPoolCamera } from './match/camera.ts';
 import { PoolDirector } from './match/director.ts';
 import { setDirector } from './match/runtime.ts';
+import { usePool } from './match/store.ts';
 import { AimGuide } from './render/AimGuide.tsx';
 import { Balls } from './render/Balls.tsx';
 import { Cue } from './render/Cue.tsx';
@@ -30,7 +32,11 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
   useEffect(() => {
     setDirector(director);
     // Dev-only QA handle; stripped from production builds.
-    if (import.meta.env.DEV) Object.assign(globalThis, { __ruckusPool: director });
+    if (import.meta.env.DEV)
+      Object.assign(globalThis, {
+        __ruckusPool: director,
+        __ruckusPoolKit: { aim, usePool, thinkBot },
+      });
     director.startExhibition();
     resetPoolCamera();
     return () => setDirector(null);

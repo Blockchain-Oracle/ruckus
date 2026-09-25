@@ -123,7 +123,8 @@ export class PoolDirector {
     for (const t of due) t.run();
 
     const d = this.driver;
-    if (d.update(dtS)) this.sync(d.lastOutcome?.message ?? null);
+    d.update(dtS);
+    if (d.takeRested()) this.sync(d.lastOutcome?.message ?? null);
     if (d.phase === 'over') return;
     if (d.phase === 'aim' && d.seats[d.shooter].bot && this.thinkingFor !== this.turnKey()) {
       this.thinkingFor = this.turnKey();

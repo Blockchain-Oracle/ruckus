@@ -76,6 +76,14 @@ export class PoolDriver {
     this.shoot(d.shot, d.calledPocket);
   }
 
+  /** Set when a shot comes to rest (however it got there); the director takes it once. */
+  private rested = false;
+  takeRested() {
+    const r = this.rested;
+    this.rested = false;
+    return r;
+  }
+
   /** Advance real time; returns true on the frame the shot came to rest. */
   update(dtS: number): boolean {
     if (this.phase !== 'rolling') return false;
@@ -98,6 +106,7 @@ export class PoolDriver {
     applyOutcome(this.rack, this.balls, out);
     this.lastOutcome = out;
     this.phase = this.rack.winner >= 0 ? 'over' : 'aim';
+    this.rested = true;
     return true;
   }
 
