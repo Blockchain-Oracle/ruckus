@@ -16,6 +16,7 @@ export type RoundOutcome = {
   ticks: number;
   kills: number[];
   diedAt: number[];
+  health: number[];
   hash: bigint;
 };
 
@@ -45,13 +46,14 @@ export function runBotRound(
 ): RoundOutcome {
   const r = run_bot_round(seed >>> 0, mapId, Int32Array.from(difficulties));
   const at = (i: number) => r[i] ?? 0;
-  const hi = BigInt(at(2 + 2 * MAX) >>> 0);
-  const lo = BigInt(at(3 + 2 * MAX) >>> 0);
+  const hi = BigInt(at(2 + 3 * MAX) >>> 0);
+  const lo = BigInt(at(3 + 3 * MAX) >>> 0);
   return {
     winner: at(0),
     ticks: at(1),
     kills: Array.from(r.slice(2, 2 + MAX)),
     diedAt: Array.from(r.slice(2 + MAX, 2 + 2 * MAX)),
+    health: Array.from(r.slice(2 + 2 * MAX, 2 + 3 * MAX)),
     hash: (hi << 32n) | lo,
   };
 }

@@ -10,8 +10,8 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 4 | S02 Deploy skeleton: Coolify/Nixpacks, Vercel, Convex (✱ context) | done | [stages/S02-deploy-skeleton.md](stages/S02-deploy-skeleton.md) |
 | 5 | ✱E Early eligible submission (waits for a finished slice: hub + Chickenz + Back Your Chicken) | todo | [stages/E-early-submission.md](stages/E-early-submission.md) |
 | 6 | S03 Engine shell, asset pipeline, budgets (✱N name + brand) | done | [stages/S03-engine-shell.md](stages/S03-engine-shell.md) |
-| 7 | S06 Chickenz sim: Rust, 4-player FFA, deterministic bots | active | [stages/S06-chickenz-sim.md](stages/S06-chickenz-sim.md) |
-| 8 | S10a Chickenz wager spike: seed banks + novel wager design | todo | [stages/S10a-chickenz-wager-spike.md](stages/S10a-chickenz-wager-spike.md) |
+| 7 | S06 Chickenz sim: Rust, 4-player FFA, deterministic bots | done | [stages/S06-chickenz-sim.md](stages/S06-chickenz-sim.md) |
+| 8 | S10a Chickenz wager spike: seed banks + novel wager design | active | [stages/S10a-chickenz-wager-spike.md](stages/S10a-chickenz-wager-spike.md) |
 | 9 | S04 Identity and onboarding | todo | [stages/S04-identity-onboarding.md](stages/S04-identity-onboarding.md) |
 | 10 | S05 Lobby, rooms, netcode framework | todo | [stages/S05-lobby-rooms.md](stages/S05-lobby-rooms.md) |
 | 11 | S07 Chickenz rendering and assets (✱ purchases) | todo | [stages/S07-chickenz-render.md](stages/S07-chickenz-render.md) |

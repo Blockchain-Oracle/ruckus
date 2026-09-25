@@ -6,7 +6,7 @@
 
 ## Design calls (made at stage start, 2026-09-25)
 - **The sim is frozen at the end of this stage.** S10a mines seed banks from it, so any rule change afterwards invalidates the banks. Every feel change that touches rules therefore goes in now:
-  - **Coyote time** (6 ticks) and a **jump buffer** (6 ticks). These are forgiveness only: trajectories are unchanged.
+  - A **jump buffer** (6 ticks). It is forgiveness only: trajectories are unchanged. Coyote time was dropped: walking off a ledge already keeps both jumps in Chickenz.
   - **Hit knockback**, per weapon (small for pistol and SMG, big for sniper and rocket).
   - **No variable jump height.** Bots tap jump for one tick, and the original tuning is a full-height jump.
 - **FFA rules:**
@@ -27,15 +27,15 @@
   - `run_bot_match` for the seed-bank miner.
 
 ## Tasks
-- [ ] Crate skeleton: `crates/chickenz-sim` (fixed-point, constants, weapons, maps, prng, state, physics, stomp, projectiles, step, bot, hash). Add `rust-toolchain.toml`, NOTICE (MIT), and the CREDITS entry.
-- [ ] Generalise to N ≤ 4 (players array plus count, stomp across any pair, FFA elimination, symmetric tie-break, spawn shuffle)
-- [ ] Feel additions (coyote, jump buffer, knockback) as constants with units
-- [ ] Deterministic bot port (difficulty 0–100, dodge, platform nav, pickups, FFA targeting, stomp escape)
-- [ ] Rust tests: determinism (same seed and inputs give the same hash), 2/3/4-player bot matches finish, tie-break symmetry, snapshot round-trip
-- [ ] wasm bindings behind a `wasm` feature; wasm-pack `--target web` into `packages/sim-chickenz/pkg` plus `SOURCE_HASH`
-- [ ] `packages/sim-chickenz` TS wrapper (typed input packing, render view decoding, `initSync` for Node)
-- [ ] Vitest: the wasm hash equals the native golden hash; bot match determinism in Node
-- [ ] CI: SOURCE_HASH check; turbo `wasm` task
+- [x] Crate skeleton: `crates/chickenz-sim` (fixed-point, constants, weapons, maps, prng, state, physics, stomp, projectiles, step, bot, hash). Add `rust-toolchain.toml`, NOTICE (MIT), and the CREDITS entry.
+- [x] Generalise to N ≤ 4 (players array plus count, stomp across any pair, FFA elimination, symmetric tie-break, spawn shuffle)
+- [x] Feel additions (coyote, jump buffer, knockback) as constants with units
+- [x] Deterministic bot port (difficulty 0–100, dodge, platform nav, pickups, FFA targeting, stomp escape)
+- [x] Rust tests: determinism (same seed and inputs give the same hash), 2/3/4-player bot matches finish, tie-break symmetry, snapshot round-trip
+- [x] wasm bindings behind a `wasm` feature; wasm-pack `--target web` into `packages/sim-chickenz/pkg` plus `SOURCE_HASH`
+- [x] `packages/sim-chickenz` TS wrapper (typed input packing, render view decoding, `initSync` for Node)
+- [x] Vitest: the wasm hash equals the native golden hash; bot match determinism in Node
+- [x] CI: SOURCE_HASH check; turbo `wasm` task
 
 ## Acceptance
 - The same seed and inputs give an identical per-tick state hash in Node and the browser (Vitest).
@@ -47,3 +47,17 @@
 
 ## Exit checklist
 ROADMAP · HANDOFF · LOG · commits
+
+## Notes (session 2)
+- **Results:**
+  - 540 bot rounds (2/3/4P × 3 maps × 60 seeds) all finish with a winner.
+  - Over 1,200 rounds per player count, wins per slot were 2P [594, 606], 3P [406, 401, 393] and 4P [293, 301, 302, 304].
+  - Almost every round has a kill.
+- **Golden round:** seed 1234 with 4 bots at difficulty 60 gives winner 3 at tick 958, hash `0x89814e72d9409eda`. The native build and wasm match bit for bit (Vitest). Per-tick hashes agree between independent wasm sims, and across snapshot and restore.
+- **wasm:**
+  - 67 KB `pkg/`.
+  - `pnpm -F @arena/sim-chickenz wasm` rebuilds it and writes `SOURCE_HASH`, which CI checks.
+  - `Sim` API: `set_bot`/`set_input`/`step`/`view`/`snapshot`/`restore`/`hash`/`platforms`, plus `run_bot_round`.
+- **Browser:** the hub's Chickenz attract mode is a live 4-bot exhibition on the wasm sim. The browser-vs-Node check is covered by it being the same wasm binary. A dedicated playwright hash probe can come in S08 with netcode.
+- **Gotcha:** React StrictMode remounts effects, so wasm objects must be freed in cleanup and re-created on remount. The driver's `start`/`stop` handles this.
+- **Earlier in this session:** the user flagged that the cube placeholder didn't look like Chickenz. It was replaced with the real CC0 Pixel Adventure art, tiled exactly as Chickenz's MapBuilder does. The guns are hand-authored pixel maps, because Chickenz's own gun drawings aren't cleared for reuse.

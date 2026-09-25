@@ -125,14 +125,22 @@ pub fn view_layout() -> Vec<i32> {
     vec![view::VIEW_VERSION, view::HEADER as i32, view::PLAYER_STRIDE as i32, view::PROJECTILE_STRIDE as i32, view::PICKUP_STRIDE as i32, view::LEN as i32]
 }
 
-/// Headless all-bot round → [winner, ticks, kills×4, died_at×4, hash_hi, hash_lo].
+/// Headless all-bot round → [winner, ticks, kills×4, died_at×4, health×4, hash_hi, hash_lo].
 #[wasm_bindgen]
 pub fn run_bot_round(seed: u32, map_id: u8, difficulties: &[i32]) -> Vec<i32> {
     let o = runner::run_bot_round(seed, map_id, difficulties);
     let mut out = vec![o.winner, o.ticks];
     out.extend(o.kills.iter().map(|&k| k as i32));
     out.extend(o.died_at.iter());
+    out.extend(o.health.iter());
     out.push((o.final_hash >> 32) as u32 as i32);
     out.push(o.final_hash as u32 as i32);
     out
+}
+
+/// Back-a-Bird class of slot 0 for a bank seed (the backed hero is always drawn into slot 0).
+#[wasm_bindgen]
+pub fn back_bird_class(seed: u32, map_id: u8, difficulties: &[i32]) -> u8 {
+    let o = runner::run_bot_round(seed, map_id, difficulties);
+    runner::classify_back_bird(&o, 0, difficulties.len().min(MAX_PLAYERS))
 }

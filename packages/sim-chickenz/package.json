@@ -18,6 +18,7 @@
     "@arena/tsconfig": "workspace:*",
     "@types/node": "^24.10.0",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@arena/casino-math": "workspace:*"
   }
 }

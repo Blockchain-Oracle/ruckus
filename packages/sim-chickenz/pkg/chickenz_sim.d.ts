@@ -46,7 +46,12 @@ export class Sim {
 }
 
 /**
- * Headless all-bot round → [winner, ticks, kills×4, died_at×4, hash_hi, hash_lo].
+ * Back-a-Bird class of slot 0 for a bank seed (the backed hero is always drawn into slot 0).
+ */
+export function back_bird_class(seed: number, map_id: number, difficulties: Int32Array): number;
+
+/**
+ * Headless all-bot round → [winner, ticks, kills×4, died_at×4, health×4, hash_hi, hash_lo].
  */
 export function run_bot_round(seed: number, map_id: number, difficulties: Int32Array): Int32Array;
 
@@ -57,6 +62,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly __wbg_sim_free: (a: number, b: number) => void;
+    readonly back_bird_class: (a: number, b: number, c: number, d: number) => number;
     readonly run_bot_round: (a: number, b: number, c: number, d: number) => [number, number];
     readonly sim_clear_bot: (a: number, b: number) => void;
     readonly sim_hash: (a: number) => bigint;

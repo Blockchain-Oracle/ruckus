@@ -2,6 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const __wbg_sim_free: (a: number, b: number) => void;
+export const back_bird_class: (a: number, b: number, c: number, d: number) => number;
 export const run_bot_round: (a: number, b: number, c: number, d: number) => [number, number];
 export const sim_clear_bot: (a: number, b: number) => void;
 export const sim_hash: (a: number) => bigint;

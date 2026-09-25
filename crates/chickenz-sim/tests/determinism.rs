@@ -91,3 +91,15 @@ fn golden_outcome() {
     let o = run_bot_round(1234, ARENA, &DIFF);
     println!("GOLDEN seed=1234 n=4 winner={} ticks={} hash={:#018x}", o.winner, o.ticks, o.final_hash);
 }
+
+#[test]
+fn back_bird_class_rates() {
+    use chickenz_sim::runner::classify_back_bird;
+    let mut counts = [0u32; 4];
+    for seed in 0..4000u32 {
+        let o = run_bot_round(seed, (seed % 3) as u8, &[75, 75, 75, 75]);
+        counts[classify_back_bird(&o, 0, 4) as usize] += 1;
+    }
+    println!("BACK_BIRD slot0 classes over 4000: flawless/win/second/lose = {counts:?}");
+    assert!(counts.iter().all(|&c| c > 0));
+}

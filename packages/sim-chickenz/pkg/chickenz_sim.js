@@ -161,7 +161,21 @@ export class Sim {
 if (Symbol.dispose) Sim.prototype[Symbol.dispose] = Sim.prototype.free;
 
 /**
- * Headless all-bot round → [winner, ticks, kills×4, died_at×4, hash_hi, hash_lo].
+ * Back-a-Bird class of slot 0 for a bank seed (the backed hero is always drawn into slot 0).
+ * @param {number} seed
+ * @param {number} map_id
+ * @param {Int32Array} difficulties
+ * @returns {number}
+ */
+export function back_bird_class(seed, map_id, difficulties) {
+    const ptr0 = passArray32ToWasm0(difficulties, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.back_bird_class(seed, map_id, ptr0, len0);
+    return ret;
+}
+
+/**
+ * Headless all-bot round → [winner, ticks, kills×4, died_at×4, health×4, hash_hi, hash_lo].
  * @param {number} seed
  * @param {number} map_id
  * @param {Int32Array} difficulties
