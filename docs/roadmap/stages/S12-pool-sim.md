@@ -26,7 +26,11 @@
   - Determinism, stun, follow/draw, rolling distance = v²/2μg, rail rebound, and legal break settling.
   - Rules verdicts.
   - Performance: about 59 ms per full break headless, after the broad phase.
-- [ ] Bot: ghost-ball candidates, then a simulated search with execution noise per difficulty. Runs in a Worker (S14 wires rooms).
+- [x] Bot (`bot.ts`):
+  - Generates ghost-ball candidates with lane checks and thin-cut pruning, and places ball in hand on a grid.
+  - Simulates up to 24 candidates × 3 spins with the real engine, scoring win, pot, foul and leave.
+  - Executes with difficulty-scaled aim and power noise.
+  - Results: 6 bot-vs-bot racks all finished, and the 90-skill bot beat the 20-skill bot 4/6. Decisions average 104 ms (max 424 ms), so it runs in a Worker in the web app.
 - [ ] Black-box comparison against tailuge's live build on a few canonical shots: stun, follow, draw, a cut angle, a bank (to do alongside S13 visuals).
 
 ## Acceptance
