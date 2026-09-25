@@ -64,6 +64,15 @@ export const CHICKENZ_MSG = {
   matchEnd: 'matchEnd',
 } as const;
 
+/** Quick-chat emotes (PLAN: no voice, quick-chat only). Ids travel on the wire; clients draw them. */
+export const CHICKENZ_EMOTES = ['gg', 'nice', 'oops', 'haha', 'comeon', 'wow'] as const;
+export type ChickenzEmote = (typeof CHICKENZ_EMOTES)[number];
+export const isChickenzEmote = (e: unknown): e is ChickenzEmote =>
+  typeof e === 'string' && (CHICKENZ_EMOTES as readonly string[]).includes(e);
+/** One emote per player per this many ms; faster spam is dropped server-side. */
+export const EMOTE_COOLDOWN_MS = 900;
+export type EmoteEvent = { slot: number; emote: ChickenzEmote };
+
 export type ChickenzJoinOptions = {
   protocolVersion: number;
   name: string;

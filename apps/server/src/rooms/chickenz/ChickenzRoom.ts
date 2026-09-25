@@ -6,7 +6,10 @@ import {
   type ChickenzJoinOptions,
   ChickenzRoomState,
   ChickenzSeat,
+  EMOTE_COOLDOWN_MS,
+  type EmoteEvent,
   INPUT_BYTES,
+  isChickenzEmote,
   type MatchEndEvent,
   NO_SLOT,
   type RoundEndEvent,
@@ -61,6 +64,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   private timers: ReturnType<typeof setTimeout>[] = [];
   /** The round in progress, replayed to anyone who joins mid-match so they can watch it. */
   private currentRound: RoundStartEvent | null = null;
+  private lastEmoteAt = new Map<string, number>();
 
   override async onCreate(options: ChickenzJoinOptions) {
     ensureChickenzWasm();
@@ -93,10 +97,14 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
       this.hostOnly(client, () => this.removeBot()),
     );
     this.onMessage(CHICKENZ_MSG.start, (client) => this.hostOnly(client, () => this.startMatch()));
-    this.onMessage(CHICKENZ_MSG.emote, (client, emote: string) => {
+    this.onMessage(CHICKENZ_MSG.emote, (client, emote: unknown) => {
       const seat = this.seatOf(client);
-      if (seat && typeof emote === 'string' && emote.length <= 16)
-        this.broadcast(CHICKENZ_MSG.emote, { slot: seat.slot, emote });
+      // Watchers have no bird to speak from; spam past the cooldown is dropped.
+      if (!seat || seat.slot === NO_SLOT || !isChickenzEmote(emote)) return;
+      const now = Date.now();
+      if (now - (this.lastEmoteAt.get(client.sessionId) ?? 0) < EMOTE_COOLDOWN_MS) return;
+      this.lastEmoteAt.set(client.sessionId, now);
+      this.broadcast(CHICKENZ_MSG.emote, { slot: seat.slot, emote } satisfies EmoteEvent);
     });
     this.setSimulationInterval(() => this.tick(), TICK_MS);
   }
@@ -105,8 +113,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     if (options.protocolVersion !== PROTOCOL_VERSION) {
       throw new ServerError(PROTOCOL_MISMATCH, 'Client protocol is out of date: reload the page.');
     }
-    if (this.state.phase !== CHICKENZ_PHASE.lobby)
-      throw new ServerError(ROOM_FULL, 'That match has already started.');
+    // Mid-match joins are allowed: onJoin seats them as watchers until the next lobby.
     return true;
   }
 
@@ -147,6 +154,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   }
 
   override onLeave(client: Client) {
+    this.lastEmoteAt.delete(client.sessionId);
     this.release(client);
   }
 
