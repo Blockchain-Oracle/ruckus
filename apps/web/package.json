@@ -19,6 +19,7 @@
     "@arena/fx": "workspace:*",
     "@arena/protocol": "workspace:*",
     "@arena/shared": "workspace:*",
+    "@arena/sim-chickenz": "workspace:*",
     "@chain/casino-sdk": "workspace:*",
     "@colyseus/sdk": "^0.18.4",
     "@convex-dev/auth": "^0.0.95",

@@ -1,7 +1,29 @@
 import { CanvasTexture, NearestFilter, SRGBColorSpace } from 'three/webgpu';
 
 import { BORDER_OUTSET_PX, MAP_H_PX, MAP_W_PX, TILE_PX } from '../config.ts';
-import type { ARENA } from '../map.ts';
+
+export type Rect = { x: number; y: number; w: number; h: number };
+export type ArenaLayout = {
+  platforms: readonly Rect[];
+  weaponSpawns: readonly { x: number; y: number }[];
+};
+
+/** Unpack the sim's flat arrays ([x,y,w,h]… and [x,y]…) into a layout. */
+export function layoutFrom(platforms: Int32Array, spawns: Int32Array): ArenaLayout {
+  const rects: Rect[] = [];
+  for (let i = 0; i + 3 < platforms.length; i += 4) {
+    rects.push({
+      x: platforms[i] ?? 0,
+      y: platforms[i + 1] ?? 0,
+      w: platforms[i + 2] ?? 0,
+      h: platforms[i + 3] ?? 0,
+    });
+  }
+  const points: { x: number; y: number }[] = [];
+  for (let i = 0; i + 1 < spawns.length; i += 2)
+    points.push({ x: spawns[i] ?? 0, y: spawns[i + 1] ?? 0 });
+  return { platforms: rects, weaponSpawns: points };
+}
 
 /** Pixel Adventure terrain sheet: 22 tiles per row (Chickenz `scenes/constants.ts`). */
 const COLS = 22;
@@ -37,7 +59,7 @@ function frameFor(tx: number, ty: number, tilesW: number, tilesH: number) {
  * Platforms, pedestals and the stone frame never move, so they are drawn once into one canvas
  * (one draw call, pixel-exact), exactly the tiling Chickenz's MapBuilder does per sprite.
  */
-export function bakeArena(sheet: HTMLImageElement, map: typeof ARENA): CanvasTexture {
+export function bakeArena(sheet: HTMLImageElement, map: ArenaLayout): CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = BAKED_W_PX;
   canvas.height = BAKED_H_PX;

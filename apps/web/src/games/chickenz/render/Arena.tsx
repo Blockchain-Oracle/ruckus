@@ -3,9 +3,8 @@ import { useMemo } from 'react';
 import { DoubleSide, RepeatWrapping, type Texture } from 'three/webgpu';
 
 import { BG_SCROLL_PX_PER_S, DEPTH, MAP_H, MAP_H_PX, MAP_W, MAP_W_PX, TILE_PX } from '../config.ts';
-import { ARENA } from '../map.ts';
 import { getSprites } from '../sprites.ts';
-import { BAKED_H_PX, BAKED_W_PX, bakeArena } from './terrain.ts';
+import { type ArenaLayout, BAKED_H_PX, BAKED_W_PX, bakeArena } from './terrain.ts';
 
 const BG_TILE_PX = 64;
 
@@ -19,9 +18,9 @@ function backgroundFor(seed: number) {
   return { index: h, dir: [Math.cos(angle), Math.sin(angle)] as const };
 }
 
-export function Arena({ seed }: { seed: number }) {
+export function Arena({ seed, layout }: { seed: number; layout: ArenaLayout }) {
   const sprites = getSprites();
-  const terrain = useMemo(() => bakeArena(sprites.terrain, ARENA), [sprites]);
+  const terrain = useMemo(() => bakeArena(sprites.terrain, layout), [sprites, layout]);
   const { background, dir } = useMemo(() => {
     const pick = backgroundFor(seed);
     const source = sprites.backgrounds[pick.index % sprites.backgrounds.length] as Texture;
