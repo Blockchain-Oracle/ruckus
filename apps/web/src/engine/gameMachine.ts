@@ -41,13 +41,23 @@ export const useGameMachine = create<GameMachine>()((set, get) => ({
   },
   async select(gameId) {
     const { phase, gameId: current } = get();
-    // Switching cabinets is a hub action; mid-match switches would orphan a room.
-    if (phase !== 'attract' || gameId === current) return;
-    // Load before fading so the scrim never lifts onto an empty stage.
-    if (gameId) await loadGame(gameId);
-    await crossfade(() => set((s) => ({ gameId, generation: s.generation + 1 })));
+    // Switching cabinets is a hub action; mid-match switches would orphan a room. A repeat request
+    // for the game already on its way (double click, StrictMode's double effect) is the same move:
+    // doing it twice would remount the scene and drop whatever it had started (a room's table).
+    if (phase !== 'attract' || gameId === current || gameId === selecting) return;
+    selecting = gameId;
+    try {
+      // Load before fading so the scrim never lifts onto an empty stage.
+      if (gameId) await loadGame(gameId);
+      await crossfade(() => set((s) => ({ gameId, generation: s.generation + 1 })));
+    } finally {
+      if (selecting === gameId) selecting = undefined;
+    }
   },
 }));
+
+/** The game a select() is currently loading and fading to (undefined when none). */
+let selecting: GameId | null | undefined;
 
 export const isInteractive = (phase: Phase) => phase === 'play';
 

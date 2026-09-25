@@ -59,6 +59,9 @@ importers:
       '@arena/sim-chickenz':
         specifier: workspace:*
         version: link:../../packages/sim-chickenz
+      '@arena/sim-pool':
+        specifier: workspace:*
+        version: link:../../packages/sim-pool
       '@colyseus/auth':
         specifier: 0.18.3
         version: 0.18.3(@colyseus/core@0.18.16)(express@5.2.1)(zod@4.6.5)

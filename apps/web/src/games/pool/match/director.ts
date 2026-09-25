@@ -1,3 +1,4 @@
+import type { PlayedEvent, RackEvent, ShotRequest } from '@arena/protocol/pool';
 import {
   CUE_BALL,
   type Group,
@@ -6,6 +7,8 @@ import {
   isStripe,
   onEight,
   onTable,
+  type RackState,
+  type Shot,
   STRIDE,
 } from '@arena/sim-pool';
 
@@ -40,7 +43,15 @@ const leftOf = (d: PoolDriver, g: Group | null) => {
  */
 export class PoolDirector {
   driver: PoolDriver;
-  mode: 'exhibition' | 'match' = 'exhibition';
+  mode: 'exhibition' | 'match' | 'online' = 'exhibition';
+  /** Dev-only timeline for browser checks (never read in production). */
+  log: string[] = [];
+  private trace(line: string) {
+    if (import.meta.env.DEV) this.log.push(`${Math.round(this.clock)} ${line}`);
+  }
+  /** Online: my seat (0/1), or −1 when watching. */
+  mySlot = 0;
+  private sendShot: ((req: ShotRequest) => void) | null = null;
   private seedBase: number;
   private racks = 0;
   private thinkingFor = -1;
@@ -53,10 +64,96 @@ export class PoolDirector {
   }
 
   humanTurn() {
+    if (this.mode === 'online') return this.driver.shooter === this.mySlot;
     return this.mode === 'match' && !this.driver.seats[this.driver.shooter].bot;
   }
 
+  // ── online (server-refereed lockstep) ───────────────────────────────────
+
+  /** A rack from the room: build the identical table (or load one mid-rack as a watcher). */
+  startOnline(e: RackEvent, balls: Float64Array, mySlot: number, send: (req: ShotRequest) => void) {
+    this.trace(`online rack seed=${e.seed} slot=${mySlot} shooter=${e.rack.shooter}`);
+    this.mode = 'online';
+    this.playedQueue = [];
+    this.mySlot = mySlot;
+    this.sendShot = send;
+    this.timers = [];
+    this.stroke = null;
+    const seats: [Seat, Seat] = [
+      { name: e.names[0], bot: e.bots[0], difficulty: 0 },
+      { name: e.names[1], bot: e.bots[1], difficulty: 0 },
+    ];
+    this.driver = new PoolDriver(e.seed, seats, e.breaker);
+    this.driver.remote = true;
+    this.driver.load(balls, e.rack as RackState);
+    this.sync(null);
+  }
+
+  /** Shots that arrived while the previous one was still rolling (or a bot stroke was playing). */
+  private playedQueue: { e: PlayedEvent; before: Float64Array; after: Float64Array }[] = [];
+
+  /** The server played a shot: queue it, and play it once the table is free. */
+  onlinePlayed(e: PlayedEvent, before: Float64Array, after: Float64Array) {
+    this.trace(
+      `played by ${e.shooter}${e.bot ? ' bot' : ''} phase=${this.driver.phase} q=${this.playedQueue.length}`,
+    );
+    if (this.mode !== 'online') return;
+    const d = this.driver;
+    // My own shot is already rolling locally: only its snap was needed.
+    if (
+      e.shooter === this.mySlot &&
+      !e.bot &&
+      d.phase === 'rolling' &&
+      this.playedQueue.length === 0
+    ) {
+      d.setSnap(after, e.rack as RackState, e.message);
+      return;
+    }
+    this.playedQueue.push({ e, before, after });
+    this.nextPlayed();
+  }
+
+  private nextPlayed() {
+    const d = this.driver;
+    if (d.phase === 'rolling' || this.stroke) return;
+    const next = this.playedQueue.shift();
+    if (next) this.playOnline(next.e, next.before, next.after);
+  }
+
+  private playOnline(e: PlayedEvent, before: Float64Array, after: Float64Array) {
+    const d = this.driver;
+    d.setSnap(after, e.rack as RackState, e.message);
+    const { shot, calledPocket } = e.request;
+    if (e.bot) {
+      if (e.request.place) d.placeCue(e.request.place.x, e.request.place.y);
+      this.playStroke(shot, () => {
+        d.replay(before, shot, calledPocket);
+        playStrike(shot.power, before[CUE_BALL * STRIDE] ?? 0);
+      });
+    } else {
+      d.replay(before, shot, calledPocket);
+      playStrike(shot.power, before[CUE_BALL * STRIDE] ?? 0);
+    }
+    usePool.getState().set({ rolling: true, message: null, thinking: false });
+  }
+
+  /** Another player's live aim (watching their cue move). */
+  remoteAim(a: { dx: number; dy: number; power: number; spinX: number; spinY: number }) {
+    if (this.humanTurn() || this.stroke) return;
+    aim.dx = a.dx;
+    aim.dy = a.dy;
+    aim.power = a.power;
+    aim.spinX = a.spinX;
+    aim.spinY = a.spinY;
+  }
+
+  onlineOver(winner: 0 | 1) {
+    this.trace(`over ${winner}`);
+    usePool.getState().set({ status: 'over', winner });
+  }
+
   startExhibition() {
+    this.trace('exhibition');
     this.mode = 'exhibition';
     this.timers = [];
     this.newRack(EXHIBITION_SEATS);
@@ -105,7 +202,15 @@ export class PoolDirector {
     const { calledPocket, mustCall } = usePool.getState();
     if (mustCall && calledPocket < 0) return;
     const power = Math.max(0.03, aim.power);
-    d.shoot({ dx: aim.dx, dy: aim.dy, power, spinX: aim.spinX, spinY: aim.spinY }, calledPocket);
+    const shot = { dx: aim.dx, dy: aim.dy, power, spinX: aim.spinX, spinY: aim.spinY };
+    if (this.mode === 'online') {
+      const place =
+        d.rack.ballInHand !== 'none'
+          ? { x: d.balls[CUE_BALL * STRIDE] ?? 0, y: d.balls[CUE_BALL * STRIDE + 1] ?? 0 }
+          : null;
+      this.sendShot?.({ shot, place, calledPocket });
+    }
+    d.shoot(shot, calledPocket);
     playStrike(power, d.balls[CUE_BALL * STRIDE] ?? 0);
     aim.power = 0;
     usePool.getState().set({ rolling: true, message: null });
@@ -128,8 +233,15 @@ export class PoolDirector {
     const d = this.driver;
     d.update(dtS);
     if (d.takeRested()) this.sync(d.lastOutcome?.message ?? null);
+    if (this.mode === 'online') this.nextPlayed();
     if (d.phase === 'over') return;
-    if (d.phase === 'aim' && d.seats[d.shooter].bot && this.thinkingFor !== this.turnKey()) {
+    // Online bots are the server's; it sends their shots.
+    if (
+      this.mode !== 'online' &&
+      d.phase === 'aim' &&
+      d.seats[d.shooter].bot &&
+      this.thinkingFor !== this.turnKey()
+    ) {
       this.thinkingFor = this.turnKey();
       this.botTurn();
     }
@@ -161,29 +273,35 @@ export class PoolDirector {
       if (d !== this.driver || d.phase !== 'aim') return;
       if (decision.place) d.placeCue(decision.place.x, decision.place.y);
       usePool.getState().set({ thinking: false });
-      // Like a player: swing the cue onto the line, draw back, pause, strike.
-      const from = Math.atan2(aim.dy, aim.dx);
-      let to = Math.atan2(decision.shot.dy, decision.shot.dx);
-      if (to - from > Math.PI) to -= 2 * Math.PI;
-      if (from - to > Math.PI) to += 2 * Math.PI;
-      const saved = { spinX: aim.spinX, spinY: aim.spinY };
-      aim.spinX = decision.shot.spinX;
-      aim.spinY = decision.shot.spinY;
-      this.stroke = {
-        from,
-        to,
-        t: 0,
-        power: decision.shot.power,
-        strike: () => {
-          aim.power = 0;
-          d.applyBot(decision);
-          playStrike(decision.shot.power, d.balls[CUE_BALL * STRIDE] ?? 0);
-          aim.spinX = saved.spinX;
-          aim.spinY = saved.spinY;
-          usePool.getState().set({ rolling: true, message: null });
-        },
-      };
+      this.playStroke(decision.shot, () => {
+        d.applyBot(decision);
+        playStrike(decision.shot.power, d.balls[CUE_BALL * STRIDE] ?? 0);
+        usePool.getState().set({ rolling: true, message: null });
+      });
     });
+  }
+
+  /** Like a player: swing the cue onto the line, draw back, pause, strike. */
+  private playStroke(shot: Shot, strike: () => void) {
+    const from = Math.atan2(aim.dy, aim.dx);
+    let to = Math.atan2(shot.dy, shot.dx);
+    if (to - from > Math.PI) to -= 2 * Math.PI;
+    if (from - to > Math.PI) to += 2 * Math.PI;
+    const saved = { spinX: aim.spinX, spinY: aim.spinY };
+    aim.spinX = shot.spinX;
+    aim.spinY = shot.spinY;
+    this.stroke = {
+      from,
+      to,
+      t: 0,
+      power: shot.power,
+      strike: () => {
+        aim.power = 0;
+        aim.spinX = saved.spinX;
+        aim.spinY = saved.spinY;
+        strike();
+      },
+    };
   }
 
   /** The bot's visible stroke: swing (ms), draw back, hold, strike. */
@@ -215,10 +333,13 @@ export class PoolDirector {
   /** Mirror rules state into the HUD store after each shot. */
   private sync(message: string | null) {
     this.turn += 1;
+    this.trace(
+      `sync shooter=${this.driver.rack.shooter} phase=${this.driver.phase} winner=${this.driver.rack.winner}`,
+    );
     const d = this.driver;
     const r = d.rack;
-    const human = !d.seats[r.shooter].bot;
-    const mustCall = human && d.phase === 'aim' && onEight(r, d.balls);
+    const mine = this.humanTurn();
+    const mustCall = mine && d.phase === 'aim' && onEight(r, d.balls);
     usePool.getState().set({
       names: [d.seats[0].name, d.seats[1].name],
       bots: [d.seats[0].bot, d.seats[1].bot],
@@ -234,11 +355,14 @@ export class PoolDirector {
       thinking: false,
       potted: Array.from({ length: 15 }, (_, k) => k + 1).filter((n) => !onTable(d.balls, n)),
       status: this.mode === 'exhibition' ? 'off' : r.winner >= 0 ? 'over' : 'playing',
+      mySlot: this.mode === 'online' ? this.mySlot : this.mode === 'match' ? 0 : -1,
+      myTurn: mine && d.phase === 'aim',
     });
     if (r.winner >= 0 && this.mode === 'exhibition') {
       this.after(NEXT_RACK_MS, () => this.newRack(EXHIBITION_SEATS));
     }
-    // A fresh break: the breaker starts behind the head string.
-    if (r.isBreak && onTable(d.balls, CUE_BALL)) d.placeCue(HEAD_STRING_X * 1.5, 0);
+    // A fresh break: the breaker starts behind the head string (online, the server's table rules).
+    if (this.mode !== 'online' && r.isBreak && onTable(d.balls, CUE_BALL))
+      d.placeCue(HEAD_STRING_X * 1.5, 0);
   }
 }

@@ -17,6 +17,7 @@ import { resetPoolCamera } from './match/camera.ts';
 import { PoolDirector } from './match/director.ts';
 import { setDirector } from './match/runtime.ts';
 import { usePool } from './match/store.ts';
+import { applyPendingRack, poolRooms, relayAim } from './net/online.ts';
 import { AimGuide } from './render/AimGuide.tsx';
 import { Balls } from './render/Balls.tsx';
 import { Cue } from './render/Cue.tsx';
@@ -41,17 +42,20 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
       });
     director.startExhibition();
     resetPoolCamera();
+    // A room rack that arrived before this scene mounted (invite links) takes over now.
+    applyPendingRack();
     return () => setDirector(null);
   }, [director]);
 
   // Play starts a match against the practice bot; leaving goes back to the exhibition.
   useEffect(() => {
     setPoolBackdrop(phase === 'attract' || phase === 'leaving');
-    if (phase === 'entering' && director.mode !== 'match') {
+    // In a room the server starts the rack; never start a local practice match meanwhile.
+    if (phase === 'entering' && director.mode === 'exhibition' && !poolRooms.inRoom()) {
       director.startMatch(useProfile.getState().name);
       resetPoolCamera();
       playMusic(POOL_TRACK);
-    } else if (phase === 'leaving' && director.mode === 'match') {
+    } else if (phase === 'leaving' && director.mode !== 'exhibition') {
       director.startExhibition();
       playMusic(LOBBY_TRACK);
     }
@@ -61,7 +65,10 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1);
-    if (director.humanTurn() && director.driver.phase === 'aim') applyHeldKeys(dt);
+    if (director.humanTurn() && director.driver.phase === 'aim') {
+      applyHeldKeys(dt);
+      if (director.mode === 'online') relayAim(performance.now());
+    }
     director.tick(dt);
     const b = director.driver.balls;
     playPoolEvents(director.driver.drain(), (i) => b[i * STRIDE + F.x] ?? 0);

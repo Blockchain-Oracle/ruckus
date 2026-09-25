@@ -76,6 +76,32 @@ export class PoolDriver {
     this.shoot(d.shot, d.calledPocket);
   }
 
+  /**
+   * Online: the server is the referee. A shot replays locally in real time, then the table and
+   * rack snap to the server's result (identical physics; the rules' final say is the server's).
+   */
+  remote = false;
+  private snap: { after: Balls; rack: RackState; message: string } | null = null;
+
+  /** Replay a shot someone else played, from the exact table it started on. */
+  replay(before: Balls, shot: Shot, calledPocket: number) {
+    this.balls.set(before);
+    this.phase = 'aim';
+    this.shoot(shot, calledPocket);
+  }
+
+  setSnap(after: Balls, rack: RackState, message: string) {
+    this.snap = { after, rack, message };
+  }
+
+  /** Load a table mid-rack (joining as a watcher, reconnecting). */
+  load(balls: Balls, rack: RackState) {
+    this.balls.set(balls);
+    this.rack = { ...rack, groups: [...rack.groups] as RackState['groups'] };
+    this.phase = rack.winner >= 0 ? 'over' : 'aim';
+    this.snap = null;
+  }
+
   /** Set when a shot comes to rest (however it got there); the director takes it once. */
   private rested = false;
   takeRested() {
@@ -102,6 +128,25 @@ export class PoolDriver {
       if (e) this.pending.push(e);
     }
     if (this.sim.active) return false;
+    if (this.remote) {
+      // Hold at rest until the server's verdict is here (normally it arrived long before).
+      const snap = this.snap;
+      if (!snap) return false;
+      this.snap = null;
+      this.balls.set(snap.after);
+      this.rack = { ...snap.rack, groups: [...snap.rack.groups] as RackState['groups'] };
+      this.lastOutcome = {
+        foul: null,
+        potted: [],
+        continues: false,
+        assigned: false,
+        winner: this.rack.winner,
+        message: snap.message,
+      };
+      this.phase = this.rack.winner >= 0 ? 'over' : 'aim';
+      this.rested = true;
+      return true;
+    }
     const out = judgeShot(this.rack, this.before, this.balls, events, this.calledPocket);
     applyOutcome(this.rack, this.balls, out);
     this.lastOutcome = out;

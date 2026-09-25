@@ -12,7 +12,8 @@
     "connectivity": "tsx src/connectivity.ts",
     "chickenz-room": "tsx src/chickenz-room.ts",
     "firefox": "tsx src/firefox-probe.ts",
-    "back-bird": "tsx src/back-bird-e2e.ts"
+    "back-bird": "tsx src/back-bird-e2e.ts",
+    "pool-room": "tsx src/pool-room.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

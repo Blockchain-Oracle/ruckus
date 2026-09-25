@@ -64,9 +64,19 @@ function PlayerCard({ seat }: { seat: 0 | 1 }) {
 
 /** Pool's in-match HUD: players, messages, the power cue, spin, and the view and leave buttons. */
 export function PoolHud({ onLeave }: { onLeave: () => void }) {
-  const { status, shooter, bots, message, ballInHand, mustCall, calledPocket, rolling } = usePool();
+  const {
+    status,
+    message,
+    ballInHand,
+    mustCall,
+    calledPocket,
+    rolling,
+    myTurn: mine,
+    mySlot,
+  } = usePool();
   if (status === 'off') return null;
-  const myTurn = status === 'playing' && !bots[shooter] && !rolling;
+  const myTurn = status === 'playing' && mine && !rolling;
+  const watching = mySlot < 0;
   const hint = !myTurn
     ? null
     : mustCall && calledPocket < 0
@@ -103,6 +113,13 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
         <FullscreenButton className="bg-ink/85" />
       </div>
 
+      {watching && (
+        <div className="absolute inset-x-0 bottom-20 flex justify-center">
+          <span className="rounded-full border-2 border-line bg-ink/85 px-3 py-1 font-display text-xs text-cream-dim">
+            WATCHING · YOU PLAY THE NEXT RACK
+          </span>
+        </div>
+      )}
       {(message || hint) && (
         <div className="absolute inset-x-0 top-28 flex justify-center px-4 sm:top-24">
           <div className="rounded-full border-2 border-line bg-ink/85 px-4 py-1.5 text-center text-sm text-cream shadow-lg">
@@ -111,8 +128,8 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
         </div>
       )}
 
-      <PowerCue enabled={myTurn && !(mustCall && calledPocket < 0)} />
-      <SpinBall enabled={myTurn} />
+      {!watching && <PowerCue enabled={myTurn && !(mustCall && calledPocket < 0)} />}
+      {!watching && <SpinBall enabled={myTurn} />}
       <div className="pointer-events-auto absolute bottom-6 left-1/2 -translate-x-1/2">
         <Button
           size="sm"

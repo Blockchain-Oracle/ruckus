@@ -22,8 +22,13 @@ function cachedHeadlessShell(): string | undefined {
   return existsSync(binary) ? binary : undefined;
 }
 
+/**
+ * Playwright's own build, else any cached headless shell, else the installed Google Chrome. The
+ * macOS cache folder gets purged from time to time, and a check shouldn't die on that.
+ */
 export async function launchBrowser(): Promise<Browser> {
   const bundled = chromium.executablePath();
   const executablePath = existsSync(bundled) ? bundled : cachedHeadlessShell();
-  return chromium.launch(executablePath ? { executablePath } : {});
+  if (executablePath) return chromium.launch({ executablePath });
+  return chromium.launch({ channel: 'chrome' });
 }

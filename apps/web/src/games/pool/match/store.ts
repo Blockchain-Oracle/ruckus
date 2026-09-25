@@ -23,6 +23,10 @@ type PoolState = {
   rolling: boolean;
   /** Object balls already down (for the players' ball rows). */
   potted: number[];
+  /** Whose seat is mine (−1 watching / exhibition). */
+  mySlot: number;
+  /** It's my turn and the table is waiting for me. */
+  myTurn: boolean;
   set(patch: Partial<Omit<PoolState, 'set'>>): void;
 };
 
@@ -41,5 +45,7 @@ export const usePool = create<PoolState>()((set) => ({
   thinking: false,
   rolling: false,
   potted: [],
+  mySlot: -1,
+  myTurn: false,
   set: (patch) => set(patch),
 }));
