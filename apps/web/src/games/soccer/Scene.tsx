@@ -29,6 +29,8 @@ import { Particles } from './render/Particles.tsx';
 import { PowerUp } from './render/PowerUp.tsx';
 import { Stadium } from './render/Stadium.tsx';
 import { tutorial, useTutorial } from './tutorial/director.ts';
+import { closeCallTheFinish } from './wager/controller.ts';
+import { useFinishBet } from './wager/store.ts';
 
 const ATTRACT_SEED = 0xe99;
 const MAX_SEATS = 4;
@@ -60,12 +62,19 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
   useEffect(() => {
     if (phase === 'attract') setCrowdBed('backdrop');
     // In a room the server starts the match; never start local practice meanwhile.
-    if (phase === 'entering' && useSoccer.getState().status === 'off' && !soccerRooms.inRoom()) {
+    const betting = useFinishBet.getState().phase !== 'off';
+    if (
+      phase === 'entering' &&
+      useSoccer.getState().status === 'off' &&
+      !soccerRooms.inRoom() &&
+      !betting
+    ) {
       fx.clear();
       if (consumeLessonsNext()) startLessons();
       else if (controlsSeen()) startMatch();
       else useSoccer.getState().set({ status: 'intro' });
     } else if (phase === 'leaving') {
+      if (betting) closeCallTheFinish();
       stopMatch();
       fx.clear();
       setCrowdBed('backdrop');
@@ -84,7 +93,10 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
     presenter.update(
       driver.world,
       dt,
-      driver.mode.kind === 'match' || driver.mode.kind === 'online',
+      driver.mode.kind === 'match' ||
+        driver.mode.kind === 'online' ||
+        // A wager's lineup waits silently behind the call sheet; call-outs start with its match.
+        (driver.mode.kind === 'wager' && useFinishBet.getState().phase === 'match'),
     );
     keepCrowdBed();
     const g = stage.current;

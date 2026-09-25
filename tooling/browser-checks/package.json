@@ -16,7 +16,8 @@
     "pool-room": "tsx src/pool-room.ts",
     "pool-wager": "tsx src/pool-wager-e2e.ts",
     "soccer-room": "tsx src/soccer-room.ts",
-    "soccer-tutorial": "tsx src/soccer-tutorial.ts"
+    "soccer-tutorial": "tsx src/soccer-tutorial.ts",
+    "soccer-finish": "tsx src/soccer-finish-e2e.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
@@ -26,6 +27,7 @@
     "typescript": "catalog:",
     "@colyseus/sdk": "^0.18.4",
     "@arena/shared": "workspace:*",
-    "@arena/protocol": "workspace:*"
+    "@arena/protocol": "workspace:*",
+    "@arena/casino-math": "workspace:*"
   }
 }

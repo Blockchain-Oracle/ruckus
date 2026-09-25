@@ -1,5 +1,7 @@
 import {
   DT,
+  FinishTracker,
+  goldenWorld,
   type Input,
   newWorld,
   type SimEvent,
@@ -15,6 +17,8 @@ export type SoccerMode =
   | { kind: 'match'; perTeam: 1 | 2; bot: number; humanSlot: number }
   /** Lessons: you and a parked second egg, staged by the tutorial director. */
   | { kind: 'tutorial'; humanSlot: number }
+  /** Call the Finish: a bank seed's golden-goal bot match, watched (no human egg). */
+  | { kind: 'wager'; seed: number }
   /** A room match: `humanSlot` is −1 for watchers. */
   | { kind: 'online'; perTeam: 1 | 2; humanSlot: number };
 
@@ -51,6 +55,11 @@ export class SoccerDriver {
   private queue: SimEvent[] = [];
   private seq = 0;
   private pending: { seq: number; input: Input }[] = [];
+  /** Holds the world still (a wager's lineup before the call, its final frame after). */
+  paused = false;
+  /** Names a golden-goal finish as it happens (wager mode only). */
+  private finish: FinishTracker | null = null;
+  onFinish: ((finish: number) => void) | null = null;
   readInput: () => Input = () => IDLE;
   sendInput: ((seq: number, input: Input) => void) | null = null;
 
@@ -92,6 +101,36 @@ export class SoccerDriver {
     this.reset();
   }
 
+  /** A bank seed's golden goal; `paused` shows its lineup until the round is settled. */
+  startGolden(seed: number, paused: boolean) {
+    this.mode = { kind: 'wager', seed };
+    this.world = goldenWorld(seed);
+    this.reset();
+    this.paused = paused;
+    this.finish = new FinishTracker();
+  }
+
+  /** Tap to skip: run the golden goal straight to its finish. */
+  skipToFinish() {
+    if (this.mode.kind !== 'wager' || !this.finish) return;
+    const w = this.world;
+    for (let i = 0; i < 2_000 && this.finish.result === null; i++) {
+      tick(w);
+      for (const e of w.events) this.queue.push(e);
+      this.finish.observe(w);
+    }
+    this.snapshot();
+    this.announceFinish();
+  }
+
+  private announceFinish() {
+    const r = this.finish?.result;
+    if (r === null || r === undefined || !this.onFinish) return;
+    const done = this.onFinish;
+    this.onFinish = null;
+    done(r);
+  }
+
   /** Pieces were moved by hand (a lesson's staging): draw them there, no tween. */
   resync() {
     this.snapshot();
@@ -112,12 +151,14 @@ export class SoccerDriver {
     this.queue.length = 0;
     this.pending = [];
     this.seq = 0;
+    this.paused = false;
+    this.finish = null;
     this.smooth = Array.from({ length: this.world.players.length + 1 }, () => ({ x: 0, y: 0 }));
     this.snapshot();
   }
 
   get humanSlot() {
-    return this.mode.kind === 'exhibition' ? -1 : this.mode.humanSlot;
+    return 'humanSlot' in this.mode ? this.mode.humanSlot : -1;
   }
 
   private snapshot() {
@@ -134,6 +175,7 @@ export class SoccerDriver {
       s.x *= k;
       s.y *= k;
     }
+    if (this.paused) return;
     if (w.phase === 'over') {
       if (this.mode.kind === 'exhibition') {
         if (this.restartIn < 0) this.restartIn = EXHIBITION_RESTART_S;
@@ -165,6 +207,7 @@ export class SoccerDriver {
         }
       }
       tick(w);
+      if (this.finish && this.finish.observe(w) !== null) this.announceFinish();
       for (const e of w.events) {
         this.queue.push(e);
         // Slow motion would put an online client behind the server's clock: offline only.

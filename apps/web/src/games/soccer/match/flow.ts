@@ -130,8 +130,11 @@ class Presenter {
       if (live) say('GOAL!', { sub: `${w.score[0]} – ${w.score[1]}`, team });
     } else if (w.phase === 'over' && this.lastPhase !== 'over') {
       if (live) {
-        store.set({ status: 'over' });
-        say('FULL TIME', { sub: `${w.score[0]} – ${w.score[1]}` });
+        // A wager's golden goal has its own result card; only matches switch to results.
+        if (store.status === 'playing') store.set({ status: 'over' });
+        say(w.score[0] + w.score[1] === 0 ? 'NO GOAL' : 'FULL TIME', {
+          sub: `${w.score[0]} – ${w.score[1]}`,
+        });
         this.overHold = FULLTIME_HOLD_S;
       }
     }

@@ -11,9 +11,13 @@ import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 import { KITS } from '../config.ts';
 import { useSoccer } from '../match/store.ts';
 import { soccerRooms, watchRoomPhase } from '../net/online.ts';
+import { closeCallTheFinish, useFinishController } from '../wager/controller.ts';
+import { FinishHud } from '../wager/FinishHud.tsx';
+import { useFinishBet } from '../wager/store.ts';
 import { SoccerHud } from './SoccerHud.tsx';
 
 const leave = () => {
+  if (useFinishBet.getState().phase !== 'off') closeCallTheFinish();
   // Leaving the pitch online leaves the room too (a labelled bot takes the egg).
   if (soccerRooms.inRoom()) void soccerRooms.leaveRoom();
   useGameMachine.getState().send('leaving');
@@ -35,7 +39,9 @@ const seatBadge = (seat: SeatView) => {
 
 /** Soccer's DOM layer: the match HUD owns the screen while a match (or its intro) is up. */
 export function SoccerOverlay() {
-  const busy = useSoccer((s) => s.status !== 'off');
+  const betting = useFinishBet((s) => s.phase !== 'off');
+  const busy = useSoccer((s) => s.status !== 'off') || betting;
+  useFinishController();
   const setGameOwnsHud = useShell((s) => s.setGameOwnsHud);
   const setImmersive = useShell((s) => s.setImmersive);
   useEffect(() => watchRoomPhase(), []);
@@ -58,6 +64,7 @@ export function SoccerOverlay() {
   return (
     <>
       <SoccerHud onLeave={leave} />
+      <FinishHud onLeave={leave} />
       <RoomSheet
         kit={soccerRooms}
         gameId="soccer"
