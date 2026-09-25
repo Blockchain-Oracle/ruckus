@@ -77,6 +77,10 @@
     {
       "path": "./tooling/biome/no-nondeterminism.grit",
       "includes": ["**/packages/sim-*/src/**"]
+    },
+    {
+      "path": "./tooling/biome/exact-math.grit",
+      "includes": ["**/packages/sim-pool/src/**"]
     }
   ],
   "overrides": [

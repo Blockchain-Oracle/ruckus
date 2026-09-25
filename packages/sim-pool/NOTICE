@@ -1,0 +1,18 @@
+@arena/sim-pool
+Copyright 2026 RUCKUS
+
+This package contains TypeScript ports of physics models from pooltool
+(https://github.com/ekiefl/pooltool), Copyright Evan Kiefl and contributors,
+licensed under the Apache License, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0):
+
+- pooltool/physics/resolve/ball_cushion/han_2005 (Han 2005 cushion impact)
+- pooltool/physics/resolve/ball_ball/frictional_inelastic and friction.py
+  (Alciatore ball-ball friction)
+- pooltool/physics/resolve/stick_ball/instantaneous_point and squirt.py
+  (cue strike, TP A-30 / A-31)
+
+The ports are modified: rewritten without trigonometric functions (frame rotations
+by dot products with the unit normal), fixed-step, and adapted to a Float64Array
+state layout. The underlying models are from the cited papers (Han 2005; Alciatore
+technical proofs A-5, A-6, A-14, A-30, A-31).

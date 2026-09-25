@@ -9,7 +9,7 @@ Every third-party asset or code source used in the product gets a row. Mirror at
 | Pop Button (adapted into `Button`) | https://21st.dev (tom_ui/pop-button) | 21st.dev community component (MIT-style) | `apps/web/src/ui/Button.tsx` | Restyled to the Art Bible lip language |
 | shadcn/ui primitives (dialog, sheet, tabs, slider, switch, sonner) | https://ui.shadcn.com | MIT | `apps/web/src/ui/primitives` | Themed via token aliases |
 | Chain casino SDK (vendored) | https://sdk.chain.wtf/casino | Provided by Chain.wtf for jam entrants | `packages/chain-casino-sdk` | Verbatim copy, synced by `pnpm sync:sdk` |
-| pooltool (physics reference port) | https://github.com/ekiefl/pooltool | Apache-2.0 | `packages/sim-pool` (Stage D) | Attribution + NOTICE required |
+| pooltool (physics reference port) | https://github.com/ekiefl/pooltool (commit bce1788) | Apache-2.0 | `packages/sim-pool` | Ported models: Han 2005 cushion (`collide.ts resolveCushion`), frictional-inelastic ball–ball with Alciatore friction (`resolveBallBall`), instantaneous-point cue strike and TP A-31 squirt (`cue.ts`). Rewritten trig-free in TypeScript; notice in `packages/sim-pool/NOTICE` |
 
 ## Art
 | Asset | Source | Licence | Price | Date | Used in |

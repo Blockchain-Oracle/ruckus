@@ -1,0 +1,11 @@
+// The pool engine must be bit-identical in every JS engine (lockstep rooms, bots, the wager
+// presentation). ECMAScript only approximates transcendental functions, so a step may use
+// + − × ÷ and Math.sqrt alone (ADR-003 B). Constants are precomputed; exp is a fixed polynomial.
+or {
+  `Math.sin($...)`, `Math.cos($...)`, `Math.tan($...)`, `Math.asin($...)`, `Math.acos($...)`,
+  `Math.atan($...)`, `Math.atan2($...)`, `Math.exp($...)`, `Math.expm1($...)`, `Math.log($...)`,
+  `Math.log2($...)`, `Math.log10($...)`, `Math.pow($...)`, `Math.hypot($...)`, `Math.cbrt($...)`,
+  `Math.sinh($...)`, `Math.cosh($...)`, `Math.tanh($...)`
+} as $call where {
+  register_diagnostic(span=$call, message="Approximated Math function in the pool engine. Use + − × ÷ sqrt (ADR-003 B).")
+}
