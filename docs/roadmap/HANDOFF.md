@@ -23,7 +23,7 @@
   - Firefox is OK.
 - `docs/CREDITS.md` now lists every ElevenLabs asset. The parity ledger was audited: 110 have, 20 partial, 14 missing (non-blocked).
 
-**Pool is feature-complete** (hidden behind `?preview` until the server deploys):
+**Pool is live in the hub** (the server with PoolRoom is deployed and verified on production):
 - **S12, the engine:** exact arithmetic, rules, and a searching bot.
 - **S13, the table:** a cinematic table; controls for keys, touch, spin and calling the 8; audio and music; a phone layout.
 - **S14, rooms:** `PoolRoom` is server-authoritative lockstep.
@@ -45,7 +45,10 @@
    - ElevenLabs SFX: kick, header, bounce, post, whistle, crowd bed and roar. Plus music.
    - Then S19 (a SoccerRoom with prediction), S21 (the tutorial), S20 (the wager, with a novelty check).
 2. Runner S22–S26, play-first.
-3. **Deploy the server once the Coolify tunnel (localhost:8001) is back:** `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow`. Then unhide Pool (`registry.ts` `hidden: false`), because production PoolRoom needs the deployed server.
+3. **Pool control feedback from the user (fixed 2026-09-25):**
+   - Aim moves only on click or drag on the table; hover never moves it.
+   - A How to play card, SET POWER / PULL & LET GO labels, and clearer lessons.
+   - Keep this rule for every game: controls must never fight the pointer, and every control is written down on screen.
 4. The four-game hub landing (ADR-007 follow-up).
 5. The Chickenz feel gaps (ledger audit list).
 6. ✱E is deferred until all four games are done.
