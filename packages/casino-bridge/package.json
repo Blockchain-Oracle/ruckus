@@ -1,0 +1,25 @@
+{
+  "name": "@arena/casino-bridge",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Guest-side casino bridge: one host connection, DemoHost fallback, RuckusGame codecs, reveal guard.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@arena/casino-math": "workspace:*",
+    "@chain/casino-sdk": "workspace:*",
+    "viem": "^2.56.9"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

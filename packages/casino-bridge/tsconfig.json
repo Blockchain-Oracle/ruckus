@@ -1,0 +1,5 @@
+{
+  "extends": "@arena/tsconfig/vite-react.json",
+  "compilerOptions": { "types": [] },
+  "include": ["src", "test"]
+}
