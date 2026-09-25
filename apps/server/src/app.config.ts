@@ -7,6 +7,7 @@ import { env } from '#app/config/env.ts';
 import { ChickenzRoom } from '#app/rooms/chickenz/ChickenzRoom.ts';
 import { HelloRoom } from '#app/rooms/hello/HelloRoom.ts';
 import { PoolRoom } from '#app/rooms/pool/PoolRoom.ts';
+import { SoccerRoom } from '#app/rooms/soccer/SoccerRoom.ts';
 
 const BOOTED_AT = Date.now();
 
@@ -15,6 +16,7 @@ export const server = defineServer({
     [ROOM.hello]: defineRoom(HelloRoom),
     [ROOM.chickenz]: defineRoom(ChickenzRoom),
     [ROOM.pool]: defineRoom(PoolRoom),
+    [ROOM.soccer]: defineRoom(SoccerRoom),
   },
   routes: createRouter({
     /** Coolify health check (curl inside the container) and uptime monitor. */

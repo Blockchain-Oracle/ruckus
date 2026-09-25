@@ -17,6 +17,7 @@
     "@arena/shared": "workspace:*",
     "@arena/sim-chickenz": "workspace:*",
     "@arena/sim-pool": "workspace:*",
+    "@arena/sim-soccer": "workspace:*",
     "@colyseus/auth": "0.18.3",
     "@colyseus/core": "0.18.16",
     "@colyseus/schema": "^5.0.34",

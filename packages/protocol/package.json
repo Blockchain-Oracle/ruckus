@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./hello": "./src/hello.ts",
     "./chickenz": "./src/chickenz.ts",
-    "./pool": "./src/pool.ts"
+    "./pool": "./src/pool.ts",
+    "./soccer": "./src/soccer.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p ."
