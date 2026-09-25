@@ -26,6 +26,7 @@ Every third-party asset or code source used in the product gets a row. Mirror at
 | Back a Bird wager stings: lock, drumroll, win, big win, lose, coins | ElevenLabs Sound Effects, prompts in `assets-src/chickenz/wager/PROMPTS.md` | ElevenLabs paid plan output, owned by us (ToS §4c) | Starter plan credits | 2026-09-25 | `apps/web/src/games/chickenz/assets/audio/wager.*` |
 | Chickenz battle tracks A and B | ElevenLabs Music (`music_v2`), raw takes in `assets-src/chickenz/music/` | ElevenLabs paid plan output, cleared for commercial use | Starter plan credits | 2026-09-25 | `apps/web/src/games/chickenz/assets/music/` |
 | Pool SFX: cue soft/hard (break), 3 ball clacks, 2 cushion thuds, pocket drop, gully roll, chalk | ElevenLabs Sound Effects, prompts in `assets-src/pool/sfx/PROMPTS.md` | ElevenLabs paid plan output, owned by us (ToS §4c) | Starter plan credits | 2026-09-25 | `apps/web/src/games/pool/assets/audio/sfx.*` |
+| Pool hall theme (jazz) | ElevenLabs Music (`music_v2`), prompt in `assets-src/pool/music/PROMPT.md` | ElevenLabs paid plan output, cleared for commercial use | Starter plan credits | 2026-09-25 | `apps/web/src/games/pool/assets/music/hall.*` |
 | Hub lobby theme | ElevenLabs Music (`music_v2`), raw take in `assets-src/hub/music/` | ElevenLabs paid plan output, cleared for commercial use | Starter plan credits | 2026-09-25 | `apps/web/src/assets/music/lobby.*` |
 
 ## Fonts

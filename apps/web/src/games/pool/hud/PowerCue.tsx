@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { aim } from '../match/aim.ts';
 import { getDirector } from '../match/runtime.ts';
 
-/** Travel of the drag that maps to full power (px). */
-const TRACK_PX = 220;
+/** Share of the bar's height the drag must travel for full power. */
+const TRACK_SHARE = 0.8;
 /** Below this the release is a cancel, not a shot. */
 const MIN_SHOT = 0.04;
 
@@ -15,6 +15,7 @@ const MIN_SHOT = 0.04;
 export function PowerCue({ enabled }: { enabled: boolean }) {
   const [power, setPower] = useState(0);
   const start = useRef<number | null>(null);
+  const track = useRef(220);
 
   useEffect(() => {
     if (!enabled) {
@@ -34,7 +35,7 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
 
   return (
     <div
-      className="pointer-events-auto absolute top-1/2 right-4 flex h-[280px] w-16 -translate-y-1/2 touch-none select-none flex-col items-center rounded-full border-2 border-line bg-ink/80 py-3 sm:right-8"
+      className="pointer-events-auto absolute top-1/2 right-4 flex h-[min(280px,56vh)] w-14 sm:w-16 -translate-y-1/2 touch-none select-none flex-col items-center rounded-full border-2 border-line bg-ink/80 py-3 sm:right-8"
       aria-label="Power: pull down and release to shoot"
       role="slider"
       aria-valuemin={0}
@@ -44,11 +45,12 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
       onPointerDown={(e) => {
         if (!enabled) return;
         start.current = e.clientY;
+        track.current = e.currentTarget.getBoundingClientRect().height * TRACK_SHARE;
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
       onPointerMove={(e) => {
         if (start.current === null) return;
-        const p = Math.max(0, Math.min(1, (e.clientY - start.current) / TRACK_PX));
+        const p = Math.max(0, Math.min(1, (e.clientY - start.current) / track.current));
         aim.power = p;
         setPower(p);
       }}
@@ -72,7 +74,7 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
       {/* The grip: a stylised cue butt that slides down with the pull. */}
       <div
         className="absolute left-1/2 h-14 w-7 -translate-x-1/2 rounded-md border-2 border-[#c9b37a] bg-gradient-to-b from-[#3b1d12] to-[#141414] shadow-lg"
-        style={{ top: `${12 + power * (280 - 88)}px` }}
+        style={{ top: `calc(12px + ${power} * (100% - 88px))` }}
       />
       <span className="absolute -bottom-7 font-display text-xs text-cream-dim">
         {enabled ? 'PULL' : ''}

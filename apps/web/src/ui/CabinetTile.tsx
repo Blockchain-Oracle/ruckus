@@ -28,7 +28,9 @@ export function CabinetTile({ title, tagline, players, active, onSelect, onInten
       )}
     >
       <span className="font-display text-xl text-cream">{title}</span>
-      <span className="text-sm leading-snug text-cream-dim">{tagline}</span>
+      <span className="text-sm leading-snug text-cream-dim [@media(max-height:480px)]:hidden">
+        {tagline}
+      </span>
       <span className="font-pixel label-caps mt-1 inline-flex items-center gap-1.5 text-xs text-teal">
         <UsersThreeIcon weight="bold" className="size-3.5" />
         {players}

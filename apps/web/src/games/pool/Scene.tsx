@@ -5,7 +5,9 @@ import { BALL_RADIUS_M, CUE_BALL, canPlaceCue, F, HALF_L, HALF_W, STRIDE } from 
 
 import { useProfile } from '@/app/stores/profile.ts';
 import type { GameSceneProps } from '@/engine/types.ts';
+import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
+import { POOL_TRACK } from './audio/music.ts';
 import { playPoolEvents, setPoolBackdrop } from './audio/sfx.ts';
 import { SURFACE_Y, simY } from './config.ts';
 import { applyHeldKeys, attachPoolKeys } from './input/keys.ts';
@@ -48,8 +50,10 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
     if (phase === 'entering' && director.mode !== 'match') {
       director.startMatch(useProfile.getState().name);
       resetPoolCamera();
+      playMusic(POOL_TRACK);
     } else if (phase === 'leaving' && director.mode === 'match') {
       director.startExhibition();
+      playMusic(LOBBY_TRACK);
     }
   }, [phase, director]);
 

@@ -19,6 +19,7 @@ import { usePool } from './store.ts';
 const BOT_THINK_MIN_MS = 700;
 const EXHIBITION_BOT_THINK_MS = 350;
 const NEXT_RACK_MS = 3_500;
+const STROKE = { swingMs: 650, drawMs: 450, holdMs: 180 } as const;
 export const PRACTICE_BOT = { name: 'Bot · Shark', difficulty: 70 } as const;
 const EXHIBITION_SEATS: [Seat, Seat] = [
   { name: 'Bot · Minnesota', bot: true, difficulty: 80 },
@@ -81,6 +82,7 @@ export class PoolDirector {
 
   private newRack(seats: [Seat, Seat]) {
     this.racks += 1;
+    this.stroke = null;
     const seed = Math.imul(this.seedBase ^ this.racks, 2654435761) >>> 0;
     this.driver = new PoolDriver(seed, seats, 0);
     this.thinkingFor = -1;
@@ -122,6 +124,7 @@ export class PoolDirector {
     this.timers = this.timers.filter((t) => t.at > this.clock);
     for (const t of due) t.run();
 
+    this.advanceStroke(dtS);
     const d = this.driver;
     d.update(dtS);
     if (d.takeRested()) this.sync(d.lastOutcome?.message ?? null);
@@ -156,13 +159,57 @@ export class PoolDirector {
     );
     this.after(wait, () => {
       if (d !== this.driver || d.phase !== 'aim') return;
-      // Show the bot's aim briefly (the cue swings round) before it strikes.
-      aim.dx = decision.shot.dx;
-      aim.dy = decision.shot.dy;
-      d.applyBot(decision);
-      playStrike(decision.shot.power, d.balls[CUE_BALL * STRIDE] ?? 0);
-      usePool.getState().set({ thinking: false, rolling: true, message: null });
+      if (decision.place) d.placeCue(decision.place.x, decision.place.y);
+      usePool.getState().set({ thinking: false });
+      // Like a player: swing the cue onto the line, draw back, pause, strike.
+      const from = Math.atan2(aim.dy, aim.dx);
+      let to = Math.atan2(decision.shot.dy, decision.shot.dx);
+      if (to - from > Math.PI) to -= 2 * Math.PI;
+      if (from - to > Math.PI) to += 2 * Math.PI;
+      const saved = { spinX: aim.spinX, spinY: aim.spinY };
+      aim.spinX = decision.shot.spinX;
+      aim.spinY = decision.shot.spinY;
+      this.stroke = {
+        from,
+        to,
+        t: 0,
+        power: decision.shot.power,
+        strike: () => {
+          aim.power = 0;
+          d.applyBot(decision);
+          playStrike(decision.shot.power, d.balls[CUE_BALL * STRIDE] ?? 0);
+          aim.spinX = saved.spinX;
+          aim.spinY = saved.spinY;
+          usePool.getState().set({ rolling: true, message: null });
+        },
+      };
     });
+  }
+
+  /** The bot's visible stroke: swing (ms), draw back, hold, strike. */
+  private stroke: {
+    from: number;
+    to: number;
+    t: number;
+    power: number;
+    strike: () => void;
+  } | null = null;
+  private advanceStroke(dtS: number) {
+    const s = this.stroke;
+    if (!s) return;
+    const fast = this.mode === 'exhibition' ? 0.6 : 1;
+    s.t += (dtS * 1000) / fast;
+    const swing = Math.min(1, s.t / STROKE.swingMs);
+    const ease = swing * swing * (3 - 2 * swing);
+    const a = s.from + (s.to - s.from) * ease;
+    aim.dx = Math.cos(a);
+    aim.dy = Math.sin(a);
+    const drawT = (s.t - STROKE.swingMs) / STROKE.drawMs;
+    aim.power = drawT <= 0 ? 0 : Math.min(1, drawT) * s.power;
+    if (s.t >= STROKE.swingMs + STROKE.drawMs + STROKE.holdMs) {
+      this.stroke = null;
+      s.strike();
+    }
   }
 
   /** Mirror rules state into the HUD store after each shot. */

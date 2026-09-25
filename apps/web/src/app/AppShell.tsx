@@ -115,14 +115,14 @@ function HubMenu() {
       exit={{ opacity: 0, y: 16, transition: EXIT }}
     >
       <section className="max-w-xl">
-        <h1 className="font-display text-4xl leading-tight sm:text-5xl">
+        <h1 className="font-display text-4xl leading-tight sm:text-5xl [@media(max-height:480px)]:text-3xl">
           {game ? game.title : t('hub.welcome.title')}
         </h1>
-        <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)]">
+        <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)] [@media(max-height:480px)]:hidden">
           {game ? t(game.taglineKey) : t('hub.welcome.body')}
         </p>
         {game && (
-          <div className="pointer-events-auto mt-5 flex flex-col gap-3 max-sm:*:h-14 max-sm:*:w-full max-sm:*:text-xl sm:flex-row sm:flex-wrap sm:gap-4">
+          <div className="pointer-events-auto mt-5 flex flex-col gap-3 max-sm:*:h-14 max-sm:*:w-full max-sm:*:text-xl sm:flex-row sm:flex-wrap sm:gap-4 [@media(max-height:480px)]:mt-3 [@media(max-height:480px)]:*:h-12 [@media(max-height:480px)]:*:text-lg">
             <Button variant="tomato" size="lg" sound="ui.confirm" onClick={() => send('entering')}>
               {t('hub.play')}
             </Button>
