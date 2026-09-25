@@ -1,0 +1,19 @@
+[package]
+name = "chickenz-sim"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Deterministic fixed-point Chickenz sim (N<=4 FFA) with bots, extracted from Chickenz (MIT)."
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+wasm = ["dep:wasm-bindgen"]
+
+[dependencies]
+wasm-bindgen = { version = "0.2", optional = true }
+
+[lints]
+workspace = true
