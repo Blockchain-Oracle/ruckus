@@ -8,3 +8,4 @@
 | 2026-09-25 | 1 | S02 | Colyseus server on Coolify (Nixpacks, HTTPS sslip.io, deploy key), Convex dev+prod with anonymous guest auth, web on Vercel (git-connected, turbo-ignore); prod connectivity check PASS | see `git log` |
 | 2026-09-25 | 2 | S03 | Persistent WebGPU shell (attract orbit, play dolly, scrim), hub overlay + brand UI kit, @arena/audio, @arena/fx, audio-sprite pipeline + ElevenLabs UI sounds, CI size budgets | see `git log` |
 | 2026-09-25 | 2 | S06 | Rust chickenz-sim (4P FFA, symmetric tie-breaks, deterministic bots, snapshots, FNV hash), wasm pkg + TS wrapper + golden tests; real Pixel Adventure Chickenz arena with a live 4-bot attract match | see `git log` |
+| 2026-09-25 | 2 | S10a + course correction | Back a Bird seed bank v1 + wager flow; then (user correction) Chickenz made PLAYABLE: controls, touch, round flow, HUD, camera, ragdoll/effects, ElevenLabs SFX+music, tutorial, onboarding; parity ledger | see `git log` |

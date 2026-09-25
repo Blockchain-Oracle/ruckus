@@ -1,12 +1,33 @@
 # HANDOFF (updated 2026-09-25 by session 2)
 
-**Stage:** S03 is done. Now on **S06 Chickenz sim**, step 1 (expand the stub into tasks). [stages/S06-chickenz-sim.md](stages/S06-chickenz-sim.md)
+**Stage:** S06 is done. S10a is done apart from the simulator e2e. **Course correction (user, 2026-09-25): every game must be PLAYABLE first** (vs bots, with friends, plus a watch mode) at full reference fidelity, before any casino add-on. Chickenz is now playable vs bots. Next: rooms with friends (S05/S08). See `docs/assets/chickenz-parity.md` §5 for the order.
 
 **About ✱E:** the early submission waits until a *finished* slice exists: the hub, Chickenz, and the Back Your Chicken wager. A site of debug panels would be rejected as half-finished. After S03, S06 and S10a, check whether a finished slice exists, and submit it if it does.
 
-**Last completed:** S03, the engine shell: a persistent WebGPU canvas with attract orbit, play dolly and scrim; the hub overlay and brand UI kit; `@arena/audio`, `@arena/fx`, the audio-sprite pipeline with ElevenLabs UI sounds; CI size budgets. Details are in the S03 notes. S02 infrastructure is unchanged (web https://ruckus-nine.vercel.app, server wss://ruckus-play.84.46.247.92.sslip.io, Convex prod `qualified-armadillo-823`).
+**Last completed (session 2):**
+- **S03 engine shell:** a persistent WebGPU canvas behind the hub.
+- **S06 Rust Chickenz sim:** 4-player FFA with deterministic bots, compiled to wasm.
+- **S10a seed bank and the Back a Bird wager flow.**
+- **Chickenz, playable:**
+  - You vs 3 labelled bots, with Chickenz controls and touch sticks.
+  - Wipe, countdown and first-to-3 rounds; HUD, results and rematch.
+  - A follow camera and kill-cam.
+  - Ragdoll deaths, dust, explosions and pickup effects.
+  - 22 ElevenLabs gameplay SFX plus 2 battle tracks and a lobby loop.
+  - The 8-step tutorial, first-run prompt and guest username.
+- `docs/assets/chickenz-parity.md` holds the reference parity ledger. Keep its status columns current.
 
-**NEXT ACTION:** S06. Read ADR-005, `docs/research/deep/chickenz.md` §1, §2, §5 and §6, and `references/chickenz/services/prover/core/src/fp.rs`. Expand the S06 stub into tasks, then create `crates/chickenz-sim` (N≤4 FFA) and install wasm-pack.
+**NEXT ACTION:** Chickenz online rooms (parity §5 item 8, stages S05 and S08).
+- A Colyseus `ChickenzRoom` in `apps/server`, running the wasm sim server-side at 60 Hz.
+- Create or join by 5-letter code and `?room=` links, with ready-up.
+- Labelled bot fill for empty seats.
+- Client prediction and smoothing.
+
+After that:
+- The Chickenz settings items: rebinding, the dynamic-camera toggle, a hero choice.
+- The simulator e2e for Back a Bird.
+- Deploy the server.
+- Then Pool, Soccer and Runner with the same play-first fidelity.
 
 **Uncommitted work:** none.
 
@@ -26,6 +47,10 @@
 - `prod-frame` also boots the real hub framed. Browser checks pass: `casino` (simulator), `prod-frame`, and `connectivity` against both local and **production**.
 
 **Gotchas learned (the rest are in the stage notes):**
+- React StrictMode double-mounts effects, so free wasm objects in cleanup and recreate them (`driver.start`/`stop`).
+- HMR resets zustand stores mid-game, so reload the page before judging state bugs.
+- Dev QA handles are `window.__ruckusMachine`, `__ruckusWager`, `__ruckusMatch` and `__ruckusTutorial` (DEV builds only).
+- Don't use `alphaTest` 0.5 on sprites that fade: it discards at half opacity. Use 0.1.
 - The shadcn CLI adds `cn`, lucide and next-themes and imports `cn` from the wrong place. Fix its imports to `@/lib/utils.ts` and use Phosphor.
 - ElevenLabs sometimes returns a near-silent take. The audio-sprite builder fails on it, so regenerate that take.
 - Pin pnpm 10.x, and Node 24.21.0 (24.12.4 doesn't exist).
