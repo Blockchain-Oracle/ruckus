@@ -63,6 +63,11 @@ try {
   })()`)) as Record<string, string>;
   for (const [capability, result] of Object.entries(report))
     console.info(`  ${capability.padEnd(15)} ${result}`);
+  // The real hub (not the debug panel) must boot in the same sandbox: demo balance + a live canvas.
+  await frame.goto(`${WEB_URL}/?preview`);
+  await frame.getByText('DEMO', { exact: true }).waitFor({ timeout: DEMO_FALLBACK_BUDGET_MS });
+  await frame.locator('canvas').waitFor({ state: 'attached', timeout: DEMO_FALLBACK_BUDGET_MS });
+  console.info('✓ hub boots framed: demo balance shown, canvas attached');
   console.info('prod-frame probe: done');
 } catch (error) {
   console.error('prod-frame probe: FAIL', error);
