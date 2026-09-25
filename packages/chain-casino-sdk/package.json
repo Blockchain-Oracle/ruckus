@@ -1,0 +1,41 @@
+{
+  "name": "@chain/casino-sdk",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Vendored copy of the Chain casino SDK bridge (casino-sdk/src). Do not edit \u2014 run `pnpm -F @chain/casino-sdk sync` (ADR-003).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./guest": {
+      "types": "./dist/guest.d.ts",
+      "default": "./dist/guest.js"
+    },
+    "./host": {
+      "types": "./dist/host.d.ts",
+      "default": "./dist/host.js"
+    }
+  },
+  "scripts": {
+    "sync": "node scripts/sync-sdk.mjs",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "penpal": "^7.0.4",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.13.6",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "files": [
+    "dist"
+  ]
+}

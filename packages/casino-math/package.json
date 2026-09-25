@@ -1,0 +1,26 @@
+{
+  "name": "@arena/casino-math",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TS mirror of RuckusGame's class tables, draw and payout (ADR-001/004). Kept equal to Solidity by parity vectors.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "vectors": "tsx scripts/gen-vectors.ts"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.10.0",
+    "tsx": "^4.21.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

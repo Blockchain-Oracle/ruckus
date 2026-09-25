@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "includes": [
       "**",
@@ -10,7 +14,9 @@
       "!**/_generated",
       "!**/dist",
       "!assets-src",
-      "!docs/raw"
+      "!docs/raw",
+      "!packages/chain-casino-sdk/src",
+      "!packages/chain-casino-sdk/dist"
     ]
   },
   "formatter": {
@@ -20,19 +26,28 @@
     "lineWidth": 100
   },
   "javascript": {
-    "formatter": { "quoteStyle": "single", "semicolons": "always", "trailingCommas": "all" }
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "useImportType": "error",
         "useExportType": "error",
         "noNonNullAssertion": "warn"
       },
       "suspicious": {
-        "noConsole": { "level": "warn", "options": { "allow": ["warn", "error", "info"] } }
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["warn", "error", "info"]
+          }
+        }
       }
     }
   },
@@ -66,7 +81,11 @@
   ],
   "overrides": [
     {
-      "includes": ["packages/sim-*/**", "packages/shared/**", "packages/casino-math/**"],
+      "includes": [
+        "packages/sim-*/src/**",
+        "packages/shared/src/**",
+        "packages/casino-math/src/**"
+      ],
       "linter": {
         "rules": {
           "style": {

@@ -1,0 +1,10 @@
+{
+  "extends": "@arena/tsconfig/vite-react.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // Vendored upstream code is kept byte-identical (ADR-003); it predates these two strict flags.
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": ["src", "test"]
+}
