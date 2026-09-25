@@ -1,0 +1,27 @@
+{
+  "name": "ruckus",
+  "private": true,
+  "description": "RUCKUS — multiplayer party arena with VRF casino wagers (Chain Jam Vol. 1)",
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14",
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
+    "lefthook": "2.1.14",
+    "turbo": "2.11.4",
+    "typescript": "catalog:"
+  }
+}

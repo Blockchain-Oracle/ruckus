@@ -1,0 +1,101 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "**",
+      "!casino-sdk",
+      "!references",
+      "!**/pkg",
+      "!**/_generated",
+      "!**/dist",
+      "!assets-src",
+      "!docs/raw"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "semicolons": "always", "trailingCommas": "all" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useImportType": "error",
+        "useExportType": "error",
+        "noNonNullAssertion": "warn"
+      },
+      "suspicious": {
+        "noConsole": { "level": "warn", "options": { "allow": ["warn", "error", "info"] } }
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ":NODE:",
+              ":BLANK_LINE:",
+              [":PACKAGE:", "!@arena/**"],
+              ":BLANK_LINE:",
+              "@arena/**",
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "path": "./tooling/biome/no-nondeterminism.grit",
+      "includes": ["**/packages/sim-*/src/**"]
+    }
+  ],
+  "overrides": [
+    {
+      "includes": ["packages/sim-*/**", "packages/shared/**", "packages/casino-math/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "three": "Simulation/pure packages must not depend on rendering.",
+                  "react": "Simulation/pure packages must not depend on React.",
+                  "zustand": "Simulation/pure packages must not depend on UI state.",
+                  "motion": "Simulation/pure packages must not depend on animation.",
+                  "@arena/audio": "Simulation/pure packages must not depend on audio.",
+                  "@arena/fx": "Simulation/pure packages must not depend on fx."
+                },
+                "patterns": [
+                  {
+                    "group": ["three/*", "@react-three/*"],
+                    "message": "No rendering in pure packages."
+                  },
+                  {
+                    "group": ["node:*"],
+                    "message": "Pure packages must run in browser, Node and Convex."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

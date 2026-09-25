@@ -1,0 +1,25 @@
+{
+  "name": "@arena/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#app/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsdown",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@arena/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.10.0",
+    "tsdown": "^0.23.0",
+    "tsx": "^4.21.0",
+    "typescript": "catalog:"
+  }
+}

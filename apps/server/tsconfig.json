@@ -1,0 +1,4 @@
+{
+  "extends": "@arena/tsconfig/node.json",
+  "include": ["src", "tsdown.config.ts"]
+}

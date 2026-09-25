@@ -25,7 +25,9 @@ This is a premium, GamePigeon-style multiplayer arena. It has four games, each a
    4. One line is added to `LOG.md`.
    5. Everything is committed.
 5. Scope lives in `docs/roadmap/PLAN.md` (the approved plan). Decisions live in `docs/decisions/ADR-*.md`. Never re-argue a locked decision without the user.
-6. Stages marked ✱ need the user. Always ask before any outward-facing action: creating a repo, deploying, buying something, submitting, or sending anything.
+6. **Work autonomously.** Move from stage to stage without asking permission, and make design calls yourself, recording them in docs.
+   - Contact the user only for real blockers: credentials or logins, which Coolify server or domain to use, spending money, jam submission, or anything irreversible where their intent is unclear.
+   - Items marked ✱ are those blockers.
 
 ## Layout
 ```

@@ -1,0 +1,14 @@
+// Simulations must be pure functions of (state, inputs, seed) so that client prediction,
+// the server, bots, seed banks and /verify all reproduce identical results (ADR-001, ADR-005).
+or {
+  `Math.random()`,
+  `Date.now()`,
+  `performance.now()`,
+  `new Date($...)`,
+  `setTimeout($...)`,
+  `setInterval($...)`,
+  `requestAnimationFrame($...)`,
+  `crypto.getRandomValues($...)`
+} as $call where {
+  register_diagnostic(span=$call, message="Non-deterministic API in a simulation package. Use the sim PRNG and tick counter instead (ADR-001/005).")
+}
