@@ -1,0 +1,11 @@
+{
+  "loudnessLufs": -20,
+  "sounds": {
+    "ui.click~1": { "src": "click_a.mp3" },
+    "ui.click~2": { "src": "click_b.mp3" },
+    "ui.confirm": { "src": "confirm.mp3" },
+    "ui.back": { "src": "back.mp3" },
+    "ui.coin": { "src": "coin.mp3" },
+    "ui.whoosh": { "src": "whoosh.mp3" }
+  }
+}

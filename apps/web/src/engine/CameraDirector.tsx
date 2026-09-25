@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { MathUtils, type PerspectiveCamera, Vector3 } from 'three/webgpu';
 
 import { useSettings } from '@/app/stores/settings.ts';
+import { uiSound } from '@/lib/audio/index.ts';
 
 import { ATTRACT_ORBIT_RAD_PER_S, ATTRACT_ZOOM, DOLLY_S, ORBIT_UNWIND_RATE } from './config.ts';
 import { useGameMachine } from './gameMachine.ts';
@@ -35,6 +36,10 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     camera.fov = rig.fov;
     camera.updateProjectionMatrix();
   }, [camera, rig.fov]);
+
+  useEffect(() => {
+    if (phase === 'entering' || phase === 'leaving') uiSound('ui.whoosh');
+  }, [phase]);
 
   // Reduced motion swaps the dolly for a scrim cut: same destination, no vestibular sweep.
   useEffect(() => {

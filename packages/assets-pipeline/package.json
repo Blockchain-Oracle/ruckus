@@ -1,0 +1,18 @@
+{
+  "name": "@arena/assets-pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "audio-sprite": "./src/audio-sprite.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "audio:hub": "node src/audio-sprite.ts ../../assets-src/hub/ui/sprite.json ../../apps/web/src/assets/audio/hub-ui"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.10.0",
+    "typescript": "catalog:"
+  }
+}

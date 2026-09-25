@@ -1,0 +1,26 @@
+{
+  "ui.click~1": {
+    "start": 0,
+    "duration": 0.139
+  },
+  "ui.click~2": {
+    "start": 0.239,
+    "duration": 0.48
+  },
+  "ui.confirm": {
+    "start": 0.819,
+    "duration": 0.8
+  },
+  "ui.back": {
+    "start": 1.719,
+    "duration": 0.48
+  },
+  "ui.coin": {
+    "start": 2.299,
+    "duration": 0.6
+  },
+  "ui.whoosh": {
+    "start": 2.999,
+    "duration": 0.4106
+  }
+}
