@@ -78,8 +78,8 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
         className="absolute left-1/2 h-14 w-7 -translate-x-1/2 rounded-md border-2 border-[#c9b37a] bg-gradient-to-b from-[#3b1d12] to-[#141414] shadow-lg"
         style={{ top: `calc(12px + ${power} * (100% - 88px))` }}
       />
-      <span className="absolute -bottom-7 font-display text-xs text-cream-dim">
-        {enabled ? 'PULL' : ''}
+      <span className="absolute -bottom-7 whitespace-nowrap font-display text-xs text-cream-dim">
+        {enabled ? (getDirector()?.mode === 'wager' ? 'SET POWER' : 'PULL & LET GO') : ''}
       </span>
     </div>
   );

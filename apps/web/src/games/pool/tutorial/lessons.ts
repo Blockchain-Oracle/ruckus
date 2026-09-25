@@ -34,8 +34,10 @@ export const LESSONS: readonly Lesson[] = [
   {
     id: 'aim',
     title: 'Aim',
-    mouse: 'Move the mouse to aim at the 1 ball. The ring shows where the cue ball will hit it.',
-    touch: 'Drag on the table to aim at the 1 ball. The ring shows where the cue ball will hit it.',
+    mouse:
+      'Click on the table (or drag) to point the cue at the 1 ball. The ring shows where the cue ball will hit it. Moving the mouse away keeps your aim; ←/→ fine-tune it.',
+    touch:
+      'Tap or drag on the table to point the cue at the 1 ball. The ring shows where the cue ball will hit it.',
     table: [
       { ball: 0, ...along(0.95) },
       { ball: 1, ...along(0.35) },
@@ -44,8 +46,9 @@ export const LESSONS: readonly Lesson[] = [
   {
     id: 'pot',
     title: 'Shoot',
-    mouse: 'Pull the cue down on the right and let go (or hold Space). Sink the 1!',
-    touch: 'Pull the cue down on the right and let go. Sink the 1!',
+    mouse:
+      'Grab the cue on the right, pull it down and let go to shoot. Or hold Space and release. Sink the 1!',
+    touch: 'Grab the cue on the right, pull it down and let go to shoot. Sink the 1!',
     table: [
       { ball: 0, ...along(0.95) },
       { ball: 1, ...along(0.35) },
@@ -55,9 +58,9 @@ export const LESSONS: readonly Lesson[] = [
     id: 'draw',
     title: 'Spin',
     mouse:
-      'Drag the red dot low on the spin ball for draw, then pot the 2. The cue ball comes back.',
+      'Drag the red dot to the bottom of the white ball (bottom left) for draw, then pot the 2. The cue ball comes back.',
     touch:
-      'Drag the red dot low on the spin ball for draw, then pot the 2. The cue ball comes back.',
+      'Drag the red dot to the bottom of the white ball (bottom left) for draw, then pot the 2. The cue ball comes back.',
     // An angled line into the far side pocket, so drawing back doesn't run into the other one.
     table: [
       { ball: 0, x: DRAW_OBJECT.x - DRAW_DIR.x * 0.45, y: DRAW_OBJECT.y - DRAW_DIR.y * 0.45 },
@@ -67,8 +70,10 @@ export const LESSONS: readonly Lesson[] = [
   {
     id: 'inhand',
     title: 'Ball in hand',
-    mouse: 'After a foul the cue ball is yours to place. Drag it anywhere, then hit the 3.',
-    touch: 'After a foul the cue ball is yours to place. Drag it anywhere, then hit the 3.',
+    mouse:
+      'After a foul the cue ball is yours: drag the white ball anywhere, then aim at the 3 and shoot.',
+    touch:
+      'After a foul the cue ball is yours: drag the white ball anywhere, then aim at the 3 and shoot.',
     table: [
       { ball: 0, x: -HALF_L + 4 * R, y: -HALF_W + 4 * R },
       { ball: 3, x: HALF_L - 0.35, y: -HALF_W + 0.2 },
@@ -79,8 +84,10 @@ export const LESSONS: readonly Lesson[] = [
   {
     id: 'eight',
     title: 'Call the 8',
-    mouse: 'Your group is down. Tap the pocket you will sink the 8 in, then sink it there.',
-    touch: 'Your group is down. Tap the pocket you will sink the 8 in, then sink it there.',
+    mouse:
+      'Your group is down, so the 8 is next. Click (or tap) the glowing ring on the pocket you want, then sink the 8 there.',
+    touch:
+      'Your group is down, so the 8 is next. Click (or tap) the glowing ring on the pocket you want, then sink the 8 there.',
     table: [
       { ball: 0, x: -0.3, y: 0.1 },
       { ball: 8, x: 0.45, y: 0.1 },

@@ -8,6 +8,7 @@ import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { Button } from '@/ui/Button.tsx';
 
 import { BallChip } from '../hud/BallChip.tsx';
+import { ControlsCard } from '../hud/Controls.tsx';
 import { PowerCue } from '../hud/PowerCue.tsx';
 import { SpinBall } from '../hud/SpinBall.tsx';
 import { getDirector } from '../match/runtime.ts';
@@ -79,6 +80,7 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
 
       {setup && <PowerCue enabled />}
       {setup && <SpinBall enabled />}
+      {setup && <ControlsCard wager />}
 
       {(setup || phase === 'checking') && (
         <div className="pointer-events-auto absolute inset-x-0 bottom-4 mx-auto flex w-[min(640px,calc(100%-2rem))] flex-col gap-3 rounded-2xl border-2 border-line bg-ink-2/95 p-4 shadow-[0_20px_60px_rgb(0_0_0/0.55)] sm:bottom-6">
@@ -96,7 +98,8 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
               </>
             ) : (
               <p className="text-sm text-cream-dim">
-                Aim at a ball and a pocket. Harder shots pay more; every call returns 96%.
+                Click or drag on the table to aim at a ball and a pocket (your aim stays put).
+                Harder shots pay more; every call returns 96%.
               </p>
             )}
           </div>

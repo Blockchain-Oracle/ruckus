@@ -43,6 +43,7 @@ const R = BALL_RADIUS_M;
 export function PoolScene({ phase, generation }: GameSceneProps) {
   const director = useMemo(() => new PoolDirector(ATTRACT_SEED + generation), [generation]);
   const dragging = useRef(false);
+  const aiming = useRef(false);
 
   useEffect(() => {
     setDirector(director);
@@ -110,22 +111,34 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
       if (canPlaceCue(b, x, y, where)) director.driver.placeCue(x, y);
       return;
     }
+    // Aim moves only while you press or drag on the table: hovering (say, on the way to the power
+    // cue or the Call it button) never swings the line you set.
+    if (!aiming.current) return;
     setAimAngle(px - (b[CUE_BALL * STRIDE + F.x] ?? 0), py - (b[CUE_BALL * STRIDE + F.y] ?? 0));
   };
   const onDown = (e: ThreeEvent<PointerEvent>) => {
-    if (!director.canPlace()) return;
+    if (!director.humanTurn() || director.driver.phase !== 'aim') return;
     const b = director.driver.balls;
     const dx = e.point.x - (b[CUE_BALL * STRIDE + F.x] ?? 0);
     const dy = simY(e.point.z) - (b[CUE_BALL * STRIDE + F.y] ?? 0);
-    if (dx * dx + dy * dy < (R * 3) ** 2) {
-      dragging.current = true;
+    const capture = () =>
       (e.target as unknown as { setPointerCapture?: (id: number) => void }).setPointerCapture?.(
         e.pointerId,
       );
+    // Ball in hand: grabbing the cue ball moves it.
+    if (director.canPlace() && dx * dx + dy * dy < (R * 3) ** 2) {
+      dragging.current = true;
+      capture();
+      return;
     }
+    // Anywhere else: point the cue at the press, and keep following while the button is held.
+    aiming.current = true;
+    setAimAngle(dx, dy);
+    capture();
   };
   const onUp = () => {
     dragging.current = false;
+    aiming.current = false;
   };
 
   return (
@@ -147,6 +160,7 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
         rotation={[-Math.PI / 2, 0, 0]}
         onPointerMove={onMove}
         onPointerDown={onDown}
+        onPointerLeave={onUp}
         onPointerUp={onUp}
         visible={false}
       >

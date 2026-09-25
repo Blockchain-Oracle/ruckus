@@ -9,6 +9,7 @@ import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { aim } from '../match/aim.ts';
 import { usePool } from '../match/store.ts';
 import { BallChip } from './BallChip.tsx';
+import { ControlsCard } from './Controls.tsx';
 import { PowerCue } from './PowerCue.tsx';
 import { SpinBall } from './SpinBall.tsx';
 
@@ -131,6 +132,7 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
 
       {!watching && <PowerCue enabled={myTurn && !(mustCall && calledPocket < 0)} />}
       {!watching && <SpinBall enabled={myTurn} />}
+      {!watching && lesson < 0 && <ControlsCard />}
       <div className="pointer-events-auto absolute bottom-6 left-1/2 -translate-x-1/2">
         <Button
           size="sm"
