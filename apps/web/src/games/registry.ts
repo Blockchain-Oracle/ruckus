@@ -28,8 +28,7 @@ export const GAMES = [
     title: '8-Ball',
     taglineKey: 'games.pool.tagline',
     players: '1–2',
-    // Shown once it is fully playable (play-first rule); `?preview` shows it meanwhile.
-    hidden: true,
+    hidden: false,
     load: () => import('./pool/index.ts').then((m) => m.pool),
   },
 ] as const satisfies readonly GameEntry[];
