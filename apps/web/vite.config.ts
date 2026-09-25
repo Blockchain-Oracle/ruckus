@@ -5,5 +5,5 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { tsconfigPaths: true },
-  build: { target: 'es2023', sourcemap: true },
+  build: { target: 'es2023', sourcemap: true, manifest: true },
 });

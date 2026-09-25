@@ -1,4 +1,4 @@
 {
   "extends": "@arena/tsconfig/node.json",
-  "include": ["test"]
+  "include": ["test", "scripts"]
 }

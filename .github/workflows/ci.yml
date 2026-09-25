@@ -26,3 +26,5 @@ jobs:
       - run: pnpm check
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm -F @arena/web build
+      - run: pnpm -F @arena/web budgets

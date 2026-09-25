@@ -1,5 +1,5 @@
 import { createEnv } from '@t3-oss/env-core';
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 /** Public build-time config (VITE_*). Missing values fail fast at startup instead of at first use. */
 export const env = createEnv({
