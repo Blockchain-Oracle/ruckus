@@ -1,53 +1,59 @@
 # HANDOFF (updated 2026-09-25 by session 1)
 
-**Stage:** S01 is done. Now on **S02 Deploy skeleton**, step 1. [stages/S02-deploy-skeleton.md](stages/S02-deploy-skeleton.md)
+**Stage:** S02 is done. Now on **S03 Engine shell, asset pipeline, brand**, step 1. [stages/S03-engine-shell.md](stages/S03-engine-shell.md)
 
-**Last completed:**
-- S01 casino core: RuckusGame contract, casino-math, vendored SDK, casino-bridge and DemoHost, the debug panel, and the browser e2e plus prod-sandbox probe.
-- See `docs/roadmap/stages/S01-casino-core.md` for the notes.
+**About ✱E:** the early submission waits until a *finished* slice exists: the hub, Chickenz, and the Back Your Chicken wager. A site of debug panels would be rejected as half-finished. After S03, S06 and S10a, check whether a finished slice exists, and submit it if it does.
 
-**NEXT ACTION:** S02 task 1. Read the Colyseus 0.18 docs through context7, then turn `apps/server` into a Colyseus server with a `hello` room and `/health`.
+**Last completed:** S02 deploys are live and verified:
+- **Web:** https://ruckus-nine.vercel.app (Vercel, git-connected, turbo-ignore)
+- **Game server:** https://ruckus-play.84.46.247.92.sslip.io (wss) on Coolify `agari-new`, app `kkeghmfwz9wl40u2l0n11iow`
+- **Convex:** prod `qualified-armadillo-823`, dev `insightful-bass-789`
+- The production connectivity check passes. Full details are in the S02 stage notes.
+
+**NEXT ACTION:** S03 task 1, brand direction.
+1. Invoke the `21st-ui-explore` skill to produce 2–3 distinct RUCKUS brand directions. The name is decided.
+2. Pick one yourself, following the art direction in ADR-006: a shared brand wrapping each game's native style, gold only for money, chunky press buttons, no emoji or Inter-everywhere.
+3. Write `docs/assets/ART-BIBLE.md`.
+4. Show the user the chosen direction in one short message. Autonomy applies: don't wait unless they object.
 
 **Uncommitted work:** none.
 
-**Blocked on the user (✱, will be needed in S02):**
-- Which Coolify context and server to use, and the subdomain for the game server (e.g. `play.<domain>`). Is there a domain?
-- Vercel team/account for the web app.
-- A Convex account and login (`npx convex dev` needs an interactive login).
+**Blocked on the user:** nothing. Server deploys need the user's Coolify tunnel open on localhost:8001.
 
 **Environment state:**
-- The simulator runs in the background from `casino-sdk` with `npm start`: harness :3300, chain :8545, coinflip :3100. Log: `/tmp/ruckus-sim.log`.
-- RuckusGame is deployed locally at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853`. The address changes on every simulator restart; re-run `pnpm -F @arena/contracts sync`.
-- The web dev server runs on :5173 (`pnpm -F @arena/web exec vite --port 5173 --host 127.0.0.1`). Log: `/tmp/ruckus-web.log`.
-- Debug page: http://127.0.0.1:5173/?debug=casino. Inside the simulator: `http://localhost:3300/?game=<encoded web url>&gameAddress=<addr>`.
-- Branch `main` tracks `origin` (github.com/Blockchain-Oracle/ruckus). CI is green.
-- Local toolchain:
-  - node 25.9 (the repo pins 24.21.0), pnpm 10.34.5 through corepack
-  - forge 1.7.1, rustc 1.98.1 with the wasm32 target
-  - the elevenlabs CLI 1.4.0, the 21st CLI, and Playwright (cached headless shell)
-  - **wasm-pack is not installed** (needed in S06)
+- The simulator runs from `casino-sdk` with `npm start` (:3300, chain :8545). Log: `/tmp/ruckus-sim.log`. The local RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` (changes on restart; re-run `pnpm -F @arena/contracts sync`).
+- Web dev server: :5173 (`pnpm -F @arena/web exec vite --port 5173 --host 127.0.0.1`). `apps/web/.env.local` points at Convex dev and `ws://127.0.0.1:2567`.
+- Local game server: `node apps/server/dist/index.js` on :2567.
+- Debug panels: `?debug=casino` and `?debug=connectivity`.
+- Branch `main` tracks origin. CI is green. This repo's git author email is `abubakrjimoh16488@gmail.com`, which Vercel needs.
+- Toolchain: node 25.9 (the repo pins 24.21.0), pnpm 10.34.5, forge 1.7.1, rustc 1.98.1 with the wasm32 target, nixpacks 1.41, docker (OrbStack), and the elevenlabs, 21st, vercel, coolify and convex CLIs. **wasm-pack is not installed** (S06 needs it).
 
 **Last green verification:**
-- `pnpm verify` passes: biome, typecheck and tests.
-- `forge test`: 11 passing.
-- `pnpm -F @arena/browser-checks casino`: PASS.
-- `pnpm -F @arena/browser-checks prod-frame`: done.
+- `pnpm verify` passes.
+- `forge test` passes.
+- Browser checks pass: `casino` (simulator), `prod-frame`, and `connectivity` against both local and **production**.
 
-**Gotchas learned:**
-- Pin pnpm 10.x for Nixpacks. Node is 24.21.0, because 24.12.4 doesn't exist.
-- Biome plugin globs need a `**/` prefix. Purity overrides apply only to `src/`. The vendored SDK is excluded from Biome, so its bytes stay identical.
-- tsdown needs `fixedExtension: false` to emit `dist/index.js`.
-- The vendored `@chain/casino-sdk` builds to `dist/`. Run `pnpm -F @chain/casino-sdk build` after a sync.
-- Foundry treats `table*` functions as table tests. NatSpec (`///`) comments can't contain `@scope/pkg` text.
-- The Hardhat node rejects `cast send` (duplicate `data`/`input` fields), so use viem scripts.
+**Gotchas learned (the rest are in the stage notes):**
+- Pin pnpm 10.x, and Node 24.21.0 (24.12.4 doesn't exist).
+- Biome plugin globs need a `**/` prefix. Purity lint rules cover only `src/`. The vendored SDK is excluded from Biome.
+- **Coolify:**
+  - It pre-sets `NIXPACKS_NODE_VERSION=22`, which we overrode to 24.
+  - Nixpacks sets `NODE_ENV=production` at build time, so install uses `--prod=false`.
+  - `prepare` skips lefthook when there's no `.git`.
+  - There's no push-to-deploy, because the dashboard is tunnel-only. Deploy with `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow`.
+- **Vercel:**
+  - `turbo.json` build needs `env: ["VITE_*"]`.
+  - It blocks commits from unrecognised authors.
+  - Run the CLI from the repo root.
 - The host binds per iframe element, so the game must never reload itself.
-- Chrome blocks public origins from framing `127.0.0.1`, and https parents block http frames as mixed content. The prod-frame probe serves a real `localhost:9999` page.
-- tsx injects `__name` into functions passed to `page.evaluate`, so pass source strings instead.
+- Foundry treats `table*` functions as table tests. NatSpec comments can't contain `@scope`.
+- The Hardhat node rejects `cast send`, so use viem.
+- `pnpm server` is a pnpm builtin, so use `run check:server`.
+- tsx injects `__name` into functions passed to `page.evaluate`, so pass source strings.
+- Chrome blocks public origins from framing 127.0.0.1.
 - commitlint rejects sentence-case subjects.
-- The user doesn't want the ElevenLabs policy raised again.
+- The user doesn't want the ElevenLabs policy raised again. Use ElevenLabs freely.
 
-**New ADRs:** none this stage.
+**Research to read before resuming:** S03's "Read first" list.
 
-**Research to read before resuming:** the "Read first" list in S02, especially `docs/research/deep/coolify-nixpacks.md`.
-
-**Deadline status:** submissions close Sun Sep 27 at 23:59 UTC. The user doesn't want quality cut. An early eligible slice is planned at ✱E, after S02. **Submitted build:** none.
+**Deadline status:** submissions close Sun Sep 27 at 23:59 UTC. The user prefers quality. ✱E happens once a finished slice exists. **Submitted build:** none.
