@@ -69,19 +69,34 @@ importers:
 
   apps/web:
     dependencies:
+      '@arena/casino-bridge':
+        specifier: workspace:*
+        version: link:../../packages/casino-bridge
+      '@arena/casino-math':
+        specifier: workspace:*
+        version: link:../../packages/casino-math
       '@arena/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@chain/casino-sdk':
+        specifier: workspace:*
+        version: link:../../packages/chain-casino-sdk
       react:
         specifier: 'catalog:'
         version: 19.3.0
       react-dom:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
+      viem:
+        specifier: ^2.56.9
+        version: 2.56.9(typescript@7.0.2)(zod@4.6.5)
     devDependencies:
       '@arena/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.13.6
       '@types/react':
         specifier: ^19.2.0
         version: 19.3.0
@@ -90,13 +105,16 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^6.1.1
-        version: 6.1.1(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))
+        version: 6.1.1(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
       vite:
         specifier: ^8.3.1
-        version: 8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)
+        version: 8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.2(@types/node@24.13.6)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))
 
   contracts:
     devDependencies:
@@ -186,6 +204,24 @@ importers:
         version: 7.0.2
 
   packages/tsconfig: {}
+
+  tooling/browser-checks:
+    devDependencies:
+      '@arena/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.13.6
+      playwright-core:
+        specifier: ^1.58.0
+        version: 1.63.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.23.15
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
 
 packages:
 
@@ -1374,6 +1410,11 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2111,10 +2152,10 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
-  '@vitejs/plugin-react@6.1.1(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))':
+  '@vitejs/plugin-react@6.1.1(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)
+      vite: 8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)
 
   '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15))':
     dependencies:
@@ -2523,6 +2564,8 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@4.0.7: {}
+
+  playwright-core@1.63.0: {}
 
   postcss@8.5.28:
     dependencies:

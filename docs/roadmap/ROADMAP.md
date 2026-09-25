@@ -6,8 +6,8 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 |---|---|---|---|
 | 1 | S00a Resume system and repo init | done | [stages/S00a-resume-system.md](stages/S00a-resume-system.md) |
 | 2 | S00b Toolchain and monorepo skeleton (GitHub repo created) | done | [stages/S00b-toolchain.md](stages/S00b-toolchain.md) |
-| 3 | S01 Casino core: contract, math, bridge, DemoHost, prod-frame | active | [stages/S01-casino-core.md](stages/S01-casino-core.md) |
-| 4 | S02 Deploy skeleton: Coolify/Nixpacks, Vercel, Convex (✱ context) | todo | [stages/S02-deploy-skeleton.md](stages/S02-deploy-skeleton.md) |
+| 3 | S01 Casino core: contract, math, bridge, DemoHost, prod-frame | done | [stages/S01-casino-core.md](stages/S01-casino-core.md) |
+| 4 | S02 Deploy skeleton: Coolify/Nixpacks, Vercel, Convex (✱ context) | active | [stages/S02-deploy-skeleton.md](stages/S02-deploy-skeleton.md) |
 | 5 | ✱E Early eligible submission | todo | [stages/E-early-submission.md](stages/E-early-submission.md) |
 | 6 | S03 Engine shell, asset pipeline, budgets (✱N name + brand) | todo | [stages/S03-engine-shell.md](stages/S03-engine-shell.md) |
 | 7 | S06 Chickenz sim: Rust, 4-player FFA, deterministic bots | todo | [stages/S06-chickenz-sim.md](stages/S06-chickenz-sim.md) |

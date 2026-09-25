@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gameId": "ruckus",
+  "apiVersion": 1,
+  "defaultLocale": "en",
+  "locales": {
+    "en": {
+      "name": "RUCKUS",
+      "description": "A multiplayer party arena — brawl, shoot, score and race with friends and bots, then back your fighter in provably fair VRF rounds."
+    }
+  },
+  "presentation": {
+    "mode": "full-iframe",
+    "hostPanels": {
+      "openSession": false,
+      "history": false,
+      "status": false
+    }
+  },
+  "capabilities": {
+    "openSession": true,
+    "submitAction": false,
+    "forfeitExpiredSession": false,
+    "cancelStuckRandomness": true,
+    "resize": false
+  }
+}

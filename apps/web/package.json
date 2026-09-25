@@ -7,12 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
   },
   "dependencies": {
     "@arena/shared": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@arena/casino-bridge": "workspace:*",
+    "@arena/casino-math": "workspace:*",
+    "@chain/casino-sdk": "workspace:*",
+    "viem": "^2.56.9"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
@@ -20,6 +25,8 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.1.1",
     "typescript": "catalog:",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "vitest": "catalog:",
+    "@types/node": "^24.10.0"
   }
 }

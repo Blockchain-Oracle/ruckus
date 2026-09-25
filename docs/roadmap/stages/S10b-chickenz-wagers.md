@@ -10,7 +10,7 @@
 - [ ] (expand at stage start)
 
 ## Acceptance
-All unhappy paths in simulator; top multiplier; /verify reproduces rounds; celebration tiers; pending-round chip; reveal watchdog; DemoHost parity.
+All unhappy paths in simulator, **including the live stuck-randomness path deferred from S01** (stop the local node, `hardhat_mine 0x10`, then cancel from the product UI); top multiplier; /verify reproduces rounds; celebration tiers; pending-round chip; reveal watchdog; DemoHost parity.
 
 ## Exit checklist
 ROADMAP · HANDOFF · LOG · commits
