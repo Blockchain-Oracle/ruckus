@@ -20,10 +20,9 @@ import {
 import { PROTOCOL_VERSION } from '@arena/shared';
 import { H, Sim, VIEW_LEN } from '@arena/sim-chickenz';
 
+import { PROTOCOL_MISMATCH, ROOM_FULL, releaseCode, uniqueCode } from '../codes.ts';
 import {
   BOT_DIFFICULTY,
-  CODE_ALPHABET,
-  CODE_LENGTH,
   COUNTDOWN_MS,
   HEROES,
   MAPS,
@@ -39,9 +38,6 @@ import {
 } from './config.ts';
 import { ensureChickenzWasm } from './sim.ts';
 
-const PROTOCOL_MISMATCH = 4000;
-const ROOM_FULL = 4001;
-const CODE_CHANNEL = '$chickenz-codes';
 type Seat = InstanceType<typeof ChickenzSeat>;
 type Input = { seq: number; buttons: number; aimX: number };
 
@@ -68,7 +64,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
 
   override async onCreate(options: ChickenzJoinOptions) {
     ensureChickenzWasm();
-    this.roomId = await this.uniqueCode();
+    this.roomId = await uniqueCode(this.presence);
     this.state.code = this.roomId;
     this.state.protocolVersion = PROTOCOL_VERSION;
     this.state.winsToTake = WINS_TO_TAKE;
@@ -161,7 +157,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   override async onDispose() {
     for (const t of this.timers) clearTimeout(t);
     this.sim?.free();
-    await this.presence.srem(CODE_CHANNEL, this.roomId);
+    await releaseCode(this.presence, this.roomId);
   }
 
   // ── seats ─────────────────────────────────────────────────────────────
@@ -235,19 +231,6 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
       this.state.hostSessionId =
         this.state.seats.find((s) => s.kind === SEAT_KIND.human)?.sessionId ?? '';
     }
-  }
-
-  private async uniqueCode(): Promise<string> {
-    const taken = await this.presence.smembers(CODE_CHANNEL);
-    let code: string;
-    do {
-      code = Array.from(
-        { length: CODE_LENGTH },
-        () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)],
-      ).join('');
-    } while (taken.includes(code));
-    await this.presence.sadd(CODE_CHANNEL, code);
-    return code;
   }
 
   // ── match flow ────────────────────────────────────────────────────────

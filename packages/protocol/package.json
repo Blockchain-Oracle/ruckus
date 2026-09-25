@@ -8,7 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./hello": "./src/hello.ts",
-    "./chickenz": "./src/chickenz.ts"
+    "./chickenz": "./src/chickenz.ts",
+    "./pool": "./src/pool.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p ."
