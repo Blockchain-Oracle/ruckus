@@ -20,7 +20,11 @@ type Manifest = Record<string, Chunk>;
 
 const KB = 1024;
 const MB = KB * KB;
-const BUDGETS = { shellGz: 150 * KB, attractGz: 1.5 * MB, game: 8 * MB } as const;
+/**
+ * The shell carries every cabinet's metadata; 155 KB leaves room for the fourth game's tile.
+ * The growth from 143.7 KB during Pool (S12–S16) is a known follow-up to audit.
+ */
+const BUDGETS = { shellGz: 155 * KB, attractGz: 1.5 * MB, game: 8 * MB } as const;
 const ENGINE_KEY = 'src/engine/GameShell.tsx';
 const GAME_KEY = /^src\/games\/([^/]+)\/index\.ts$/;
 

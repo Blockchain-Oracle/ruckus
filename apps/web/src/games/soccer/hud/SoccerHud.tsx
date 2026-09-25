@@ -1,0 +1,84 @@
+import { ArrowLeftIcon, GearSixIcon } from '@phosphor-icons/react';
+
+import { MATCH_SECONDS, TICK_HZ } from '@arena/sim-soccer';
+
+import { useUi } from '@/app/stores/ui.ts';
+import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
+
+import { startMatch } from '../match/flow.ts';
+import { getDriver } from '../match/runtime.ts';
+import { useSoccer } from '../match/store.ts';
+import { Announce } from './Announce.tsx';
+import { ControlsButton, IntroCard } from './Controls.tsx';
+import { Results } from './Results.tsx';
+import { PowerChips, ScoreBug } from './ScoreBug.tsx';
+import { TouchPad } from './TouchPad.tsx';
+import { useCoarse } from './useCoarse.ts';
+import { useTick } from './useTick.ts';
+
+const HUD_HZ = 12;
+/** The key reminder stays up for the opening seconds, until the first goal. */
+const HINT_S = 20;
+const roundBtn =
+  'pointer-events-auto grid size-10 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream hover:border-cream-dim';
+
+export function SoccerHud({ onLeave }: { onLeave: () => void }) {
+  useTick(HUD_HZ);
+  const status = useSoccer((s) => s.status);
+  const names = useSoccer((s) => s.names);
+  const coarse = useCoarse();
+  const d = getDriver();
+  if (status === 'off' || !d) return null;
+  if (status === 'intro') return <IntroCard onGo={startMatch} />;
+  const w = d.world;
+  const you = d.humanSlot;
+  const firstMinute = w.clock > (MATCH_SECONDS - HINT_S) * TICK_HZ && w.score[0] + w.score[1] === 0;
+
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 [@media(pointer:fine)]:top-4">
+        <ScoreBug w={w} names={names} you={you} />
+        <PowerChips w={w} />
+      </div>
+      <Announce />
+
+      {!coarse && (
+        <div
+          className="absolute inset-x-0 bottom-5 text-center text-xs text-cream transition-opacity duration-700 [text-shadow:1px_1px_0_#000]"
+          style={{ opacity: firstMinute && status === 'playing' ? 0.9 : 0 }}
+        >
+          A / D or ← → move · W, ↑ or Space jump (hold for higher) · run into the ball to kick
+        </div>
+      )}
+      {coarse && status === 'playing' && <TouchPad />}
+
+      <button
+        type="button"
+        aria-label="Leave match"
+        title="Leave match"
+        onClick={onLeave}
+        className={`${roundBtn} absolute top-3 left-3 sm:left-8 [@media(pointer:fine)]:top-4`}
+      >
+        <ArrowLeftIcon weight="bold" className="size-5" />
+      </button>
+      <div className="absolute top-16 left-3 sm:left-8 [@media(pointer:fine)]:top-[4.25rem]">
+        <ControlsButton />
+      </div>
+      <div className="absolute top-3 right-3 flex flex-col gap-2 sm:right-8 [@media(pointer:fine)]:top-4">
+        <button
+          type="button"
+          aria-label="Settings"
+          onClick={() => useUi.getState().openSheet('settings')}
+          className={roundBtn}
+        >
+          <GearSixIcon weight="bold" className="size-5" />
+        </button>
+        <FullscreenButton className="bg-ink/85" />
+      </div>
+
+      {status === 'over' && !useSoccer.getState().announce && (
+        <Results w={w} you={you} onRematch={startMatch} onLeave={onLeave} />
+      )}
+    </div>
+  );
+}

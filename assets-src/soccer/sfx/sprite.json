@@ -1,0 +1,24 @@
+{
+  "loudnessLufs": -18,
+  "sounds": {
+    "soccer.kick~1": { "src": "kick_a.mp3" },
+    "soccer.kick~2": { "src": "kick_b.mp3" },
+    "soccer.kick~3": { "src": "kick_c.mp3" },
+    "soccer.header": { "src": "header.mp3" },
+    "soccer.bounce~1": { "src": "bounce_a.mp3" },
+    "soccer.bounce~2": { "src": "bounce_b.mp3" },
+    "soccer.post": { "src": "post.mp3" },
+    "soccer.net": { "src": "net.mp3" },
+    "soccer.jump": { "src": "jump.mp3" },
+    "soccer.whistle.kickoff": { "src": "whistle_kickoff.mp3" },
+    "soccer.whistle.fulltime": { "src": "whistle_fulltime.mp3" },
+    "soccer.count": { "src": "count.mp3" },
+    "soccer.goal": { "src": "goal.mp3" },
+    "soccer.ooh": { "src": "ooh.mp3" },
+    "soccer.crowd": { "src": "crowd.mp3", "loop": true },
+    "soccer.powerup": { "src": "powerup.mp3" },
+    "soccer.freeze": { "src": "freeze.mp3" },
+    "soccer.grow": { "src": "grow.mp3" },
+    "soccer.shrink": { "src": "shrink.mp3" }
+  }
+}

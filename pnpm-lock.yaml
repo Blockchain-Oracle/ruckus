@@ -129,6 +129,9 @@ importers:
       '@arena/sim-pool':
         specifier: workspace:*
         version: link:../../packages/sim-pool
+      '@arena/sim-soccer':
+        specifier: workspace:*
+        version: link:../../packages/sim-soccer
       '@chain/casino-sdk':
         specifier: workspace:*
         version: link:../../packages/chain-casino-sdk

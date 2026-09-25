@@ -1,0 +1,79 @@
+{
+  "soccer.kick~1": {
+    "start": 0,
+    "duration": 0.4402
+  },
+  "soccer.kick~2": {
+    "start": 0.5402,
+    "duration": 0.1647
+  },
+  "soccer.kick~3": {
+    "start": 0.8049,
+    "duration": 0.4798
+  },
+  "soccer.header": {
+    "start": 1.3847,
+    "duration": 0.48
+  },
+  "soccer.bounce~1": {
+    "start": 1.9647,
+    "duration": 0.2454
+  },
+  "soccer.bounce~2": {
+    "start": 2.3101,
+    "duration": 0.0537
+  },
+  "soccer.post": {
+    "start": 2.4638,
+    "duration": 0.3513
+  },
+  "soccer.net": {
+    "start": 2.9151,
+    "duration": 0.8516
+  },
+  "soccer.jump": {
+    "start": 3.8667,
+    "duration": 0.4799
+  },
+  "soccer.whistle.kickoff": {
+    "start": 4.4466,
+    "duration": 0.7999
+  },
+  "soccer.whistle.fulltime": {
+    "start": 5.3465,
+    "duration": 1.989
+  },
+  "soccer.count": {
+    "start": 7.4355,
+    "duration": 0.48
+  },
+  "soccer.goal": {
+    "start": 8.0155,
+    "duration": 3.9356
+  },
+  "soccer.ooh": {
+    "start": 12.0511,
+    "duration": 1.5531
+  },
+  "soccer.crowd": {
+    "start": 13.7041,
+    "duration": 15,
+    "loop": true
+  },
+  "soccer.powerup": {
+    "start": 28.8041,
+    "duration": 1
+  },
+  "soccer.freeze": {
+    "start": 29.9041,
+    "duration": 1
+  },
+  "soccer.grow": {
+    "start": 31.0041,
+    "duration": 0.891
+  },
+  "soccer.shrink": {
+    "start": 31.9951,
+    "duration": 1
+  }
+}
