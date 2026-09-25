@@ -46,6 +46,20 @@ const state = await page.evaluate(
   'JSON.stringify({phase: __ruckusSoccer.world.phase, score: __ruckusSoccer.world.score, ball: __ruckusSoccer.world.ball, p0: __ruckusSoccer.world.players[0].x, mode: __ruckusSoccer.mode})',
 );
 console.info(state);
+// Score a goal, then run the clock down: GOAL! → FULL TIME → results card.
+await page.evaluate('Object.assign(__ruckusSoccer.world.ball, { x: 600, y: 60, vx: 300, vy: 0 })');
+await page.waitForTimeout(400);
+await page.screenshot({ path: `${out}/soccer-goal.png` });
+await page.waitForTimeout(3500);
+await page.evaluate('__ruckusSoccer.world.clock = 90');
+await page.waitForTimeout(5500);
+await page.screenshot({ path: `${out}/soccer-results.png` });
+console.info(
+  await page.evaluate(
+    'JSON.stringify({ phase: __ruckusSoccer.world.phase, score: __ruckusSoccer.world.score })',
+  ),
+);
+console.info('rematch button:', await page.getByRole('button', { name: 'Rematch' }).count());
 console.info(
   logs
     .filter((l) => !/THREE\.Clock|PCFSoft|AudioContext/.test(l))

@@ -1,6 +1,6 @@
-# HANDOFF (updated 2026-09-25 by session 3)
+# HANDOFF (updated 2026-09-25 by session 4)
 
-**Stage:** S09 Chickenz feel is active. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
+**Stage:** S19 Soccer room is next (S18 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
 
 **Last completed (session 3):**
 - Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
@@ -34,24 +34,21 @@
 - **S16, the tutorial:** five hands-on lessons.
 - The `select()` double-select fix (it remounted scenes and dropped online tables).
 
-**Soccer:** S17's sim is done (`packages/sim-soccer`: Eggy numbers, bots, power-ups, 1v1/2v2, about 5 goals a match).
+**Soccer (session 4):** S17 sim done; **S18 done — Egg Soccer is live in the hub** (`apps/web/src/games/soccer`).
+- Toon egg players (lathe egg, 3-band toon, ink hull outline, ball-tracking eyes + blink, boots, kit band, 2v2 partner headband, squash/stretch spring, freeze/speed/grow looks).
+- Procedural football; night stadium (mowed pitch, scrolling LED boards, instanced reactive crowd, floodlight towers, glass end walls); goals with billowing nets.
+- HUD: score bug + clock, power-up chips, 3-2-1-GO / GOAL! / FULL TIME call-outs (motion), results + rematch, How to play (blocks the first kickoff, then a ? button), key hint, touch ◀ ▶ + JUMP.
+- ElevenLabs SFX sprite (19 sounds, crowd bed loop) + stadium anthem; Settings: 1v1/2v2 and Rookie/Pro/Legend.
+- Camera uses rig `pose` (tilted down, width-fit, lifts for high balls). Screenshot helper: `tooling/browser-checks/src/soccer-shots.ts`.
 
 **NEXT ACTION:**
-1. **Soccer S18: render the pitch.**
-   - Code-drawn egg characters: squash and stretch, eyes tracking the ball, team kits.
-   - A night-stadium backdrop with crowd and floodlights; goal nets; a rolling football.
-   - HUD: score bug and clock, power-up chips, READY/GO, and a GOAL! celebration.
-   - Controls: keys and touch buttons.
-   - ElevenLabs SFX: kick, header, bounce, post, whistle, crowd bed and roar. Plus music.
-   - Then S19 (a SoccerRoom with prediction), S21 (the tutorial), S20 (the wager, with a novelty check).
+1. **Soccer S19: SoccerRoom** (server-authoritative lockstep like PoolRoom, client prediction of own egg; reuse `features/rooms` kit + lobby sheet; labelled bots, watchers, invite links). The presenter in `match/flow.ts` reads sim state (not timers), so online presents identically. Then S21 tutorial, S20 wager (novelty check).
 2. Runner S22–S26, play-first.
-3. **Pool control feedback from the user (fixed 2026-09-25):**
-   - Aim moves only on click or drag on the table; hover never moves it.
-   - A How to play card, SET POWER / PULL & LET GO labels, and clearer lessons.
-   - Keep this rule for every game: controls must never fight the pointer, and every control is written down on screen.
-4. The four-game hub landing (ADR-007 follow-up).
-5. The Chickenz feel gaps (ledger audit list).
-6. ✱E is deferred until all four games are done.
+3. Keep the controls rule for every game: controls never fight the pointer; every control written on screen.
+4. Four-game hub landing (ADR-007 follow-up).
+5. Chickenz feel gaps (ledger audit list).
+6. Audit shell bundle growth (143.7 → 150.2 KB gz during Pool/Soccer; budget raised to 155 KB).
+7. ✱E deferred until all four games are done.
 
 **Uncommitted work:** none.
 
@@ -65,7 +62,10 @@
 - Branch `main` tracks origin. CI is green. This repo's git author email is `abubakrjimoh16488@gmail.com`, which Vercel needs.
 - Toolchain: node 25.9 (the repo pins 24.21.0), pnpm 10.34.5, forge 1.7.1, rustc 1.98.1 with the wasm32 target, nixpacks 1.41, docker (OrbStack), and the elevenlabs, 21st, vercel, coolify and convex CLIs. **wasm-pack is not installed** (S06 needs it).
 
-**Last green verification (session 3):**
+**Last green verification (session 4):**
+- `pnpm verify` passes; web build + budgets pass (shell 150.2 / 155 KB gz). Soccer screenshots at 1280×720 and 844×390 touch 2v2: no console errors; goal → FULL TIME → results/rematch verified.
+
+**Verification (session 3):**
 - `pnpm verify` passes. `back-bird` e2e PASS (10 VRF rounds, all 4 classes, flawless 6× on round 7). `firefox` probe OK. Production late-join is verified with a two-client script against wss://ruckus-play.84.46.247.92.sslip.io.
 
 **Older verification:**

@@ -24,8 +24,8 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 18 | S14 Pool room and bot | todo | [stages/S14-pool-room.md](stages/S14-pool-room.md) |
 | 19 | S15 Pool wager | todo | [stages/S15-pool-wager.md](stages/S15-pool-wager.md) |
 | 20 | S16 Pool tutorial, polish, ship | todo | [stages/S16-pool-tutorial.md](stages/S16-pool-tutorial.md) |
-| 21 | S17 Soccer sim | todo | [stages/S17-soccer-sim.md](stages/S17-soccer-sim.md) |
-| 22 | S18 Soccer rendering and assets | todo | [stages/S18-soccer-rendering.md](stages/S18-soccer-rendering.md) |
+| 21 | S17 Soccer sim | done | [stages/S17-soccer-sim.md](stages/S17-soccer-sim.md) |
+| 22 | S18 Soccer rendering and assets | done | [stages/S18-soccer-rendering.md](stages/S18-soccer-rendering.md) |
 | 23 | S19 Soccer room and bot | todo | [stages/S19-soccer-room.md](stages/S19-soccer-room.md) |
 | 24 | S20 Soccer wager | todo | [stages/S20-soccer-wager.md](stages/S20-soccer-wager.md) |
 | 25 | S21 Soccer tutorial, polish, ship | todo | [stages/S21-soccer-tutorial.md](stages/S21-soccer-tutorial.md) |
