@@ -1,0 +1,200 @@
+<title>RUCKUS Brand Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@500;700&family=Bungee&family=Lilita+One&family=Nunito:wght@600;800&family=Rubik:wght@500;700&family=Silkscreen&display=swap">
+<style>
+  :root {
+    --page: #f4f2f7; --panel: #ffffff; --ink: #1d1a24; --muted: #5d5868; --line: #dcd8e4; --accent: #6b3fd1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --page: #121017; --panel: #1b1822; --ink: #efecf5; --muted: #a39db0; --line: #2e2a38; --accent: #b79bff; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --page: #121017; --panel: #1b1822; --ink: #efecf5; --muted: #a39db0; --line: #2e2a38; --accent: #b79bff; color-scheme: dark; }
+
+  body { background: var(--page); color: var(--ink); font: 15px/1.55 "Barlow", system-ui, sans-serif; padding-inline: 16px; padding-block: 28px 48px; }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 28px; }
+  header h1 { font: 400 clamp(28px, 4vw, 44px)/1.05 "Anton", Impact, sans-serif; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+  header p { color: var(--muted); max-width: 68ch; margin: 8px 0 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 22px; align-items: start; }
+  .dir { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px; }
+  .dir h2 { margin: 0; font: 700 20px/1.2 "Barlow", sans-serif; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .dir h2 small { color: var(--muted); font-weight: 500; font-size: 13px; }
+  .rec { font: 700 11px/1 "Barlow", sans-serif; letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--panel); padding: 5px 8px; border-radius: 99px; }
+  dl { margin: 0; display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; font-size: 13.5px; }
+  dt { color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; padding-top: 2px; }
+  dd { margin: 0; }
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sw { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(0,0,0,.15); position: relative; }
+  .sw span { position: absolute; top: 34px; left: 0; font: 500 9.5px/1 ui-monospace, monospace; color: var(--muted); white-space: nowrap; }
+  .swatches { padding-bottom: 14px; }
+  .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .verdict h2 { margin: 0 0 6px; font: 400 24px/1.1 "Anton", Impact, sans-serif; }
+  .verdict p { margin: 0; max-width: 80ch; color: var(--muted); }
+
+  /* ── Phone mock shell ──────────────────────────────────────── */
+  .phone { position: relative; height: 560px; border-radius: 22px; overflow: hidden; isolation: isolate; max-width: 100%; }
+  .phone .bg { position: absolute; inset: 0; z-index: -2; }
+  .phone .vignette { position: absolute; inset: 0; z-index: -1; }
+  .phone .ui { height: 100%; display: flex; flex-direction: column; padding: 16px; gap: 12px; box-sizing: border-box; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; }
+  .games { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: auto; }
+  .game { aspect-ratio: 3 / 4; display: grid; place-items: end start; padding: 7px; font-size: 11px; line-height: 1.1; }
+  .ph-ic { width: 22px; height: 22px; display: inline-block; }
+  @media (prefers-reduced-motion: reduce) { .phone * { animation: none !important; } }
+
+  /* ── A: Arcade Cabinet ─────────────────────────────────────── */
+  .a { --ink-a: #1B1024; --tomato: #FF5A36; --teal: #2EC4B6; --cream: #FFF1D6; --gold: #FFC23A; color: var(--cream); font-family: "Rubik", sans-serif; }
+  .a .bg { background:
+      linear-gradient(transparent 70%, #2a1838 70%) 0 0 / 100% 100%,
+      repeating-linear-gradient(90deg, #24163a 0 40px, #1e1230 40px 80px);
+    animation: a-scroll 6s linear infinite; }
+  .a .bg::after { content: ""; position: absolute; left: 0; right: 0; bottom: 30%; height: 16px;
+    background: repeating-linear-gradient(90deg, #6b4a2b 0 16px, #5a3d23 16px 32px); }
+  .a .chick { position: absolute; bottom: calc(30% + 16px); width: 22px; height: 22px; background: var(--tomato); box-shadow: 6px -6px 0 -2px var(--gold); animation: a-hop 1.2s steps(6) infinite; }
+  .a .chick.two { background: var(--teal); left: 58%; animation-delay: -.6s; }
+  .a .chick.one { left: 26%; }
+  .a .vignette { background: radial-gradient(ellipse at 50% 38%, transparent 30%, rgba(12,4,18,.85) 100%); }
+  .a .logo { font: 400 44px/0.9 "Bungee", Impact, sans-serif; color: var(--cream); text-shadow: 0 4px 0 var(--tomato), 0 8px 0 #7a1f10; letter-spacing: .02em; }
+  .a .tag { font: 500 12px/1 "Silkscreen", monospace; color: var(--teal); letter-spacing: .08em; }
+  .a .coins { font: 700 13px/1 "Rubik", sans-serif; font-variant-numeric: tabular-nums; background: #2a1838; border: 2px solid var(--gold); color: var(--gold); padding: 7px 10px; border-radius: 10px; }
+  .a .btn { font: 400 22px/1 "Bungee", Impact, sans-serif; color: var(--ink-a); background: var(--gold); border: 0; border-radius: 14px; padding: 16px 0 14px; box-shadow: 0 6px 0 #b8780e, 0 10px 18px rgba(0,0,0,.45); cursor: pointer; transition: transform .06s, box-shadow .06s; width: 100%; }
+  .a .btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #b8780e; }
+  .a .btn.alt { background: var(--teal); box-shadow: 0 6px 0 #178075; font-size: 15px; padding: 12px 0 10px; }
+  .a .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .a .game { background: #2a1838; border: 2px solid #4a2d5e; border-radius: 10px; color: var(--cream); font-weight: 700; }
+  .a .game.on { border-color: var(--tomato); box-shadow: 0 0 0 3px rgba(255,90,54,.25); }
+  @keyframes a-scroll { to { background-position: 0 0, -80px 0; } }
+  @keyframes a-hop { 50% { transform: translateY(-18px); } }
+
+  /* ── B: Toy Box ────────────────────────────────────────────── */
+  .b { --paper: #FFF3DC; --navy: #1E2A4A; --tang: #FF8A1F; --mint: #3DD6A6; --sky: #58B7FF; --gold: #F2B705; color: var(--navy); font-family: "Nunito", sans-serif; }
+  .b .bg { background: radial-gradient(circle at 20% 20%, #ffe4b8 0 18%, transparent 19%), radial-gradient(circle at 80% 60%, #d8f4ea 0 22%, transparent 23%), var(--paper); }
+  .b .ball { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 4px solid var(--navy); top: 34%; left: 12%; animation: b-arc 2.4s ease-in-out infinite; }
+  .b .egg { position: absolute; bottom: 24%; width: 58px; height: 70px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%; border: 4px solid var(--navy); }
+  .b .egg.l { left: 14%; background: var(--tang); }
+  .b .egg.r { right: 14%; background: var(--sky); }
+  .b .egg::after { content: ""; position: absolute; width: 10px; height: 10px; background: var(--navy); border-radius: 50%; top: 22px; left: 30px; box-shadow: -14px 0 0 var(--navy); }
+  .b .vignette { background: linear-gradient(transparent 55%, rgba(255,243,220,.95) 78%); }
+  .b .logo { font: 400 46px/0.95 "Lilita One", sans-serif; color: var(--tang); -webkit-text-stroke: 3px var(--navy); paint-order: stroke fill; transform: rotate(-3deg); display: inline-block; text-shadow: 3px 4px 0 var(--navy); }
+  .b .tag { font: 800 12px/1 "Nunito", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+  .b .coins { font: 800 13px/1 "Nunito", sans-serif; font-variant-numeric: tabular-nums; background: var(--gold); border: 3px solid var(--navy); padding: 6px 10px; border-radius: 99px; box-shadow: 2px 3px 0 var(--navy); }
+  .b .btn { font: 400 24px/1 "Lilita One", sans-serif; color: #fff; background: var(--mint); border: 3px solid var(--navy); border-radius: 99px; padding: 14px 0; box-shadow: 0 5px 0 var(--navy); cursor: pointer; width: 100%; -webkit-text-stroke: 1.5px var(--navy); paint-order: stroke fill; transition: transform .08s cubic-bezier(.3,1.6,.5,1), box-shadow .08s; }
+  .b .btn:active { transform: translateY(4px) scale(.98); box-shadow: 0 1px 0 var(--navy); }
+  .b .btn.alt { background: #fff; color: var(--navy); -webkit-text-stroke: 0; font-size: 16px; padding: 10px 0; }
+  .b .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .b .game { background: #fff; border: 3px solid var(--navy); border-radius: 14px; font-weight: 800; box-shadow: 2px 3px 0 var(--navy); }
+  .b .game:nth-child(odd) { transform: rotate(-2deg); }
+  .b .game:nth-child(even) { transform: rotate(2deg); }
+  .b .game.on { background: #ffe0c2; }
+  @keyframes b-arc { 50% { transform: translate(190px, -40px) rotate(200deg); } }
+
+  /* ── C: Scorebug ───────────────────────────────────────────── */
+  .c { --navy: #0B1530; --white: #F4F6FB; --red: #E8272F; --gold: #F5B82E; --steel: #1B2A4F; color: var(--white); font-family: "Barlow", sans-serif; }
+  .c .bg { background: linear-gradient(180deg, #16244a 0%, #0B1530 55%, #0f3325 55.5%, #0b2a1e 100%); }
+  .c .bg::before { content: ""; position: absolute; left: -10%; right: -10%; top: 56%; height: 2px; background: rgba(255,255,255,.35); }
+  .c .light { position: absolute; top: -40px; width: 180px; height: 360px; background: radial-gradient(ellipse at top, rgba(255,255,255,.22), transparent 70%); animation: c-sweep 7s ease-in-out infinite alternate; }
+  .c .light.r { right: -30px; animation-delay: -3s; }
+  .c .vignette { background: linear-gradient(90deg, rgba(11,21,48,.8), transparent 40% 60%, rgba(11,21,48,.8)); }
+  .c .logo { font: 400 50px/0.9 "Anton", Impact, sans-serif; letter-spacing: .02em; transform: skewX(-8deg); display: inline-block; }
+  .c .logo b { color: var(--red); font-weight: 400; }
+  .c .tag { font: 700 11px/1 "Barlow", sans-serif; letter-spacing: .18em; text-transform: uppercase; background: var(--red); padding: 5px 8px; display: inline-block; transform: skewX(-12deg); }
+  .c .coins { font: 700 14px/1 "Barlow", sans-serif; font-variant-numeric: tabular-nums; background: var(--steel); border-left: 4px solid var(--gold); padding: 7px 10px; color: var(--gold); transform: skewX(-12deg); }
+  .c .ticker { display: flex; gap: 0; font: 700 12px/1 "Barlow", sans-serif; font-variant-numeric: tabular-nums; }
+  .c .ticker span { background: var(--steel); padding: 7px 9px; }
+  .c .ticker span:first-child { background: var(--red); }
+  .c .btn { font: 400 26px/1 "Anton", Impact, sans-serif; letter-spacing: .03em; color: var(--navy); background: var(--white); border: 0; padding: 15px 0; width: 100%; cursor: pointer; clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%); transition: background .1s, transform .1s; }
+  .c .btn:hover { background: var(--gold); }
+  .c .btn:active { transform: translateX(3px); }
+  .c .btn.alt { background: var(--red); color: var(--white); font-size: 17px; padding: 11px 0; }
+  .c .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .c .game { background: var(--steel); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border-bottom: 3px solid transparent; }
+  .c .game.on { border-bottom-color: var(--red); }
+  @keyframes c-sweep { to { transform: translateX(120px) rotate(8deg); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>RUCKUS brand directions</h1>
+    <p>Three ways to dress the hub that wraps Chickenz, pool, head-soccer and the runner. Each mock is the same screen: a live game plays behind the menu, a gold demo balance, Quick Play, and the four game cards. Press the buttons to feel each press style. Gold is reserved for money in all three.</p>
+  </header>
+
+  <section class="grid">
+    <article class="dir">
+      <h2>A · Arcade Cabinet <small>loud, pixel-native, party</small> <span class="rec">Recommended</span></h2>
+      <div class="phone a" role="img" aria-label="Arcade Cabinet hub mock">
+        <div class="bg"><i class="chick one"></i><i class="chick two"></i></div><div class="vignette"></div>
+        <div class="ui">
+          <div class="topbar"><span class="tag">GUEST · FOX4821</span><span class="coins">1,000.00 DEMO</span></div>
+          <div><div class="logo">RUCK<br>US</div></div>
+          <div class="games">
+            <div class="game on">Chickenz</div><div class="game">8-Ball</div><div class="game">Egg Kick</div><div class="game">Dash</div>
+          </div>
+          <button class="btn" type="button" id="a-quick">QUICK PLAY</button>
+          <div class="row"><button class="btn alt" type="button" id="a-room">ROOMS</button><button class="btn alt" type="button" id="a-bet">BACK A BIRD</button></div>
+        </div>
+      </div>
+      <dl>
+        <dt>Palette</dt><dd><div class="swatches"><i class="sw" style="background:#1B1024"><span>#1B1024</span></i><i class="sw" style="background:#FF5A36"><span>#FF5A36</span></i><i class="sw" style="background:#2EC4B6"><span>#2EC4B6</span></i><i class="sw" style="background:#FFF1D6"><span>#FFF1D6</span></i><i class="sw" style="background:#FFC23A"><span>#FFC23A</span></i></div></dd>
+        <dt>Type</dt><dd>Bungee (arcade marquee) for titles and buttons · Rubik for body and numbers · Silkscreen for small pixel tags</dd>
+        <dt>Buttons</dt><dd>Thick 6px bottom lip that collapses on press (Supercell feel), chunky 14px radius</dd>
+        <dt>Motion</dt><dd>Stepped, frame-snapped animation that echoes pixel art; bouncy spring only on money moments</dd>
+        <dt>Fits</dt><dd>Chickenz pixel art natively; dark ground makes gold payouts and the live game behind the menu pop</dd>
+        <dt>Risk</dt><dd>Bungee is heavy; keep it to titles and buttons, never body copy</dd>
+      </dl>
+    </article>
+
+    <article class="dir">
+      <h2>B · Toy Box <small>friendly, iMessage-bright, social</small></h2>
+      <div class="phone b" role="img" aria-label="Toy Box hub mock">
+        <div class="bg"><i class="ball"></i><i class="egg l"></i><i class="egg r"></i></div><div class="vignette"></div>
+        <div class="ui">
+          <div class="topbar"><span class="tag">Hi, Fox4821</span><span class="coins">1,000.00 DEMO</span></div>
+          <div><span class="logo">RUCKUS</span></div>
+          <div class="games">
+            <div class="game on">Chickenz</div><div class="game">8-Ball</div><div class="game">Egg Kick</div><div class="game">Dash</div>
+          </div>
+          <button class="btn" type="button" id="b-quick">Quick Play</button>
+          <div class="row"><button class="btn alt" type="button" id="b-room">Play with friends</button><button class="btn alt" type="button" id="b-bet">Back a bird</button></div>
+        </div>
+      </div>
+      <dl>
+        <dt>Palette</dt><dd><div class="swatches"><i class="sw" style="background:#FFF3DC"><span>#FFF3DC</span></i><i class="sw" style="background:#1E2A4A"><span>#1E2A4A</span></i><i class="sw" style="background:#FF8A1F"><span>#FF8A1F</span></i><i class="sw" style="background:#3DD6A6"><span>#3DD6A6</span></i><i class="sw" style="background:#58B7FF"><span>#58B7FF</span></i><i class="sw" style="background:#F2B705"><span>#F2B705</span></i></div></dd>
+        <dt>Type</dt><dd>Lilita One with navy stroke for titles · Nunito for body and numbers</dd>
+        <dt>Buttons</dt><dd>Outlined pills with a navy drop edge and an overshoot squish on press</dd>
+        <dt>Motion</dt><dd>Sticker wobble, springy overshoot, cards tilted a few degrees like stickers on a lunchbox</dd>
+        <dt>Fits</dt><dd>The GamePigeon "play with a friend" mood; egg soccer natively</dd>
+        <dt>Risk</dt><dd>Light ground fights the live game behind the menu; reads younger and less like real stakes</dd>
+      </dl>
+    </article>
+
+    <article class="dir">
+      <h2>C · Scorebug <small>broadcast, competitive, tournaments</small></h2>
+      <div class="phone c" role="img" aria-label="Scorebug hub mock">
+        <div class="bg"><i class="light"></i><i class="light r"></i></div><div class="vignette"></div>
+        <div class="ui">
+          <div class="topbar"><span class="tag">LIVE</span><span class="coins">1,000.00 DEMO</span></div>
+          <div><span class="logo">RUCK<b>US</b></span></div>
+          <div class="ticker"><span>CUP</span><span>FOX4821 3–1 KIWI77</span><span>12:40</span></div>
+          <div class="games">
+            <div class="game on">Chickenz</div><div class="game">8-Ball</div><div class="game">Soccer</div><div class="game">Dash</div>
+          </div>
+          <button class="btn" type="button" id="c-quick">QUICK PLAY</button>
+          <div class="row"><button class="btn alt" type="button" id="c-room">ROOMS</button><button class="btn alt" type="button" id="c-bet">BACK A BIRD</button></div>
+        </div>
+      </div>
+      <dl>
+        <dt>Palette</dt><dd><div class="swatches"><i class="sw" style="background:#0B1530"><span>#0B1530</span></i><i class="sw" style="background:#F4F6FB"><span>#F4F6FB</span></i><i class="sw" style="background:#E8272F"><span>#E8272F</span></i><i class="sw" style="background:#F5B82E"><span>#F5B82E</span></i><i class="sw" style="background:#1B2A4F"><span>#1B2A4F</span></i></div></dd>
+        <dt>Type</dt><dd>Anton condensed, skewed, for titles · Barlow for body and tabular scores</dd>
+        <dt>Buttons</dt><dd>Slanted TV-graphic chips (clip-path), hard edges, slide-on-press</dd>
+        <dt>Motion</dt><dd>Broadcast wipes and tickers; snappy linear moves, no bounce</dd>
+        <dt>Fits</dt><dd>Tournaments, leaderboards, soccer and pool; strongest "live event" feel</dd>
+        <dt>Risk</dt><dd>Clashes with Chickenz pixel art; can feel like a sportsbook, not a party game</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="verdict">
+    <h2>Going with A · Arcade Cabinet</h2>
+    <p>It is the only direction that is native to the flagship game (pixel Chickenz) while still framing 3D pool and the cartoon soccer as "cabinets" in one arcade. The dark ground lets the live game behind the menu and the gold payouts carry the screen, and the thick press lip gives every tap the tactile Supercell feel. From B it borrows the friendly copy ("Play with friends"); from C it borrows the ticker for live results and tournaments.</p>
+  </section>
+</div>

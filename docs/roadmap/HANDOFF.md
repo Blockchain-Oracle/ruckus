@@ -10,11 +10,7 @@
 - **Convex:** prod `qualified-armadillo-823`, dev `insightful-bass-789`
 - The production connectivity check passes. Full details are in the S02 stage notes.
 
-**NEXT ACTION:** S03 task 1, brand direction.
-1. Invoke the `21st-ui-explore` skill to produce 2–3 distinct RUCKUS brand directions. The name is decided.
-2. Pick one yourself, following the art direction in ADR-006: a shared brand wrapping each game's native style, gold only for money, chunky press buttons, no emoji or Inter-everywhere.
-3. Write `docs/assets/ART-BIBLE.md`.
-4. Show the user the chosen direction in one short message. Autonomy applies: don't wait unless they object.
+**NEXT ACTION:** S03 task 2, the engine. The brand is done: read `docs/assets/ART-BIBLE.md`, which is direction A, Arcade Cabinet. Then read the three.js WebGPURenderer and TSL, R3F 9 and zustand 5 docs through context7, and build `apps/web/src/engine/` (GameShell, cameraDirector, gameMachine, scrim).
 
 **Uncommitted work:** none.
 

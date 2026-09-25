@@ -10,7 +10,7 @@
 - context7 docs: three.js WebGPURenderer/TSL post-processing, R3F 9, zustand 5, Motion
 
 ## Tasks
-1. [ ] **✱N Name and brand.**
+1. [x] **✱N Name and brand.** Done: direction A, Arcade Cabinet, is recorded in `docs/assets/ART-BIBLE.md`. The comparison artifact is https://claude.ai/artifact/5N3ouNtD9vLWUNiBaZwGiJ.
    - The name is decided: **RUCKUS** (gameId `ruckus`).
    - Use the **21st-ui-explore** skill to show 2–3 distinct brand directions.
    - The user picks one. Write `docs/assets/ART-BIBLE.md`: palette tokens (gold reserved for money), type (display + body fonts, tabular numbers), button language, iconography (Phosphor), motion rules and audio identity.
