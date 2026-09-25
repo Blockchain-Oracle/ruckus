@@ -15,6 +15,7 @@ import { useChickenzPrefs } from './prefs.ts';
 import { Arena } from './render/Arena.tsx';
 import { Bird } from './render/Bird.tsx';
 import { Effects } from './render/Effects.tsx';
+import { EmoteBubble } from './render/EmoteBubble.tsx';
 import { ChickenzEffects } from './render/effects.ts';
 import { Nameplate } from './render/Nameplates.tsx';
 import { Pickups } from './render/Pickups.tsx';
@@ -178,6 +179,9 @@ export function ChickenzScene({ generation }: GameSceneProps) {
           driver={driver}
           front={slot === markedSlot}
         />
+      ))}
+      {plateNames?.map((_, slot) => (
+        <EmoteBubble key={slot} slot={slot} driver={driver} />
       ))}
       <Projectiles driver={driver} />
       <Effects effects={effects} />

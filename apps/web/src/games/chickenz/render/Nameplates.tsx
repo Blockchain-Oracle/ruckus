@@ -30,8 +30,19 @@ const HP_COLORS = { high: '#66bb6a', mid: '#ffa726', low: '#ef5350' } as const;
 /** Above every bird, rider or victim, so a stomped bird's bar is never hidden (GameScene.ts:2172). */
 const Z = DEPTH.bird + 0.1;
 
-const SLOT_LIFT = 0.005;
-const FRONT_LIFT = 0.05;
+/**
+ * Plates always draw over the world, ordered among themselves (yours last, so on top) rather than
+ * by depth: thin layers a hair apart z-fight at play-camera distance.
+ */
+export const OVERLAY = {
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+  toneMapped: false,
+} as const;
+const PLATE_ORDER = 100;
+const PLATE_ORDER_STEP = 10;
+const FRONT_ORDER = PLATE_ORDER + PLATE_ORDER_STEP * 5;
 
 const u = (px: number) => px / TILE_PX;
 
@@ -92,11 +103,7 @@ export function Nameplate({ slot, name, color, driver, front = false }: Props) {
     const x = lerpPx(prev, curr, base + P.x, alpha);
     const y = lerpPx(prev, curr, base + P.y, alpha);
     // The group origin is the body's top centre; children offset in sim pixels (y down → -y up).
-    g.position.set(
-      u(x + BODY_W_PX / 2),
-      u(MAP_H_PX - y),
-      Z + (front ? FRONT_LIFT : slot * SLOT_LIFT),
-    );
+    g.position.set(u(x + BODY_W_PX / 2), u(MAP_H_PX - y), Z);
 
     const hp = Math.max(0, Math.min(1, (curr[base + P.health] ?? 0) / MAX_HEALTH_HP));
     const f = fill.current;
@@ -126,34 +133,39 @@ export function Nameplate({ slot, name, color, driver, front = false }: Props) {
     }
   });
 
+  const order = front ? FRONT_ORDER : PLATE_ORDER + slot * PLATE_ORDER_STEP;
   const barY = -u(BAR_TOP_PX + BAR_H_PX / 2);
   const shakeY = -u(BODY_H_PX + SHAKE_GAP_PX + SHAKE_BAR_H_PX / 2);
   return (
     <group ref={group} visible={false}>
       {label && (
-        <mesh position={[0, u(NAME_GAP_PX + label.heightPx / 2), 0]}>
+        <mesh position={[0, u(NAME_GAP_PX + label.heightPx / 2), 0]} renderOrder={order + 3}>
           <planeGeometry args={[u(label.widthPx), u(label.heightPx)]} />
-          <meshBasicMaterial
-            map={label.texture}
-            transparent
-            toneMapped={false}
-            depthWrite={false}
-          />
+          <meshBasicMaterial map={label.texture} {...OVERLAY} />
         </mesh>
       )}
-      <Bar y={barY} h={BAR_H_PX} track="#333333" fillRef={fill} fillColor={HP_COLORS.high} />
+      <Bar
+        y={barY}
+        h={BAR_H_PX}
+        track="#333333"
+        fillRef={fill}
+        fillColor={HP_COLORS.high}
+        order={order}
+      />
       <group ref={shake} position={[0, shakeY, 0]} visible={false}>
-        <Bar y={0} h={SHAKE_BAR_H_PX} track="#444444" fillRef={shakeFill} fillColor="#ffee58" />
+        <Bar
+          y={0}
+          h={SHAKE_BAR_H_PX}
+          track="#444444"
+          fillRef={shakeFill}
+          fillColor="#ffee58"
+          order={order}
+        />
       </group>
       {alertText && (
-        <mesh ref={alert} visible={false}>
+        <mesh ref={alert} visible={false} renderOrder={order + 4}>
           <planeGeometry args={[u(alertText.widthPx), u(alertText.heightPx)]} />
-          <meshBasicMaterial
-            map={alertText.texture}
-            transparent
-            toneMapped={false}
-            depthWrite={false}
-          />
+          <meshBasicMaterial map={alertText.texture} {...OVERLAY} />
         </mesh>
       )}
     </group>
@@ -167,26 +179,28 @@ function Bar({
   track,
   fillRef,
   fillColor,
+  order,
 }: {
   y: number;
   h: number;
   track: string;
   fillRef: RefObject<Mesh | null>;
   fillColor: string;
+  order: number;
 }) {
   return (
     <group position={[0, y, 0]}>
-      <mesh position={[0, 0, -0.002]}>
+      <mesh renderOrder={order}>
         <planeGeometry args={[u(BODY_W_PX + 2), u(h + 2)]} />
-        <meshBasicMaterial color="#000000" toneMapped={false} />
+        <meshBasicMaterial color="#000000" {...OVERLAY} />
       </mesh>
-      <mesh position={[0, 0, -0.001]}>
+      <mesh renderOrder={order + 1}>
         <planeGeometry args={[u(BODY_W_PX), u(h)]} />
-        <meshBasicMaterial color={track} toneMapped={false} />
+        <meshBasicMaterial color={track} {...OVERLAY} />
       </mesh>
-      <mesh ref={fillRef}>
+      <mesh ref={fillRef} renderOrder={order + 2}>
         <planeGeometry args={[u(BODY_W_PX), u(h)]} />
-        <meshBasicMaterial color={fillColor} toneMapped={false} />
+        <meshBasicMaterial color={fillColor} {...OVERLAY} />
       </mesh>
     </group>
   );

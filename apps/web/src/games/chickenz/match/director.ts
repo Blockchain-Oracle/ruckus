@@ -3,6 +3,7 @@ import { H } from '@arena/sim-chickenz';
 import { useProfile } from '@/app/stores/profile.ts';
 
 import { playCue } from '../audio/sfx.ts';
+import { type ChickenzEmote, clearEmotes, showEmote } from '../emotes/emotes.ts';
 import type { ChickenzDriver } from '../sim/driver.ts';
 import { HERO_NAMES, HEROES, type Hero } from '../sprites.ts';
 import {
@@ -20,6 +21,10 @@ import {
   WIPE_IN_MS,
 } from './config.ts';
 import { useMatch } from './store.ts';
+
+/** A winning practice bot's reaction, picked from the match seed (no hidden randomness). */
+const BOT_BRAGS = ['haha', 'wow', 'comeon', 'nice'] as const satisfies readonly ChickenzEmote[];
+const BOT_EMOTE_DELAY_MS = 350;
 
 type Timer = { at: number; run: () => void };
 
@@ -62,6 +67,7 @@ export class MatchDirector {
     useMatch.getState().set({ round, heroes, names, localSlot, wins, winner: -1, announce: null });
     const swap = () => {
       this.driver.setMode({ kind: 'online', seed, mapId, players, humanSlot: localSlot });
+      clearEmotes();
       this.driver.frozen = true;
     };
     // Always wipe online: the wipe plus countdown spans the server's frozen window, so GO! lines up.
@@ -120,6 +126,7 @@ export class MatchDirector {
   stop() {
     this.timers = [];
     this.driver.frozen = false;
+    clearEmotes();
     useMatch.getState().set({ status: 'off', announce: null, wipe: 0 });
   }
 
@@ -137,6 +144,7 @@ export class MatchDirector {
         difficulty: PRACTICE_BOT_DIFFICULTY,
       });
       this.driver.frozen = true;
+      clearEmotes();
     };
     this.present(swap, withWipe);
   }
@@ -200,6 +208,18 @@ export class MatchDirector {
     playCue(matchWon ? 'cz.matchwin' : 'cz.roundwin');
     // Online, the server decides what comes next (next round or match end).
     if (this.online) return;
+
+    // Practice bots are labelled characters, so they may react like players do.
+    if (winner >= 0 && winner !== state.localSlot && !matchWon) {
+      const brag = BOT_BRAGS[(this.seed + state.round) % BOT_BRAGS.length] ?? 'haha';
+      this.after(BOT_EMOTE_DELAY_MS, () => showEmote(winner, brag));
+    }
+    if (matchWon) {
+      state.heroes.forEach((_, slot) => {
+        if (slot !== state.localSlot)
+          this.after(BOT_EMOTE_DELAY_MS * (slot + 1), () => showEmote(slot, 'gg'));
+      });
+    }
 
     this.after(ROUND_OVER_MS, () => {
       if (matchWon) {

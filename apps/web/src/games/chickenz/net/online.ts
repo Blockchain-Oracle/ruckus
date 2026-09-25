@@ -1,5 +1,8 @@
+import { isChickenzEmote } from '@arena/protocol/chickenz';
+
 import { useGameMachine } from '@/engine/gameMachine.ts';
 
+import { fromRoom } from '../emotes/emotes.ts';
 import { getDirectors, getDriver } from '../match/runtime.ts';
 import { useMatch } from '../match/store.ts';
 import { HERO_NAMES, HEROES } from '../sprites.ts';
@@ -46,6 +49,9 @@ export function installOnline() {
     },
     onMatchEnd(e) {
       getDirectors()?.match.onlineMatchEnd(e.winner, e.wins);
+    },
+    onEmote(e) {
+      if (isChickenzEmote(e.emote)) fromRoom(e.slot, e.emote);
     },
     onSnapshot(_tick, ack, remote, body) {
       const driver = getDriver();

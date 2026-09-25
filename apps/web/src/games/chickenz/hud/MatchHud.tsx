@@ -12,6 +12,7 @@ import { getDriver } from '../match/runtime.ts';
 import { useMatch } from '../match/store.ts';
 import { primaryKey, useChickenzPrefs } from '../prefs.ts';
 import { HeroPortrait } from '../wager/HeroPortrait.tsx';
+import { EmoteBar } from './EmoteBar.tsx';
 import { useTick } from './useTick.ts';
 
 const HUD_HZ = 12;
@@ -143,6 +144,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
       >
         <ArrowLeftIcon weight="bold" className="size-5" />
       </button>
+      <EmoteBar className="absolute top-16 left-3 sm:left-8 [@media(pointer:fine)]:top-[4.25rem]" />
     </div>
   );
 }

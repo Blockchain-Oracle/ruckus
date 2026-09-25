@@ -115,5 +115,6 @@ export function playEvents(
     audio.play('cz.zone', { bus: 'sfx', gainDb });
 }
 
-export const playCue = (name: 'cz.countdown' | 'cz.go' | 'cz.roundwin' | 'cz.matchwin') =>
-  getAudio().play(name, { bus: 'sfx', exact: true });
+export const playCue = (
+  name: 'cz.countdown' | 'cz.go' | 'cz.roundwin' | 'cz.matchwin' | 'cz.emote',
+) => getAudio().play(name, { bus: 'sfx', exact: true });

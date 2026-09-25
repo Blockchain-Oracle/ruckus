@@ -4,6 +4,7 @@ import { ROOM } from '@arena/protocol';
 import {
   CHICKENZ_MSG,
   type ChickenzJoinOptions,
+  type EmoteEvent,
   INPUT_BYTES,
   type MatchEndEvent,
   type RoundEndEvent,
@@ -24,6 +25,7 @@ type Handlers = {
   onRoundEnd(e: RoundEndEvent): void;
   onMatchEnd(e: MatchEndEvent): void;
   onSnapshot(tick: number, ack: number, remote: Int8Array, body: Uint8Array): void;
+  onEmote(e: EmoteEvent): void;
 };
 
 const RECONNECT_TOKEN_KEY = 'ruckus.chickenz.reconnect';
@@ -67,7 +69,7 @@ function attach(r: Room) {
   r.onMessage(CHICKENZ_MSG.roundStart, (e: RoundStartEvent) => handlers?.onRoundStart(e));
   r.onMessage(CHICKENZ_MSG.roundEnd, (e: RoundEndEvent) => handlers?.onRoundEnd(e));
   r.onMessage(CHICKENZ_MSG.matchEnd, (e: MatchEndEvent) => handlers?.onMatchEnd(e));
-  r.onMessage(CHICKENZ_MSG.emote, () => {});
+  r.onMessage(CHICKENZ_MSG.emote, (e: EmoteEvent) => handlers?.onEmote(e));
   r.onMessage(CHICKENZ_MSG.snapshot, (packet: Uint8Array) => {
     if (packet.byteLength < SNAPSHOT_HEADER_BYTES) return;
     const dv = new DataView(packet.buffer, packet.byteOffset, packet.byteLength);

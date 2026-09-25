@@ -20,6 +20,10 @@ Every third-party asset or code source used in the product gets a row. Mirror at
 | Asset | Source | Licence | Price | Date | Used in |
 |---|---|---|---|---|---|
 | Hub UI sounds: click ×2, confirm, back, coin, whoosh | ElevenLabs Sound Effects (`eleven_text_to_sound_v2`), prompts in `assets-src/hub/ui/` | ElevenLabs paid plan output, owned by us (ToS §4c) | Starter plan credits | 2026-09-25 | `apps/web/src/assets/audio/hub-ui.*` |
+| Chickenz gameplay SFX (23): 5 weapon shots, hit, death, pickup, jump, double jump, explosion, stomp, escape, countdown, go, round win, match win, zone alarm, 4 hero taunts, emote pop | ElevenLabs Sound Effects (`eleven_text_to_sound_v2`), raw takes in `assets-src/chickenz/sfx/` | ElevenLabs paid plan output, owned by us (ToS §4c) | Starter plan credits | 2026-09-25 | `apps/web/src/games/chickenz/assets/audio/sfx.*` |
+| Back a Bird wager stings: lock, drumroll, win, big win, lose, coins | ElevenLabs Sound Effects, prompts in `assets-src/chickenz/wager/PROMPTS.md` | ElevenLabs paid plan output, owned by us (ToS §4c) | Starter plan credits | 2026-09-25 | `apps/web/src/games/chickenz/assets/audio/wager.*` |
+| Chickenz battle tracks A and B | ElevenLabs Music (`music_v2`), raw takes in `assets-src/chickenz/music/` | ElevenLabs paid plan output, cleared for commercial use | Starter plan credits | 2026-09-25 | `apps/web/src/games/chickenz/assets/music/` |
+| Hub lobby theme | ElevenLabs Music (`music_v2`), raw take in `assets-src/hub/music/` | ElevenLabs paid plan output, cleared for commercial use | Starter plan credits | 2026-09-25 | `apps/web/src/assets/music/lobby.*` |
 
 ## Fonts
 | Font | Source | Licence |

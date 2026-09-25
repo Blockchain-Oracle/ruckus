@@ -1,27 +1,74 @@
 {
   "loudnessLufs": -18,
   "sounds": {
-    "cz.shot.pistol": { "src": "shot_pistol.mp3" },
-    "cz.shot.shotgun": { "src": "shot_shotgun.mp3" },
-    "cz.shot.sniper": { "src": "shot_sniper.mp3" },
-    "cz.shot.rocket": { "src": "shot_rocket.mp3" },
-    "cz.shot.smg": { "src": "shot_smg.mp3" },
-    "cz.hit": { "src": "hit.mp3" },
-    "cz.death": { "src": "death.mp3" },
-    "cz.pickup": { "src": "pickup.mp3" },
-    "cz.jump": { "src": "jump.mp3" },
-    "cz.doublejump": { "src": "double_jump.mp3" },
-    "cz.explosion": { "src": "explosion.mp3" },
-    "cz.stomp": { "src": "stomp.mp3" },
-    "cz.escape": { "src": "escape.mp3" },
-    "cz.countdown": { "src": "countdown.mp3" },
-    "cz.go": { "src": "go.mp3" },
-    "cz.roundwin": { "src": "round_win.mp3" },
-    "cz.matchwin": { "src": "match_win.mp3" },
-    "cz.zone": { "src": "zone_warn.mp3" },
-    "cz.taunt.ninja-frog": { "src": "taunt_frog.mp3" },
-    "cz.taunt.mask-dude": { "src": "taunt_mask.mp3" },
-    "cz.taunt.pink-man": { "src": "taunt_pink.mp3" },
-    "cz.taunt.virtual-guy": { "src": "taunt_virtual.mp3" }
+    "cz.shot.pistol": {
+      "src": "shot_pistol.mp3"
+    },
+    "cz.shot.shotgun": {
+      "src": "shot_shotgun.mp3"
+    },
+    "cz.shot.sniper": {
+      "src": "shot_sniper.mp3"
+    },
+    "cz.shot.rocket": {
+      "src": "shot_rocket.mp3"
+    },
+    "cz.shot.smg": {
+      "src": "shot_smg.mp3"
+    },
+    "cz.hit": {
+      "src": "hit.mp3"
+    },
+    "cz.death": {
+      "src": "death.mp3"
+    },
+    "cz.pickup": {
+      "src": "pickup.mp3"
+    },
+    "cz.jump": {
+      "src": "jump.mp3"
+    },
+    "cz.doublejump": {
+      "src": "double_jump.mp3"
+    },
+    "cz.explosion": {
+      "src": "explosion.mp3"
+    },
+    "cz.stomp": {
+      "src": "stomp.mp3"
+    },
+    "cz.escape": {
+      "src": "escape.mp3"
+    },
+    "cz.countdown": {
+      "src": "countdown.mp3"
+    },
+    "cz.go": {
+      "src": "go.mp3"
+    },
+    "cz.roundwin": {
+      "src": "round_win.mp3"
+    },
+    "cz.matchwin": {
+      "src": "match_win.mp3"
+    },
+    "cz.zone": {
+      "src": "zone_warn.mp3"
+    },
+    "cz.taunt.ninja-frog": {
+      "src": "taunt_frog.mp3"
+    },
+    "cz.taunt.mask-dude": {
+      "src": "taunt_mask.mp3"
+    },
+    "cz.taunt.pink-man": {
+      "src": "taunt_pink.mp3"
+    },
+    "cz.taunt.virtual-guy": {
+      "src": "taunt_virtual.mp3"
+    },
+    "cz.emote": {
+      "src": "emote.mp3"
+    }
   }
 }

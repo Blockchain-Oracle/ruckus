@@ -86,5 +86,9 @@
   "cz.taunt.virtual-guy": {
     "start": 18.5444,
     "duration": 0.48
+  },
+  "cz.emote": {
+    "start": 19.1244,
+    "duration": 0.48
   }
 }
