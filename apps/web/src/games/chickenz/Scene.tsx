@@ -5,10 +5,10 @@ import { useGameMachine } from '@/engine/gameMachine.ts';
 import type { GameSceneProps } from '@/engine/types.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
-import { BATTLE_TRACKS } from './audio/music.ts';
 import { playEvents } from './audio/sfx.ts';
+import { onPlay, stopAll } from './flow.ts';
 import { MatchDirector } from './match/director.ts';
-import { input, setDriver } from './match/runtime.ts';
+import { input, setDirectors, setDriver } from './match/runtime.ts';
 import { useMatch } from './match/store.ts';
 import { Arena } from './render/Arena.tsx';
 import { Bird } from './render/Bird.tsx';
@@ -20,6 +20,8 @@ import { layoutFrom } from './render/terrain.ts';
 import { Zone } from './render/Zone.tsx';
 import { ChickenzDriver } from './sim/driver.ts';
 import { HEROES, type Hero } from './sprites.ts';
+import { TutorialDirector, useTutorial } from './tutorial/director.ts';
+import { useOnboarding } from './tutorial/onboarding.ts';
 import { PRESENTATION } from './wager/constants.ts';
 import { heroesForFight, useWager } from './wager/store.ts';
 
@@ -27,12 +29,11 @@ import { heroesForFight, useWager } from './wager/store.ts';
 const ATTRACT_SEED_BASE = 0x5eed;
 const MS_PER_S = 1000;
 
-let director: MatchDirector | null = null;
-export const getDirector = () => director;
-
 export function ChickenzScene({ generation }: GameSceneProps) {
   const driver = useMemo(() => new ChickenzDriver(ATTRACT_SEED_BASE + generation), [generation]);
   const matchDirector = useMemo(() => new MatchDirector(driver), [driver]);
+  const tutorialDirector = useMemo(() => new TutorialDirector(driver), [driver]);
+  const tutorialStep = useTutorial((s) => s.step);
   const effects = useMemo(() => new ChickenzEffects(), []);
   const [round, setRound] = useState(0);
   const machinePhase = useGameMachine((s) => s.phase);
@@ -44,13 +45,19 @@ export function ChickenzScene({ generation }: GameSceneProps) {
   const matchHeroes = useMatch((s) => s.heroes);
 
   const presenting = driver.kind === 'fight' && (wagerPhase === 'fight' || wagerPhase === 'result');
-  const inMatch = matchStatus !== 'off';
-  const heroes: Hero[] = presenting ? heroesForFight(backed) : inMatch ? matchHeroes : [...HEROES];
+  const inMatch = matchStatus !== 'off' || tutorialStep >= 0;
+  const heroes: Hero[] = presenting
+    ? heroesForFight(backed)
+    : matchStatus !== 'off'
+      ? matchHeroes
+      : tutorialStep >= 0
+        ? heroesForFight(backed)
+        : [...HEROES];
 
   useEffect(() => {
     driver.start();
     setDriver(driver);
-    director = matchDirector;
+    setDirectors({ match: matchDirector, tutorial: tutorialDirector });
     driver.onRound = () => {
       effects.clear();
       setRound(driver.round);
@@ -59,12 +66,12 @@ export function ChickenzScene({ generation }: GameSceneProps) {
     driver.readInput = () => input.read();
     return () => {
       input.dispose();
-      matchDirector.stop();
+      stopAll();
       driver.stop();
       setDriver(null);
-      director = null;
+      setDirectors(null);
     };
-  }, [driver, matchDirector, effects]);
+  }, [driver, matchDirector, tutorialDirector, effects]);
 
   // Sounds follow whatever is on screen: full volume in play, a quiet bed behind the menu.
   useEffect(() => {
@@ -76,16 +83,16 @@ export function ChickenzScene({ generation }: GameSceneProps) {
 
   // Play starts a real match (you vs bots); leaving returns the backdrop to exhibitions.
   useEffect(() => {
-    if (machinePhase === 'entering' && wagerPhase === 'idle' && !matchDirector.active) {
-      matchDirector.start(useWager.getState().hero, (Date.now() ^ generation) >>> 0);
-      const track = BATTLE_TRACKS[generation % BATTLE_TRACKS.length];
-      if (track) playMusic(track);
-    } else if (machinePhase === 'leaving' && matchDirector.active) {
-      matchDirector.stop();
+    const busy =
+      matchDirector.active || tutorialDirector.active || useOnboarding.getState().stage !== 'none';
+    if (machinePhase === 'entering' && wagerPhase === 'idle' && !busy) {
+      onPlay();
+    } else if (machinePhase === 'leaving' && busy) {
+      stopAll();
       driver.exhibit();
       playMusic(LOBBY_TRACK);
     }
-  }, [machinePhase, wagerPhase, matchDirector, driver, generation]);
+  }, [machinePhase, wagerPhase, matchDirector, tutorialDirector, driver]);
 
   // A settled wager swaps the exhibition for its bank seed; leaving the wager restores exhibitions.
   useEffect(() => {

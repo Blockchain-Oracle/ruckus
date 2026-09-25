@@ -24,7 +24,9 @@ export type Mode =
       players: number;
       humanSlot: number;
       difficulty: number;
-    };
+    }
+  /** The hands-on tutorial: you in slot 0, a scripted dummy in slot 1, no clock. */
+  | { kind: 'tutorial'; seed: number };
 
 type Input = { buttons: number; aimX: number };
 
@@ -55,6 +57,8 @@ export class ChickenzDriver {
   /** Every simulated tick, with the views either side of it (sound events diff these). */
   onStep?: (prev: Int32Array, curr: Int32Array) => void;
   readInput?: () => Input;
+  /** Runs before every tick with the live sim and this tick's human input (tutorial scripting). */
+  beforeStep: ((sim: Sim, input: Input) => void) | undefined;
 
   constructor(seed: number) {
     this.seed = seed >>> 0;
@@ -70,11 +74,13 @@ export class ChickenzDriver {
   }
 
   get mapId(): number {
+    if (this.mode.kind === 'tutorial') return MapId.Tutorial;
     if (this.mode.kind !== 'exhibition') return this.mode.mapId;
     return ATTRACT_MAPS[this.round % ATTRACT_MAPS.length] ?? MapId.Arena;
   }
 
   get humanSlot(): number {
+    if (this.mode.kind === 'tutorial') return 0;
     return this.mode.kind === 'match' ? this.mode.humanSlot : -1;
   }
 
@@ -90,7 +96,9 @@ export class ChickenzDriver {
   private newRound(): Sim {
     const m = this.mode;
     let sim: Sim;
-    if (m.kind === 'exhibition') {
+    if (m.kind === 'tutorial') {
+      sim = Sim.new_tutorial(m.seed);
+    } else if (m.kind === 'exhibition') {
       sim = new Sim(this.seed, ATTRACT_PLAYERS, this.mapId);
       ATTRACT_DIFFICULTY.forEach((d, slot) => {
         sim.set_bot(slot, d);
@@ -132,9 +140,11 @@ export class ChickenzDriver {
     }
     this.accumulator = Math.min(this.accumulator + dtS, MAX_CATCH_UP_TICKS * TICK_S);
     while (this.accumulator >= TICK_S) {
-      if (this.mode.kind === 'match' && this.readInput) {
+      const human = this.humanSlot;
+      if (human >= 0 && this.readInput) {
         const input = this.readInput();
-        sim.set_input(this.mode.humanSlot, input.buttons, input.aimX, 0);
+        sim.set_input(human, input.buttons, input.aimX, 0);
+        this.beforeStep?.(sim, input);
       }
       this.prev.set(this.curr);
       sim.step();
@@ -144,7 +154,7 @@ export class ChickenzDriver {
     }
     this.alpha = this.accumulator / TICK_S;
 
-    if (!this.curr[H.matchOver]) return;
+    if (!this.curr[H.matchOver] || this.mode.kind === 'tutorial') return;
     if (this.mode.kind !== 'exhibition') {
       if (!this.ended) {
         this.ended = true;

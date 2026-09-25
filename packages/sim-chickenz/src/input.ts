@@ -14,7 +14,7 @@ export const NULL_INPUT: PlayerInput = { buttons: 0, aimX: 0, aimY: 0 };
 
 export const WeaponId = { None: -1, Pistol: 0, Shotgun: 1, Sniper: 2, Rocket: 3, Smg: 4 } as const;
 
-export const MapId = { Arena: 0, Towers: 1, Bridges: 2 } as const;
+export const MapId = { Arena: 0, Towers: 1, Bridges: 2, Tutorial: 3 } as const;
 
 /** 60 Hz fixed tick; all timing constants in the sim are in these ticks. */
 export const TICK_HZ = 60;

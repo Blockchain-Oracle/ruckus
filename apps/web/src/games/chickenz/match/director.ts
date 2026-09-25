@@ -1,5 +1,7 @@
 import { H } from '@arena/sim-chickenz';
 
+import { useProfile } from '@/app/stores/profile.ts';
+
 import { playCue } from '../audio/sfx.ts';
 import type { ChickenzDriver } from '../sim/driver.ts';
 import { HERO_NAMES, HEROES, type Hero } from '../sprites.ts';
@@ -63,7 +65,8 @@ export class MatchDirector {
     this.seed = seed >>> 0 || 1;
     // You always take slot 0 with your hero; bots fill the rest with the other heroes.
     const heroes = [hero, ...HEROES.filter((h) => h !== hero)].slice(0, PRACTICE_PLAYERS);
-    const names = heroes.map((h, i) => (i === 0 ? 'You' : `Bot · ${HERO_NAMES[h]}`));
+    const you = useProfile.getState().name;
+    const names = heroes.map((h, i) => (i === 0 ? you : `Bot · ${HERO_NAMES[h]}`));
     useMatch.getState().set({
       status: 'wipe',
       round: 0,

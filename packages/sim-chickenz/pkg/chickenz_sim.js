@@ -1,6 +1,12 @@
 /* @ts-self-types="./chickenz_sim.d.ts" */
 
 export class Sim {
+    static __wrap(ptr) {
+        const obj = Object.create(Sim.prototype);
+        obj.__wbg_ptr = ptr;
+        SimFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
@@ -51,6 +57,15 @@ export class Sim {
         this.__wbg_ptr = ret;
         SimFinalization.register(this, this.__wbg_ptr, this);
         return this;
+    }
+    /**
+     * Two-bird tutorial sandbox: tutorial map, 99 lives, no clock (see `tutorial.rs`).
+     * @param {number} seed
+     * @returns {Sim}
+     */
+    static new_tutorial(seed) {
+        const ret = wasm.sim_new_tutorial(seed);
+        return Sim.__wrap(ret);
     }
     /**
      * Platforms as [x, y, w, h] px quads (non-empty only), for the renderer's terrain bake.
@@ -131,6 +146,32 @@ export class Sim {
     tick() {
         const ret = wasm.sim_tick(this.__wbg_ptr);
         return ret;
+    }
+    /**
+     * @param {number} slot
+     */
+    tutorial_banish(slot) {
+        wasm.sim_tutorial_banish(this.__wbg_ptr, slot);
+    }
+    /**
+     * @param {number} student
+     * @param {number} target
+     */
+    tutorial_kill(student, target) {
+        wasm.sim_tutorial_kill(this.__wbg_ptr, student, target);
+    }
+    /**
+     * @param {number} slot
+     */
+    tutorial_pin_health(slot) {
+        wasm.sim_tutorial_pin_health(this.__wbg_ptr, slot);
+    }
+    /**
+     * @param {number} victim
+     * @param {number} rider
+     */
+    tutorial_stomp(victim, rider) {
+        wasm.sim_tutorial_stomp(this.__wbg_ptr, victim, rider);
     }
     /**
      * Fill `out` (length `view_len()`) with the render view.

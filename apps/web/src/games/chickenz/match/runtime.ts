@@ -1,6 +1,8 @@
 import { KeyboardInput } from '../input/keyboard.ts';
 import { TouchSticks } from '../input/touch.ts';
 import type { ChickenzDriver } from '../sim/driver.ts';
+import type { TutorialDirector } from '../tutorial/director.ts';
+import type { MatchDirector } from './director.ts';
 
 /**
  * The live driver, shared with the DOM HUD and the camera (both sit outside the scene tree).
@@ -17,3 +19,9 @@ export const getDriver = () => driver;
 export const input = new KeyboardInput();
 export const touch = new TouchSticks();
 input.touch = touch;
+
+let directors: { match: MatchDirector; tutorial: TutorialDirector } | null = null;
+export const setDirectors = (d: typeof directors) => {
+  directors = d;
+};
+export const getDirectors = () => directors;

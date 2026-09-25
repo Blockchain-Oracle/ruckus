@@ -12,6 +12,7 @@ pub mod prng;
 pub mod runner;
 pub mod state;
 pub mod step;
+pub mod tutorial;
 pub mod stomp;
 pub mod view;
 pub mod weapons;

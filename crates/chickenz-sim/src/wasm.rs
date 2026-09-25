@@ -29,6 +29,38 @@ impl Sim {
         Sim { state, map, bots: [None, None, None, None], inputs: [Input::default(); MAX_PLAYERS], seed }
     }
 
+    /// Two-bird tutorial sandbox: tutorial map, 99 lives, no clock (see `tutorial.rs`).
+    pub fn new_tutorial(seed: u32) -> Sim {
+        let cfg = crate::tutorial::config();
+        let map = map::by_id(cfg.map);
+        let state = State::new(seed, cfg, &map);
+        Sim { state, map, bots: [None, None, None, None], inputs: [Input::default(); MAX_PLAYERS], seed }
+    }
+
+    pub fn tutorial_banish(&mut self, slot: usize) {
+        if slot < self.state.n() {
+            crate::tutorial::banish(&mut self.state, slot);
+        }
+    }
+
+    pub fn tutorial_stomp(&mut self, victim: usize, rider: usize) {
+        if victim < self.state.n() && rider < self.state.n() && victim != rider {
+            crate::tutorial::stage_stomp(&mut self.state, victim, rider);
+        }
+    }
+
+    pub fn tutorial_pin_health(&mut self, slot: usize) {
+        if slot < self.state.n() {
+            crate::tutorial::pin_health(&mut self.state, slot);
+        }
+    }
+
+    pub fn tutorial_kill(&mut self, student: usize, target: usize) {
+        if student < self.state.n() && target < self.state.n() && student != target {
+            crate::tutorial::stage_kill(&mut self.state, student, target);
+        }
+    }
+
     /// Hand a slot to the deterministic bot (difficulty 0–100).
     pub fn set_bot(&mut self, slot: usize, difficulty: i32) {
         if slot < MAX_PLAYERS {

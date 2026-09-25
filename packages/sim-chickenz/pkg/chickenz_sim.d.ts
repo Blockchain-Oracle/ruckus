@@ -16,6 +16,10 @@ export class Sim {
     match_over(): boolean;
     constructor(seed: number, player_count: number, map_id: number);
     /**
+     * Two-bird tutorial sandbox: tutorial map, 99 lives, no clock (see `tutorial.rs`).
+     */
+    static new_tutorial(seed: number): Sim;
+    /**
      * Platforms as [x, y, w, h] px quads (non-empty only), for the renderer's terrain bake.
      */
     platforms(): Int32Array;
@@ -37,6 +41,10 @@ export class Sim {
     step_many(ticks: number): void;
     sudden_death_tick(): number;
     tick(): number;
+    tutorial_banish(slot: number): void;
+    tutorial_kill(student: number, target: number): void;
+    tutorial_pin_health(slot: number): void;
+    tutorial_stomp(victim: number, rider: number): void;
     /**
      * Fill `out` (length `view_len()`) with the render view.
      */
@@ -69,6 +77,7 @@ export interface InitOutput {
     readonly sim_input_of: (a: number, b: number) => number;
     readonly sim_match_over: (a: number) => number;
     readonly sim_new: (a: number, b: number, c: number) => number;
+    readonly sim_new_tutorial: (a: number) => number;
     readonly sim_platforms: (a: number) => [number, number];
     readonly sim_restore: (a: number, b: number, c: number) => number;
     readonly sim_round_ticks: (a: number) => number;
@@ -79,6 +88,10 @@ export interface InitOutput {
     readonly sim_step_many: (a: number, b: number) => void;
     readonly sim_sudden_death_tick: (a: number) => number;
     readonly sim_tick: (a: number) => number;
+    readonly sim_tutorial_banish: (a: number, b: number) => void;
+    readonly sim_tutorial_kill: (a: number, b: number, c: number) => void;
+    readonly sim_tutorial_pin_health: (a: number, b: number) => void;
+    readonly sim_tutorial_stomp: (a: number, b: number, c: number) => void;
     readonly sim_view: (a: number, b: number, c: number, d: any) => void;
     readonly sim_weapon_spawns: (a: number) => [number, number];
     readonly sim_winner: (a: number) => number;

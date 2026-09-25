@@ -47,12 +47,15 @@ pub type MapId = u8;
 pub const ARENA: MapId = 0;
 pub const TOWERS: MapId = 1;
 pub const BRIDGES: MapId = 2;
+/** Maps in match rotation (and the seed-bank `seed % MAP_COUNT` rule); TUTORIAL is outside it. */
 pub const MAP_COUNT: u8 = 3;
+pub const TUTORIAL: MapId = 3;
 
 pub fn by_id(id: MapId) -> Map {
     match id {
         TOWERS => towers(),
         BRIDGES => bridges(),
+        TUTORIAL => tutorial(),
         _ => arena(),
     }
 }
@@ -118,4 +121,11 @@ pub fn bridges() -> Map {
         spawns: [pt(112, 480), pt(848, 480), pt(368, 208), pt(608, 208)],
         weapon_spawns: [pt(128, 304), pt(848, 304), pt(480, 384), pt(480, 208)],
     }
+}
+
+/// ARENA plus a high platform that only a double jump reaches (Chickenz `TUTORIAL_MAP`).
+pub fn tutorial() -> Map {
+    let mut m = arena();
+    m.platforms[6] = Platform::px(368, 144, 224, 16);
+    m
 }
