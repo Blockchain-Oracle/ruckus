@@ -1,0 +1,11 @@
+references
+casino-sdk
+assets-src
+contracts/lib
+contracts/out
+contracts/cache
+crates/*/target
+**/node_modules
+**/dist
+**/.turbo
+docs/raw

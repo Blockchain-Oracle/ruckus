@@ -46,3 +46,5 @@ test-results/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+.vercel
+.env*
