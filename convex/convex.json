@@ -1,0 +1,7 @@
+{
+  "functions": "src/",
+  "codegen": {
+    "staticApi": true,
+    "staticDataModel": true
+  }
+}

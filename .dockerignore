@@ -1,0 +1,13 @@
+# Mirror what Coolify gets from a git clone: no local installs, caches or reference repos.
+**/node_modules
+**/dist
+**/.turbo
+references
+casino-sdk
+assets-src
+contracts/out
+contracts/cache
+contracts/lib
+.git
+.env
+.env.*

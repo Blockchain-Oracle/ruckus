@@ -1,0 +1,22 @@
+# Coolify build for the Colyseus game server (ADR-002, docs/research/deep/coolify-nixpacks.md).
+# Coolify: Base Directory "/", build variables NIXPACKS_CONFIG_FILE=apps/server/nixpacks.toml
+# and NIXPACKS_NODE_VERSION=24. Never set NODE_ENV=production as a *build* variable.
+
+[variables]
+NIXPACKS_NODE_VERSION = "24"
+
+[phases.setup]
+# "..." keeps the Node provider's packages (node + pnpm from `packageManager`); curl serves the health check.
+nixPkgs = ["...", "curl"]
+
+[phases.install]
+# The Node provider exports NODE_ENV=production, which would make pnpm skip the devDependencies
+# (tsdown, typescript) the build needs — so force them in.
+cmds = ["pnpm install --frozen-lockfile --prod=false --filter @arena/server..."]
+
+[phases.build]
+cmds = ["pnpm --filter @arena/server... run build"]
+
+[start]
+# Run node directly so SIGTERM reaches Colyseus' graceful shutdown.
+cmd = "node apps/server/dist/index.js"

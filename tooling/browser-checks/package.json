@@ -7,13 +7,18 @@
   "scripts": {
     "casino": "tsx src/casino-e2e.ts",
     "prod-frame": "tsx src/prod-frame.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "check:server": "tsx src/server-hello.ts",
+    "connectivity": "tsx src/connectivity.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
     "@types/node": "^24.10.0",
     "playwright-core": "^1.58.0",
     "tsx": "^4.21.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@colyseus/sdk": "^0.18.4",
+    "@arena/shared": "workspace:*",
+    "@arena/protocol": "workspace:*"
   }
 }

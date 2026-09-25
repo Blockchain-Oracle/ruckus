@@ -13,7 +13,12 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@arena/shared": "workspace:*"
+    "@arena/shared": "workspace:*",
+    "@arena/protocol": "workspace:*",
+    "colyseus": "^0.18.8",
+    "@colyseus/schema": "^5.0.34",
+    "@t3-oss/env-core": "^0.13.11",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

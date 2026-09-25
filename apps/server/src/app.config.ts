@@ -1,0 +1,24 @@
+import { createEndpoint, createRouter, defineRoom, defineServer } from 'colyseus';
+
+import { ROOM } from '@arena/protocol';
+import { PROTOCOL_VERSION } from '@arena/shared';
+
+import { env } from '#app/config/env.ts';
+import { HelloRoom } from '#app/rooms/hello/HelloRoom.ts';
+
+const BOOTED_AT = Date.now();
+
+export const server = defineServer({
+  rooms: {
+    [ROOM.hello]: defineRoom(HelloRoom),
+  },
+  routes: createRouter({
+    /** Coolify health check (curl inside the container) and uptime monitor. */
+    health: createEndpoint('/health', { method: 'GET' }, async () => ({
+      status: 'ok' as const,
+      protocolVersion: PROTOCOL_VERSION,
+      commit: env.SOURCE_COMMIT ?? 'dev',
+      uptimeSeconds: Math.round((Date.now() - BOOTED_AT) / 1000),
+    })),
+  }),
+});

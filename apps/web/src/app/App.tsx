@@ -8,6 +8,12 @@ const CasinoDebugPanel = lazy(() =>
   })),
 );
 
+const ConnectivityPanel = lazy(() =>
+  import('@/features/connectivity-debug/ConnectivityPanel.tsx').then((m) => ({
+    default: m.ConnectivityPanel,
+  })),
+);
+
 const DEBUG_PARAM = 'debug';
 
 export function App() {
@@ -16,6 +22,13 @@ export function App() {
     return (
       <Suspense fallback={null}>
         <CasinoDebugPanel />
+      </Suspense>
+    );
+  }
+  if (debug === 'connectivity') {
+    return (
+      <Suspense fallback={null}>
+        <ConnectivityPanel />
       </Suspense>
     );
   }

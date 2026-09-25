@@ -17,7 +17,14 @@
     "@arena/casino-bridge": "workspace:*",
     "@arena/casino-math": "workspace:*",
     "@chain/casino-sdk": "workspace:*",
-    "viem": "^2.56.9"
+    "viem": "^2.56.9",
+    "convex": "^1.46.0",
+    "@convex-dev/auth": "^0.0.95",
+    "@colyseus/sdk": "^0.18.4",
+    "@t3-oss/env-core": "^0.13.11",
+    "zod": "catalog:",
+    "@arena/protocol": "workspace:*",
+    "@arena/convex": "workspace:*"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

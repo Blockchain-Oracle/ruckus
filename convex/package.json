@@ -1,0 +1,26 @@
+{
+  "name": "@arena/convex",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Convex backend: guest identity (anonymous auth), profiles, leaderboards, tournaments, replays.",
+  "type": "module",
+  "exports": {
+    "./api": "./src/_generated/api.js",
+    "./dataModel": "./src/_generated/dataModel.d.ts"
+  },
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "typecheck": "tsc --noEmit -p src"
+  },
+  "dependencies": {
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.95",
+    "convex": "^1.46.0"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "@types/node": "^24.10.0"
+  }
+}
