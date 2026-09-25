@@ -16,13 +16,25 @@ contract ParityTest is Test {
     }
 
     function test_backChicken_matchesTsMirror() public view {
-        string memory json = vm.readFile(string.concat(vm.projectRoot(), "/vectors/back-chicken.json"));
+        _replay("back-chicken.json", game.BET_BACK_CHICKEN(), abi.encode(uint8(0)));
+    }
+
+    function test_callShot_matchesTsMirror() public view {
+        bytes memory params = abi.encode(uint8(1), uint8(3));
+        _replay("call-shot-1.json", game.BET_CALL_SHOT_STRAIGHT(), params);
+        _replay("call-shot-2.json", game.BET_CALL_SHOT_CUT(), params);
+        _replay("call-shot-3.json", game.BET_CALL_SHOT_THIN(), params);
+        _replay("call-shot-4.json", game.BET_CALL_SHOT_LONG(), params);
+    }
+
+    function _replay(string memory file, uint8 betType, bytes memory params) private view {
+        string memory json = vm.readFile(string.concat(vm.projectRoot(), "/vectors/", file));
         bytes32[] memory randomness = vm.parseJsonBytes32Array(json, ".randomness");
         uint256[] memory classes = vm.parseJsonUintArray(json, ".classes");
         string[] memory wagers = vm.parseJsonStringArray(json, ".wagers");
         string[] memory payouts = vm.parseJsonStringArray(json, ".payouts");
-        (uint256[] memory weights,) = game.betTable(game.BET_BACK_CHICKEN());
-        bytes memory gameData = abi.encode(game.BET_BACK_CHICKEN(), uint8(1), abi.encode(uint8(0)));
+        (uint256[] memory weights,) = game.betTable(betType);
+        bytes memory gameData = abi.encode(betType, uint8(1), params);
 
         assertGt(randomness.length, 0);
         for (uint256 i = 0; i < randomness.length; ++i) {

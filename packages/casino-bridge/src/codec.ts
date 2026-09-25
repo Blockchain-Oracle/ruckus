@@ -28,6 +28,11 @@ export function encodeBackChickenParams(fighterIndex: number): Hex {
   return encodeAbiParameters([{ type: 'uint8' }], [fighterIndex]);
 }
 
+/** Call Your Shot params: the called object ball (1–15) and pocket (0–5). */
+export function encodeCallShotParams(ball: number, pocket: number): Hex {
+  return encodeAbiParameters([{ type: 'uint8' }, { type: 'uint8' }], [ball, pocket]);
+}
+
 export function decodeBet(gameData: Hex): DecodedBet {
   const [betType, presentationVersion, params] = decodeAbiParameters(BET_ENVELOPE, gameData);
   getBetTable(betType as BetType); // throws for bet types this client does not know

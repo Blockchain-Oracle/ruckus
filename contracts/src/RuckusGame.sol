@@ -23,6 +23,15 @@ contract RuckusGame is ICasinoGameV2 {
     ///         params = abi.encode(uint8 fighterIndex). Classes: flawless win, win, 2nd place, lose.
     uint8 public constant BET_BACK_CHICKEN = 0;
     uint8 public constant CHICKENZ_FIGHTERS = 4;
+    /// @notice 8-ball "Call Your Shot": call a ball and a pocket on a real table; the tier is the
+    ///         shot's difficulty (straight, cut, thin, long). params = abi.encode(uint8 ball, uint8 pocket).
+    ///         Classes: make, miss. Every tier pays the one declared RTP.
+    uint8 public constant BET_CALL_SHOT_STRAIGHT = 1;
+    uint8 public constant BET_CALL_SHOT_CUT = 2;
+    uint8 public constant BET_CALL_SHOT_THIN = 3;
+    uint8 public constant BET_CALL_SHOT_LONG = 4;
+    uint8 public constant POOL_OBJECT_BALLS = 15;
+    uint8 public constant POOL_POCKETS = 6;
 
     error RuckusGame__UnknownBetType(uint8 betType);
     error RuckusGame__InvalidParams(uint8 betType);
@@ -133,7 +142,23 @@ contract RuckusGame is ICasinoGameV2 {
             (weights[3], multipliersBps[3]) = (10, 0); //     lose
             return (weights, multipliersBps);
         }
+        // Call Your Shot tiers: (make weight, miss weight, make multiplier), each 96.00% exactly.
+        if (betType == BET_CALL_SHOT_STRAIGHT) return _makeMiss(3, 1, 12_800); // 3/4 × 1.28
+        if (betType == BET_CALL_SHOT_CUT) return _makeMiss(1, 1, 19_200); //      1/2 × 1.92
+        if (betType == BET_CALL_SHOT_THIN) return _makeMiss(1, 3, 38_400); //     1/4 × 3.84
+        if (betType == BET_CALL_SHOT_LONG) return _makeMiss(1, 9, 96_000); //     1/10 × 9.6
         revert RuckusGame__UnknownBetType(betType);
+    }
+
+    function _makeMiss(uint256 makeWeight, uint256 missWeight, uint256 makeBps)
+        internal
+        pure
+        returns (uint256[] memory weights, uint256[] memory multipliersBps)
+    {
+        weights = new uint256[](2);
+        multipliersBps = new uint256[](2);
+        (weights[0], multipliersBps[0]) = (makeWeight, makeBps); // make
+        (weights[1], multipliersBps[1]) = (missWeight, 0); //       miss
     }
 
     function _decodeBet(bytes calldata gameData)
@@ -151,6 +176,13 @@ contract RuckusGame is ICasinoGameV2 {
             if (params.length != 32) revert RuckusGame__InvalidParams(betType);
             uint8 fighter = abi.decode(params, (uint8));
             if (fighter >= CHICKENZ_FIGHTERS) revert RuckusGame__InvalidParams(betType);
+        } else {
+            // Call Your Shot: a real object ball and one of the six pockets.
+            if (params.length != 64) revert RuckusGame__InvalidParams(betType);
+            (uint8 ball, uint8 pocket) = abi.decode(params, (uint8, uint8));
+            if (ball == 0 || ball > POOL_OBJECT_BALLS || pocket >= POOL_POCKETS) {
+                revert RuckusGame__InvalidParams(betType);
+            }
         }
     }
 

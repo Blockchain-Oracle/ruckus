@@ -112,6 +112,46 @@ contract RuckusGameTest is Test {
         game.quoteCaps(1e18, _gameData(0, 4));
     }
 
+    // ── Call Your Shot ───────────────────────────────────────────────────────────
+
+    function _shotData(uint8 betType, uint8 ball, uint8 pocket) private pure returns (bytes memory) {
+        return abi.encode(betType, uint8(1), abi.encode(ball, pocket));
+    }
+
+    function test_callShot_everyTierIsExactlyDeclared() public view {
+        for (uint8 betType = game.BET_CALL_SHOT_STRAIGHT(); betType <= game.BET_CALL_SHOT_LONG(); ++betType) {
+            (uint256[] memory weights, uint256[] memory multipliersBps) = game.betTable(betType);
+            assertEq(weights.length, 2, "make / miss");
+            assertEq(multipliersBps[1], 0, "a miss pays nothing");
+            uint256 denominator = weights[0] + weights[1];
+            assertEq(weights[0] * multipliersBps[0], DECLARED_RTP_BPS * denominator, "RTP must be exactly 96.00%");
+        }
+    }
+
+    function testFuzz_callShot_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 tier) public view {
+        wager = bound(wager, 1, MAX_WAGER);
+        uint8 betType = uint8(bound(tier, game.BET_CALL_SHOT_STRAIGHT(), game.BET_CALL_SHOT_LONG()));
+        bytes memory gameData = _shotData(betType, 1, 3);
+        (uint256 maxEscrow, uint256 maxProfit) = game.quoteCaps(wager, gameData);
+        StepResult memory start = game.onSessionStart(_ctx(wager, gameData));
+        StepResult memory settle = game.onRandomness(_ctx(wager, gameData), randomness);
+        assertLe(settle.payout, maxEscrow + maxProfit, "payout exceeds escrow + reserve");
+        assertEq(uint256(start.reservedProfitDelta), maxProfit);
+        assertEq(settle.reservedProfitDelta, 0);
+    }
+
+    function test_revert_callShot_badParams() public {
+        uint8 cut = game.BET_CALL_SHOT_CUT();
+        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, cut));
+        game.quoteCaps(1e18, _shotData(cut, 0, 3)); // the cue ball can't be called
+        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, cut));
+        game.quoteCaps(1e18, _shotData(cut, 16, 3));
+        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, cut));
+        game.quoteCaps(1e18, _shotData(cut, 1, 6));
+        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, cut));
+        game.quoteCaps(1e18, abi.encode(cut, uint8(1), abi.encode(uint8(1)))); // wrong shape
+    }
+
     function test_revert_noPlayerAction() public {
         vm.expectRevert(RuckusGame.RuckusGame__NoPlayerAction.selector);
         game.onPlayerAction(_ctx(1e18, _gameData(0, 0)), "");

@@ -1,4 +1,5 @@
 export { type BotDecision, botShot } from './bot.ts';
+export * from './callshot.ts';
 export * from './constants.ts';
 export { type Shot, strike } from './cue.ts';
 export { hashBalls, PoolSim, type ShotEvent } from './engine.ts';

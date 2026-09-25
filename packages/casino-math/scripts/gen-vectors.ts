@@ -2,12 +2,22 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { buildParityVectors } from '../src/index.ts';
+import { BET_TYPE, type BetType, buildParityVectors } from '../src/index.ts';
 
-export const VECTORS_PATH = resolve(
-  import.meta.dirname,
-  '../../../contracts/vectors/back-chicken.json',
-);
+const DIR = resolve(import.meta.dirname, '../../../contracts/vectors');
+const FILES = {
+  [BET_TYPE.backChicken]: 'back-chicken.json',
+  [BET_TYPE.callShotStraight]: 'call-shot-1.json',
+  [BET_TYPE.callShotCut]: 'call-shot-2.json',
+  [BET_TYPE.callShotThin]: 'call-shot-3.json',
+  [BET_TYPE.callShotLong]: 'call-shot-4.json',
+} as const;
 
-writeFileSync(VECTORS_PATH, `${JSON.stringify(buildParityVectors(), null, 2)}\n`);
-console.info(`[vectors] wrote ${VECTORS_PATH}`);
+for (const [betType, file] of Object.entries(FILES)) {
+  const path = resolve(DIR, file);
+  writeFileSync(
+    path,
+    `${JSON.stringify(buildParityVectors(Number(betType) as BetType), null, 2)}\n`,
+  );
+  console.info(`[vectors] wrote ${path}`);
+}

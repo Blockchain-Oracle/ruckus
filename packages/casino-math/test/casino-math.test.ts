@@ -18,7 +18,14 @@ import {
   rtp,
 } from '../src/index.ts';
 
-const VECTORS_PATH = resolve(import.meta.dirname, '../../../contracts/vectors/back-chicken.json');
+const VECTORS_DIR = resolve(import.meta.dirname, '../../../contracts/vectors');
+const VECTOR_FILES = [
+  [BET_TYPE.backChicken, 'back-chicken.json'],
+  [BET_TYPE.callShotStraight, 'call-shot-1.json'],
+  [BET_TYPE.callShotCut, 'call-shot-2.json'],
+  [BET_TYPE.callShotThin, 'call-shot-3.json'],
+  [BET_TYPE.callShotLong, 'call-shot-4.json'],
+] as const;
 
 describe('bet tables', () => {
   it.each(Object.values(BET_TABLES))('$name pays exactly the declared RTP', (table) => {
@@ -63,8 +70,11 @@ describe('drawClass', () => {
 });
 
 describe('parity vectors', () => {
-  it('committed contracts/vectors/back-chicken.json matches the TS mirror (run `pnpm vectors`)', () => {
-    const committed = JSON.parse(readFileSync(VECTORS_PATH, 'utf8'));
-    expect(committed).toEqual(JSON.parse(JSON.stringify(buildParityVectors())));
-  });
+  it.each(VECTOR_FILES)(
+    'committed vectors for bet %i (%s) match the TS mirror (run `pnpm vectors`)',
+    (betType, file) => {
+      const committed = JSON.parse(readFileSync(resolve(VECTORS_DIR, file), 'utf8'));
+      expect(committed).toEqual(JSON.parse(JSON.stringify(buildParityVectors(betType))));
+    },
+  );
 });
