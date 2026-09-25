@@ -48,24 +48,38 @@ function Rows() {
 }
 
 /** First visit: How to play stands between Play and the kickoff. */
-export function IntroCard({ onGo }: { onGo: () => void }) {
+export function IntroCard({ onGo, onLearn }: { onGo: () => void; onLearn: () => void }) {
   return (
     <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/55 px-4">
       <div className="w-full max-w-md rounded-2xl border-2 border-teal bg-ink-2 p-5 text-sm shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
         <div className="mb-3 font-display text-2xl text-teal">HOW TO PLAY</div>
         <Rows />
-        <Button
-          variant="tomato"
-          size="lg"
-          sound="ui.confirm"
-          className="mt-4 w-full"
-          onClick={() => {
-            markControlsSeen();
-            onGo();
-          }}
-        >
-          Kick off
-        </Button>
+        <div className="mt-4 flex gap-3">
+          <Button
+            variant="teal"
+            size="lg"
+            sound="ui.confirm"
+            className="flex-1"
+            onClick={() => {
+              markControlsSeen();
+              onLearn();
+            }}
+          >
+            Try it (1 min)
+          </Button>
+          <Button
+            variant="tomato"
+            size="lg"
+            sound="ui.confirm"
+            className="flex-1"
+            onClick={() => {
+              markControlsSeen();
+              onGo();
+            }}
+          >
+            Kick off
+          </Button>
+        </div>
       </div>
     </div>
   );

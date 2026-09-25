@@ -15,7 +15,8 @@
     "back-bird": "tsx src/back-bird-e2e.ts",
     "pool-room": "tsx src/pool-room.ts",
     "pool-wager": "tsx src/pool-wager-e2e.ts",
-    "soccer-room": "tsx src/soccer-room.ts"
+    "soccer-room": "tsx src/soccer-room.ts",
+    "soccer-tutorial": "tsx src/soccer-tutorial.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

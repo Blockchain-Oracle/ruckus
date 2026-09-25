@@ -5,11 +5,12 @@ import { MATCH_SECONDS, TICK_HZ } from '@arena/sim-soccer';
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 
-import { startMatch } from '../match/flow.ts';
+import { startLessons, startMatch } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
 import { useSoccer } from '../match/store.ts';
 import { Announce } from './Announce.tsx';
 import { ControlsButton, IntroCard } from './Controls.tsx';
+import { LessonCard } from './Lesson.tsx';
 import { Results } from './Results.tsx';
 import { PowerChips, ScoreBug } from './ScoreBug.tsx';
 import { TouchPad } from './TouchPad.tsx';
@@ -30,7 +31,8 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
   const coarse = useCoarse();
   const d = getDriver();
   if (status === 'off' || !d) return null;
-  if (status === 'intro') return <IntroCard onGo={startMatch} />;
+  if (status === 'intro') return <IntroCard onGo={startMatch} onLearn={startLessons} />;
+  const lessons = status === 'tutorial';
   const w = d.world;
   const you = d.humanSlot;
   const firstMinute = w.clock > (MATCH_SECONDS - HINT_S) * TICK_HZ && w.score[0] + w.score[1] === 0;
@@ -38,20 +40,21 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
   return (
     <div className="pointer-events-none absolute inset-0">
       <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 [@media(pointer:fine)]:top-4">
-        <ScoreBug w={w} names={names} you={you} />
-        <PowerChips w={w} />
+        {!lessons && <ScoreBug w={w} names={names} you={you} />}
+        {!lessons && <PowerChips w={w} />}
       </div>
       <Announce />
+      <LessonCard />
 
       {!coarse && (
         <div
           className="absolute inset-x-0 bottom-5 text-center text-xs text-cream transition-opacity duration-700 [text-shadow:1px_1px_0_#000]"
-          style={{ opacity: firstMinute && status === 'playing' ? 0.9 : 0 }}
+          style={{ opacity: (firstMinute && status === 'playing') || lessons ? 0.9 : 0 }}
         >
           A / D or ← → move · W, ↑ or Space jump (hold for higher) · run into the ball to kick
         </div>
       )}
-      {coarse && status === 'playing' && <TouchPad />}
+      {coarse && (status === 'playing' || lessons) && <TouchPad />}
 
       <button
         type="button"

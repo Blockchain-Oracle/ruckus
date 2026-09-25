@@ -10,7 +10,13 @@ import { keepCrowdBed, playSoccerEvents, setCrowdBed } from './audio/sfx.ts';
 import { controlsSeen } from './hud/controlsSeen.ts';
 import { attachKeys, readInput } from './input/keys.ts';
 import { SoccerDriver } from './match/driver.ts';
-import { presenter, startMatch, stopMatch } from './match/flow.ts';
+import {
+  consumeLessonsNext,
+  presenter,
+  startLessons,
+  startMatch,
+  stopMatch,
+} from './match/flow.ts';
 import { setDriver } from './match/runtime.ts';
 import { useSoccer } from './match/store.ts';
 import { applyPendingMatch, soccerRooms } from './net/online.ts';
@@ -18,9 +24,11 @@ import { Ball, Shadows } from './render/Ball.tsx';
 import { Egg } from './render/Egg.tsx';
 import { SoccerFx } from './render/fx.ts';
 import { Goal } from './render/Goal.tsx';
+import { LessonRing } from './render/LessonRing.tsx';
 import { Particles } from './render/Particles.tsx';
 import { PowerUp } from './render/PowerUp.tsx';
 import { Stadium } from './render/Stadium.tsx';
+import { tutorial, useTutorial } from './tutorial/director.ts';
 
 const ATTRACT_SEED = 0xe99;
 const MAX_SEATS = 4;
@@ -36,7 +44,8 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
   useEffect(() => {
     setDriver(driver);
     driver.readInput = readInput;
-    if (import.meta.env.DEV) Object.assign(globalThis, { __ruckusSoccer: driver });
+    if (import.meta.env.DEV)
+      Object.assign(globalThis, { __ruckusSoccer: driver, __ruckusSoccerTutorial: useTutorial });
     const detach = attachKeys();
     // A room match that arrived before this scene mounted (invite links) takes over now.
     applyPendingMatch();
@@ -53,7 +62,8 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
     // In a room the server starts the match; never start local practice meanwhile.
     if (phase === 'entering' && useSoccer.getState().status === 'off' && !soccerRooms.inRoom()) {
       fx.clear();
-      if (controlsSeen()) startMatch();
+      if (consumeLessonsNext()) startLessons();
+      else if (controlsSeen()) startMatch();
       else useSoccer.getState().set({ status: 'intro' });
     } else if (phase === 'leaving') {
       stopMatch();
@@ -68,9 +78,14 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
     const dt = Math.min(delta, 0.1);
     driver.update(dt);
     const events = driver.drain();
+    if (driver.mode.kind === 'tutorial') tutorial.update(driver.world, events, dt);
     fx.ingest(events, driver.world);
     playSoccerEvents(events, driver.world);
-    presenter.update(driver.world, dt, driver.mode.kind !== 'exhibition');
+    presenter.update(
+      driver.world,
+      dt,
+      driver.mode.kind === 'match' || driver.mode.kind === 'online',
+    );
     keepCrowdBed();
     const g = stage.current;
     if (g) {
@@ -95,6 +110,7 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
       ))}
       <Ball driver={get} />
       <PowerUp driver={get} />
+      <LessonRing />
       <Particles fx={fx} />
     </group>
   );

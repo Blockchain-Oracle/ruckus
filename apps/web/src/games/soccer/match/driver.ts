@@ -13,6 +13,8 @@ import { EXHIBITION_RESTART_S, EXHIBITION_SKILL, SLOWMO_S, SLOWMO_SCALE } from '
 export type SoccerMode =
   | { kind: 'exhibition' }
   | { kind: 'match'; perTeam: 1 | 2; bot: number; humanSlot: number }
+  /** Lessons: you and a parked second egg, staged by the tutorial director. */
+  | { kind: 'tutorial'; humanSlot: number }
   /** A room match: `humanSlot` is −1 for watchers. */
   | { kind: 'online'; perTeam: 1 | 2; humanSlot: number };
 
@@ -82,6 +84,18 @@ export class SoccerDriver {
     this.mode = { kind: 'match', perTeam, bot, humanSlot: 0 };
     this.world = newWorld(this.seed, perTeam, bots);
     this.reset();
+  }
+
+  startTutorial() {
+    this.mode = { kind: 'tutorial', humanSlot: 0 };
+    this.world = newWorld(1, 1, [-1, -1]);
+    this.reset();
+  }
+
+  /** Pieces were moved by hand (a lesson's staging): draw them there, no tween. */
+  resync() {
+    this.snapshot();
+    for (const s of this.smooth) s.x = s.y = 0;
   }
 
   /** A room match: the same world every client builds from the server's seed. */

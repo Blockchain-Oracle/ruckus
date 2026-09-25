@@ -1,6 +1,11 @@
+import { useUi } from '@/app/stores/ui.ts';
+import { useGameMachine } from '@/engine/gameMachine.ts';
 import { cn } from '@/lib/utils.ts';
+import { Button } from '@/ui/Button.tsx';
 
 import type { BotLevel } from '../config.ts';
+import { queueLessons, startLessons } from '../match/flow.ts';
+import { soccerRooms } from '../net/online.ts';
 import { useSoccerPrefs } from '../prefs.ts';
 
 const FORMATS = [
@@ -76,6 +81,20 @@ export function SoccerSettings() {
         />
       </div>
       <p className="text-xs text-cream-dim">Changes apply from your next match or rematch.</p>
+      <Button size="md" sound="ui.confirm" disabled={soccerRooms.inRoom()} onClick={replayTutorial}>
+        Replay tutorial
+      </Button>
     </section>
   );
+}
+
+/** From the hub it queues the lessons and enters; mid-practice it switches straight to them. */
+function replayTutorial() {
+  useUi.getState().openSheet(null);
+  const machine = useGameMachine.getState();
+  if (machine.phase === 'play') startLessons();
+  else if (machine.phase === 'attract') {
+    queueLessons();
+    machine.send('entering');
+  }
 }

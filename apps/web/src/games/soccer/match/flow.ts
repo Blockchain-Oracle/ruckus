@@ -8,6 +8,7 @@ import { STADIUM_TRACK } from '../audio/music.ts';
 import { playCue, setCrowdBed } from '../audio/sfx.ts';
 import { BOT_LEVELS, KITS } from '../config.ts';
 import { useSoccerPrefs } from '../prefs.ts';
+import { tutorial } from '../tutorial/director.ts';
 import { getDriver } from './runtime.ts';
 import { useSoccer } from './store.ts';
 
@@ -18,11 +19,22 @@ const GO_HOLD_S = 0.7;
 const FULLTIME_HOLD_S = 2.2;
 
 let matches = 0;
+/** Settings → Replay tutorial from the hub: the next Play goes straight into the lessons. */
+let lessonsNext = false;
+export const queueLessons = () => {
+  lessonsNext = true;
+};
+export const consumeLessonsNext = () => {
+  const next = lessonsNext;
+  lessonsNext = false;
+  return next;
+};
 
 /** Practice: you (team Tomato) vs bots, 1v1 or 2v2 with a bot partner. */
 export function startMatch() {
   const d = getDriver();
   if (!d) return;
+  tutorial.stop();
   const { perTeam, level } = useSoccerPrefs.getState();
   const seed = (Date.now() ^ Math.imul(matches + 1, 0x9e3779b1)) >>> 0;
   d.startMatch(seed, perTeam, BOT_LEVELS[level]);
@@ -47,7 +59,23 @@ export function startOnlineMatch(e: SoccerMatchStart, slot: number) {
   playMusic(STADIUM_TRACK);
 }
 
+/** The hands-on lessons (first visit, or Settings → Replay tutorial). */
+export function startLessons() {
+  if (!getDriver()) return;
+  tutorial.start();
+  presenter.reset();
+  useSoccer.getState().set({
+    status: 'tutorial',
+    names: [useProfile.getState().name || 'You'],
+    announce: null,
+    online: false,
+  });
+  setCrowdBed('match');
+  playMusic(STADIUM_TRACK);
+}
+
 export function stopMatch() {
+  tutorial.stop();
   getDriver()?.exhibit();
   presenter.reset();
   useSoccer.getState().set({ status: 'off', announce: null, online: false });
