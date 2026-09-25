@@ -73,3 +73,43 @@ export function bankHash(json: string): `0x${string}` {
   const digest = keccak_256(ascii(json));
   return `0x${Array.from(digest, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
+
+const FINISH_DOMAIN = ascii('finish');
+
+/**
+ * "Call the Finish" presentation. The contract settles make or miss for the call; the same VRF
+ * word then picks *which* finish shows, among the finishes the outcome allows, weighted by the
+ * declared table (so over many rounds every finish appears at its declared rate), and a bank seed
+ * that ends exactly that way.
+ */
+export function finishPresentation(
+  bank: SeedBank,
+  randomness: `0x${string}`,
+  covers: readonly number[],
+  outcomeClass: number,
+  weights: readonly number[],
+): { finish: number; seed: number } {
+  const made = outcomeClass === 0;
+  const allowed = weights.map((w, i) => ({ i, w })).filter(({ i }) => covers.includes(i) === made);
+  const total = allowed.reduce((sum, a) => sum + a.w, 0);
+  if (total <= 0) throw new Error('No finish fits that outcome');
+  const n = BigInt(total);
+  const limit = UINT256_SPAN - (UINT256_SPAN % n);
+  const input = new Uint8Array(32 + FINISH_DOMAIN.length);
+  input.set(toBytes(randomness));
+  input.set(FINISH_DOMAIN, 32);
+  let word = keccak_256(input);
+  while (toBigint(word) >= limit) word = keccak_256(word);
+  // Walk the cumulative weights to the drawn point.
+  let pick = Number(toBigint(word) % n);
+  let chosen = allowed[allowed.length - 1];
+  for (const a of allowed) {
+    if (pick < a.w) {
+      chosen = a;
+      break;
+    }
+    pick -= a.w;
+  }
+  if (!chosen) throw new Error('unreachable: allowed is non-empty');
+  return { finish: chosen.i, seed: presentationSeed(bank, randomness, chosen.i) };
+}

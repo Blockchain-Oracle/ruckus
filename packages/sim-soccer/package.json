@@ -2,7 +2,7 @@
   "name": "@arena/sim-soccer",
   "version": "0.0.0",
   "private": true,
-  "description": "Deterministic head-soccer sim (Eggy League numbers): variable jump, contact kicks with ground assist, crossbar and ceiling bounces, power-ups, bots. + − × ÷ sqrt only, fixed 60 Hz.",
+  "description": "Deterministic head-soccer sim (Eggy League numbers): variable jump, contact kicks with ground assist, crossbar and ceiling bounces, power-ups, bots. + \u2212 \u00d7 \u00f7 sqrt only, fixed 60 Hz.",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -10,12 +10,15 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "mine-bank": "tsx scripts/mine-finish-bank.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
     "@types/node": "^24.10.0",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@arena/casino-math": "workspace:*",
+    "tsx": "^4.21.0"
   }
 }
