@@ -20,6 +20,9 @@ const attractTarget = new Vector3();
 const playPos = new Vector3();
 const playTarget = new Vector3();
 const lookAt = new Vector3();
+/** Follow-cam smoothing (1/s): position snappier than zoom, as Chickenz (0.15 vs 0.05 per frame). */
+const FOLLOW_POS_RATE = 9;
+const FOLLOW_ZOOM_RATE = 3;
 
 /**
  * One camera for the whole hub. Attract orbits the scene; Play dollies the same camera into the
@@ -30,7 +33,7 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
   const phase = useGameMachine((s) => s.phase);
   const send = useGameMachine((s) => s.send);
   const reducedMotion = useSettings((s) => s.reducedMotion);
-  const state = useRef({ angle: 0, blend: 0 });
+  const state = useRef({ angle: 0, blend: 0, fx: Number.NaN, fy: 0, fz: 1 });
 
   useEffect(() => {
     camera.fov = rig.fov;
@@ -80,6 +83,22 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     );
     playPos.set(...play.position);
     playTarget.set(...play.target);
+    const follow = phase === 'attract' ? null : (rig.follow?.(camera.aspect) ?? null);
+    if (follow) {
+      if (Number.isNaN(s.fx)) {
+        s.fx = play.target[0];
+        s.fy = play.target[1];
+        s.fz = 1;
+      }
+      s.fx = MathUtils.damp(s.fx, follow.x, FOLLOW_POS_RATE, delta);
+      s.fy = MathUtils.damp(s.fy, follow.y, FOLLOW_POS_RATE, delta);
+      s.fz = MathUtils.damp(s.fz, follow.zoom, FOLLOW_ZOOM_RATE, delta);
+      const distance = (play.position[2] - play.target[2]) / s.fz;
+      playTarget.set(s.fx, s.fy, play.target[2]);
+      playPos.set(s.fx, s.fy, play.target[2] + distance);
+    } else {
+      s.fx = Number.NaN;
+    }
 
     const t = easeInOutCubic(s.blend);
     camera.position.lerpVectors(attractPos, playPos, t);

@@ -88,9 +88,9 @@ export const GUN_HOLD = [
 
 /** Bullet size in px (Chickenz ProjectileRenderer: 3×2 up to 6×4), with outline. */
 export const BULLET_PX = [
-  { w: 4, h: 3 },
   { w: 3, h: 2 },
-  { w: 6, h: 3 },
+  { w: 4, h: 2 },
+  { w: 6, h: 2 },
   { w: 6, h: 4 },
   { w: 3, h: 2 },
 ] as const;

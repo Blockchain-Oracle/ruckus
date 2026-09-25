@@ -13,6 +13,13 @@ import terrainUrl from './assets/terrain.png';
 export const HEROES = ['ninja-frog', 'mask-dude', 'pink-man', 'virtual-guy'] as const;
 export type Hero = (typeof HEROES)[number];
 
+export const HERO_NAMES = {
+  'ninja-frog': 'Ninja Frog',
+  'mask-dude': 'Mask Dude',
+  'pink-man': 'Pink Man',
+  'virtual-guy': 'Virtual Guy',
+} as const satisfies Record<Hero, string>;
+
 export const ANIMS = {
   idle: 11,
   run: 12,
@@ -28,7 +35,7 @@ const characterUrls = import.meta.glob<string>('./assets/characters/*.png', {
   eager: true,
   import: 'default',
 });
-const characterUrl = (hero: Hero, anim: Anim) => {
+export const characterUrl = (hero: Hero, anim: Anim) => {
   const url = characterUrls[`./assets/characters/${hero}-${anim}.png`];
   if (!url) throw new Error(`Missing sprite ${hero}-${anim}`);
   return url;

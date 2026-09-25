@@ -23,3 +23,5 @@ export const FP_ONE = 256;
 export const MAX_PLAYERS = 4;
 export const MAX_PROJECTILES = 32;
 export const MAX_PICKUPS = 4;
+/** Full health (crates/chickenz-sim constants MAX_HEALTH). */
+export const MAX_HEALTH_HP = 100;

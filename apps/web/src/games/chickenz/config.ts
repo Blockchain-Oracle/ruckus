@@ -1,5 +1,7 @@
 import type { CameraRig } from '@/engine/types.ts';
 
+import { chickenzFollow } from './match/camera.ts';
+
 /** Chickenz maps are 960×540 px on a 16 px grid; one world unit is one 16 px tile. */
 export const TILE_PX = 16;
 export const MAP_W_PX = 960;
@@ -17,6 +19,7 @@ export const rig: CameraRig = {
   fov: PLAY_FOV_DEG,
   attract: { target: CENTER, distance: PLAY_DISTANCE * 0.9, height: MAP_H * 0.2, lensShift: -6 },
   play: { position: [CENTER[0], CENTER[1], PLAY_DISTANCE], target: CENTER },
+  follow: chickenzFollow,
 };
 
 /** Layer depths (world units): the diorama separates when the attract camera orbits. */

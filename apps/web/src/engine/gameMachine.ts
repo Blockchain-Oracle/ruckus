@@ -50,3 +50,7 @@ export const useGameMachine = create<GameMachine>()((set, get) => ({
 }));
 
 export const isInteractive = (phase: Phase) => phase === 'play';
+
+if (import.meta.env.DEV) {
+  (globalThis as { __ruckusMachine?: unknown }).__ruckusMachine = useGameMachine;
+}

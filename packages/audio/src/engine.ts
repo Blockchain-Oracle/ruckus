@@ -44,6 +44,8 @@ export class AudioEngine {
   private readonly voices = new Map<string, Voice[]>();
   private readonly lastPlayed = new Map<string, number>();
   private stems = new Map<string, { source: AudioBufferSourceNode; gain: GainNode }>();
+  /** Decoded music, keyed by first URL, so returning to a track doesn't refetch or re-decode it. */
+  private readonly musicBuffers = new Map<string, Promise<AudioBuffer>>();
   private disposeUnlock: () => void;
   unlocked = false;
 
@@ -166,7 +168,6 @@ export class AudioEngine {
    * is just per-stem gain.
    */
   async playStems(stems: Record<string, readonly string[]>, initial: Record<string, number>) {
-    this.stopMusic(0);
     const decoded = await Promise.all(
       Object.entries(stems).map(
         async ([layer, urls]) => [layer, await fetchAndDecode(this.ctx, urls)] as const,
@@ -185,6 +186,17 @@ export class AudioEngine {
       next.set(layer, { source, gain });
     }
     this.stems = next;
+  }
+
+  private decodeCached(urls: readonly string[]): Promise<AudioBuffer> {
+    const key = urls[0] ?? '';
+    let buffer = this.musicBuffers.get(key);
+    if (!buffer) {
+      buffer = fetchAndDecode(this.ctx, urls);
+      buffer.catch(() => this.musicBuffers.delete(key));
+      this.musicBuffers.set(key, buffer);
+    }
+    return buffer;
   }
 
   setLayer(layer: string, volume: number, rampS: number) {

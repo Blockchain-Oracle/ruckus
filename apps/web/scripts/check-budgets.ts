@@ -84,7 +84,9 @@ for (const key of Object.keys(manifest)) {
   const game = minus(files(closure(key)), shell);
   check(`${id} attract (gz)`, sumGz(new Set([...engine, ...game])), BUDGETS.attractGz);
   const withAssets = minus(files(closure(key), true), shell);
-  const raw = [...withAssets].reduce((n, f) => n + statSync(join(dist, f)).size, 0);
+  // Browsers fetch one audio format; the AAC twins of Opus files are a fallback, not extra weight.
+  const fetched = [...withAssets].filter((f) => !f.endsWith('.m4a'));
+  const raw = fetched.reduce((n, f) => n + statSync(join(dist, f)).size, 0);
   check(`${id} game chunk (raw)`, raw, BUDGETS.game);
 }
 

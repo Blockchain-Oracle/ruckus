@@ -1,0 +1,92 @@
+import { Button } from '@arena/sim-chickenz';
+
+/**
+ * Chickenz's controls (`apps/client/src/input/InputManager.ts`): two bindable codes per action,
+ * aim follows the last horizontal direction, shots go where you face.
+ */
+export const DEFAULT_BINDINGS = {
+  left: ['KeyA', 'ArrowLeft'],
+  right: ['KeyD', 'ArrowRight'],
+  jump: ['KeyW', 'ArrowUp'],
+  shoot: ['Space', 'Mouse0'],
+  taunt: ['KeyS', 'ArrowDown'],
+} as const satisfies Record<string, readonly [string, string]>;
+
+type Action = keyof typeof DEFAULT_BINDINGS;
+
+/** Keys the game consumes: stop the page scrolling / buttons activating while playing. */
+const CAPTURED = new Set<string>(Object.values(DEFAULT_BINDINGS).flat());
+
+export class KeyboardInput {
+  private down = new Set<string>();
+  private touchButtons = 0;
+  private touchAim = 0;
+  private lastAim: -1 | 1 = 1;
+  private detach: () => void = () => {};
+
+  attach() {
+    const key = (pressed: boolean) => (e: KeyboardEvent) => {
+      if (!CAPTURED.has(e.code)) return;
+      // Typing in a field (e.g. chat, name) must never drive the bird.
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      e.preventDefault();
+      if (pressed) this.down.add(e.code);
+      else this.down.delete(e.code);
+    };
+    const mouse = (pressed: boolean) => (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse' || !(e.target instanceof HTMLCanvasElement)) return;
+      const code = `Mouse${e.button}`;
+      if (pressed) this.down.add(code);
+      else this.down.delete(code);
+    };
+    const onDown = key(true);
+    const onUp = key(false);
+    const onMouseDown = mouse(true);
+    const onMouseUp = mouse(false);
+    const clear = () => this.down.clear();
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    window.addEventListener('pointerdown', onMouseDown);
+    window.addEventListener('pointerup', onMouseUp);
+    window.addEventListener('blur', clear);
+    this.detach = () => {
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
+      window.removeEventListener('pointerdown', onMouseDown);
+      window.removeEventListener('pointerup', onMouseUp);
+      window.removeEventListener('blur', clear);
+      this.down.clear();
+    };
+  }
+
+  dispose() {
+    this.detach();
+  }
+
+  /** Touch controls OR their state in, like Chickenz's `setTouchState`. */
+  setTouch(buttons: number, aim: number) {
+    this.touchButtons = buttons;
+    this.touchAim = aim;
+  }
+
+  private pressed(action: Action) {
+    const [a, b] = DEFAULT_BINDINGS[action];
+    return this.down.has(a) || this.down.has(b);
+  }
+
+  read(): { buttons: number; aimX: -1 | 0 | 1 } {
+    let buttons = this.touchButtons;
+    const left = this.pressed('left');
+    const right = this.pressed('right');
+    if (left) buttons |= Button.Left;
+    if (right) buttons |= Button.Right;
+    if (this.pressed('jump')) buttons |= Button.Jump;
+    if (this.pressed('shoot')) buttons |= Button.Shoot;
+    if (this.pressed('taunt')) buttons |= Button.Taunt;
+    if (left && !right) this.lastAim = -1;
+    else if (right && !left) this.lastAim = 1;
+    if (this.touchAim) this.lastAim = this.touchAim > 0 ? 1 : -1;
+    return { buttons, aimX: left || right || this.touchAim ? this.lastAim : 0 };
+  }
+}

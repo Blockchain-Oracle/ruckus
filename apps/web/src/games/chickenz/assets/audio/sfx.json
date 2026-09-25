@@ -1,0 +1,90 @@
+{
+  "cz.shot.pistol": {
+    "start": 0,
+    "duration": 0.4799
+  },
+  "cz.shot.shotgun": {
+    "start": 0.5799,
+    "duration": 0.6803
+  },
+  "cz.shot.sniper": {
+    "start": 1.3602,
+    "duration": 0.7999
+  },
+  "cz.shot.rocket": {
+    "start": 2.2601,
+    "duration": 0.8
+  },
+  "cz.shot.smg": {
+    "start": 3.1601,
+    "duration": 0.48
+  },
+  "cz.hit": {
+    "start": 3.7401,
+    "duration": 0.48
+  },
+  "cz.death": {
+    "start": 4.3201,
+    "duration": 0.88
+  },
+  "cz.pickup": {
+    "start": 5.3001,
+    "duration": 0.6
+  },
+  "cz.jump": {
+    "start": 6.0001,
+    "duration": 0.2224
+  },
+  "cz.doublejump": {
+    "start": 6.3225,
+    "duration": 0.48
+  },
+  "cz.explosion": {
+    "start": 6.9025,
+    "duration": 1
+  },
+  "cz.stomp": {
+    "start": 8.0025,
+    "duration": 0.6
+  },
+  "cz.escape": {
+    "start": 8.7025,
+    "duration": 0.3385
+  },
+  "cz.countdown": {
+    "start": 9.141,
+    "duration": 0.48
+  },
+  "cz.go": {
+    "start": 9.721,
+    "duration": 0.8
+  },
+  "cz.roundwin": {
+    "start": 10.621,
+    "duration": 1.76
+  },
+  "cz.matchwin": {
+    "start": 12.481,
+    "duration": 3
+  },
+  "cz.zone": {
+    "start": 15.581,
+    "duration": 1.2
+  },
+  "cz.taunt.ninja-frog": {
+    "start": 16.881,
+    "duration": 0.48
+  },
+  "cz.taunt.mask-dude": {
+    "start": 17.461,
+    "duration": 0.48
+  },
+  "cz.taunt.pink-man": {
+    "start": 18.041,
+    "duration": 0.4034
+  },
+  "cz.taunt.virtual-guy": {
+    "start": 18.5444,
+    "duration": 0.48
+  }
+}

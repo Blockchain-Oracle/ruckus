@@ -4,7 +4,7 @@ import { lazy, Suspense } from 'react';
 
 import { writeUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
-import { loadGame } from '@/games/loader.ts';
+import { getLoadedGame, loadGame } from '@/games/loader.ts';
 import { findGame, visibleGames } from '@/games/registry.ts';
 import { useT } from '@/i18n/index.ts';
 import { BalancePill } from '@/ui/BalancePill.tsx';
@@ -12,6 +12,7 @@ import { Button } from '@/ui/Button.tsx';
 import { CabinetTile } from '@/ui/CabinetTile.tsx';
 import { Logo } from '@/ui/Logo.tsx';
 
+import { useShell } from './stores/shell.ts';
 import { useUi } from './stores/ui.ts';
 
 /** Entrances ease out and are slower than exits (research §1.2). */
@@ -36,6 +37,10 @@ export function AppShell() {
   const inGame = phase === 'play' || phase === 'entering';
   // Mounted on first open and kept, so the sheet's close animation can play.
   const sheetOpen = useUi((s) => s.sheetEverOpened);
+  const gameOwnsHud = useShell((s) => s.gameOwnsHud);
+  const immersive = useShell((s) => s.immersive);
+  const gameId = useGameMachine((s) => s.gameId);
+  const GameOverlay = getLoadedGame(gameId)?.Overlay;
 
   return (
     <LazyMotion features={loadMotionFeatures} strict>
@@ -46,11 +51,12 @@ export function AppShell() {
           className="absolute inset-0 transition-opacity duration-700"
           style={{ background: 'var(--vignette)', opacity: inGame ? PLAY_VIGNETTE_OPACITY : 1 }}
         />
-        <TopBar />
+        <TopBar hidden={immersive} />
         <AnimatePresence mode="wait">
           {showMenu && <HubMenu key="menu" />}
-          {inGame && <PlayHud key="hud" />}
+          {inGame && !gameOwnsHud && <PlayHud key="hud" />}
         </AnimatePresence>
+        {GameOverlay && <GameOverlay />}
         {sheetOpen && (
           <Suspense fallback={null}>
             <SettingsSheet />
@@ -61,10 +67,14 @@ export function AppShell() {
   );
 }
 
-function TopBar() {
+function TopBar({ hidden }: { hidden: boolean }) {
   const openSheet = useUi((s) => s.openSheet);
   return (
-    <header className="relative flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-8">
+    <header
+      aria-hidden={hidden}
+      className="relative flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] transition-opacity duration-300 sm:px-8"
+      style={{ opacity: hidden ? 0 : 1, visibility: hidden ? 'hidden' : 'visible' }}
+    >
       <Logo className="text-3xl sm:text-4xl" />
       <div className="pointer-events-auto flex items-center gap-3">
         <BalancePill />
@@ -88,6 +98,7 @@ function HubMenu() {
   const send = useGameMachine((s) => s.send);
   const games = visibleGames();
   const game = findGame(gameId);
+  const HubActions = getLoadedGame(gameId)?.HubActions;
 
   const choose = (id: typeof gameId) => {
     writeUrlState({ game: id });
@@ -113,6 +124,7 @@ function HubMenu() {
             <Button variant="tomato" size="lg" sound="ui.confirm" onClick={() => send('entering')}>
               {t('hub.play')}
             </Button>
+            {HubActions && <HubActions />}
             <Button variant="ink" size="lg" sound="ui.back" onClick={() => choose(null)}>
               {t('hub.back')}
             </Button>

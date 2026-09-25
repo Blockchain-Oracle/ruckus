@@ -5,6 +5,7 @@ import {
   type Group,
   type Mesh,
   type MeshBasicMaterial,
+  Shape,
   type Texture,
 } from 'three/webgpu';
 
@@ -24,8 +25,22 @@ const SPRITE_UNITS = SPRITE_PX / TILE_PX;
 const HIT_FLASH_S = 0.3;
 /** Below this horizontal speed a grounded bird idles rather than runs. */
 const RUN_THRESHOLD_FP = FP_ONE / 2;
+/** "Your bird" arrow: tomato ("yours" in the Art Bible), bobbing above the backed hero. */
+const MARKER_COLOR = '#ff5a36';
+const MARKER_GAP_PX = 6;
+const MARKER_BOB_HZ = 1.6;
+const MARKER_SHAPE = (() => {
+  const s = new Shape();
+  const w = 7 / TILE_PX;
+  const h = 8 / TILE_PX;
+  s.moveTo(-w, h);
+  s.lineTo(w, h);
+  s.lineTo(0, 0);
+  s.closePath();
+  return s;
+})();
 
-type Props = { hero: Hero; slot: number; driver: ChickenzDriver };
+type Props = { hero: Hero; slot: number; driver: ChickenzDriver; marked?: boolean };
 
 function animFor(v: Int32Array, base: number, hitRecently: boolean): Anim {
   if (hitRecently) return 'hit';
@@ -43,10 +58,11 @@ function animFor(v: Int32Array, base: number, hitRecently: boolean): Anim {
  * One Pixel Adventure hero driven by the sim view. Each animation is a horizontal strip; stepping
  * `offset.x` over a cloned texture plays it without touching the shared image.
  */
-export function Bird({ hero, slot, driver }: Props) {
+export function Bird({ hero, slot, driver, marked = false }: Props) {
   const group = useRef<Group>(null);
   const body = useRef<Mesh>(null);
   const gun = useRef<Mesh>(null);
+  const marker = useRef<Mesh>(null);
   const guns = useGunTextures();
   const strips = useMemo(() => {
     const source = getSprites().characters[hero];
@@ -110,6 +126,15 @@ export function Bird({ hero, slot, driver }: Props) {
     );
     g.scale.x = facing;
 
+    const mk = marker.current;
+    if (mk) {
+      mk.visible = marked;
+      // Undo the facing flip so the arrow never mirrors, and bob it above the head.
+      mk.scale.x = facing;
+      mk.position.y =
+        (SPRITE_PX / 2 + MARKER_GAP_PX + Math.sin(t * MARKER_BOB_HZ * Math.PI * 2) * 2) / TILE_PX;
+    }
+
     const weapon = curr[base + P.weapon] ?? -1;
     const gm = gun.current;
     if (gm) {
@@ -141,6 +166,10 @@ export function Bird({ hero, slot, driver }: Props) {
           toneMapped={false}
           side={DoubleSide}
         />
+      </mesh>
+      <mesh ref={marker} visible={false}>
+        <shapeGeometry args={[MARKER_SHAPE]} />
+        <meshBasicMaterial color={MARKER_COLOR} toneMapped={false} side={DoubleSide} />
       </mesh>
       <mesh ref={gun} visible={false}>
         <planeGeometry args={[1, 1]} />

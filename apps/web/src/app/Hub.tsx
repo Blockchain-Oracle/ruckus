@@ -4,6 +4,7 @@ import { useGameMachine } from '@/engine/gameMachine.ts';
 import { Scrim } from '@/engine/Scrim.tsx';
 import { findGame } from '@/games/registry.ts';
 import { getAudio } from '@/lib/audio/index.ts';
+import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
 import { AppShell } from './AppShell.tsx';
 import { readUrlState } from './urlState.ts';
@@ -21,6 +22,10 @@ export function Hub() {
   useEffect(() => {
     // Build the graph and fetch UI sounds now; the context itself unlocks on the first gesture.
     getAudio();
+    // Music waits for the first gesture: browsers block audio before it, and it saves 1 MB on load.
+    const startMusic = () => playMusic(LOBBY_TRACK);
+    window.addEventListener('pointerdown', startMusic, { once: true });
+    window.addEventListener('keydown', startMusic, { once: true });
     const deepLinked = findGame(readUrlState().game);
     if (deepLinked) void useGameMachine.getState().select(deepLinked.id);
   }, []);

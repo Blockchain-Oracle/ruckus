@@ -1,0 +1,11 @@
+{
+  "loudnessLufs": -18,
+  "sounds": {
+    "wager.lock": { "src": "lock.mp3" },
+    "wager.drumroll": { "src": "drumroll.mp3", "loop": true },
+    "wager.win": { "src": "win.mp3" },
+    "wager.bigwin": { "src": "bigwin.mp3" },
+    "wager.lose": { "src": "lose.mp3" },
+    "wager.coins": { "src": "coins.mp3" }
+  }
+}

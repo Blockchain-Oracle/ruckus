@@ -1,0 +1,27 @@
+{
+  "wager.lock": {
+    "start": 0,
+    "duration": 0.6131
+  },
+  "wager.drumroll": {
+    "start": 0.7131,
+    "duration": 4,
+    "loop": true
+  },
+  "wager.win": {
+    "start": 4.8131,
+    "duration": 1.76
+  },
+  "wager.bigwin": {
+    "start": 6.6731,
+    "duration": 3
+  },
+  "wager.lose": {
+    "start": 9.7731,
+    "duration": 1.2
+  },
+  "wager.coins": {
+    "start": 11.0731,
+    "duration": 1.0832
+  }
+}
