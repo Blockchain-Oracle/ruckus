@@ -23,30 +23,32 @@
   - Firefox is OK.
 - `docs/CREDITS.md` now lists every ElevenLabs asset. The parity ledger was audited: 110 have, 20 partial, 14 missing (non-blocked).
 
+**Pool progress (session 3, later):**
+- **S12 is done** (`packages/sim-pool`):
+  - A deterministic engine using only + − × ÷ sqrt, enforced by the exact-math lint.
+  - 8-ball rules and a searching bot.
+- **S13 is mostly done** (`apps/web/src/games/pool`):
+  - Visuals: the cinematic table, balls and cue, the aim guide, the HDRI, lighting and shadows.
+  - Controls: the power cue, the spin ball, pocket calling, ball in hand, keys, and a phone layout.
+  - Audio: ElevenLabs SFX and a jazz track.
+  - A bot exhibition behind the hub, practice vs a bot, and visible bot strokes.
+  - It's hidden behind `?preview` until it's complete.
+- A soak test (a full rack through the real HUD code paths via `__ruckusPoolKit`) passes.
+
 **NEXT ACTION:**
-1. **✱E is deferred by the user:** no submission until all four games are playable and the hub presents all of them. Keep the repo private and invite reviewers at submission. See ADR-007's follow-up.
-2. **Pool (S12–S16), play-first:**
-   1. Write the reference parity ledger (`docs/assets/pool-parity.md`).
-   2. Build the sim and a playable game vs bots.
-   3. Then rooms, then the wager.
-   Then Soccer (S17–S21) and Runner (S22–S26) the same way.
-3. **Then rebuild the hub landing** as a four-game arena, with each cabinet showing its game's live attract.
-4. **Chickenz S09 feel gaps**, interleaved as polish. From the ledger audit:
-   1. The weapon/ammo HUD.
-   2. Muzzle flash, shake and hit-stop.
-   3. Stomp layering.
-   4. The projectile muzzle origin.
-   5. SFX for silent events.
-   6. `SUDDEN DEATH IN n`.
-   7. A lose sting.
-   8. "DRAW!" in the round banner.
-   9. Online correction smoothing.
-   10. The shoot-button position and the 16 px gutter.
-   11. Music focus fade.
-   12. The round-start camera snap.
-   13. A kill feed.
-   14. A music toggle.
-   15. Suppress the canvas context menu.
+1. **Pool S14, rooms with friends (and watchers):**
+   - Build `PoolRoom` on the server. The server runs `@arena/sim-pool` authoritatively.
+   - The shooter sends `{place, shot, calledPocket}`. The server simulates it and broadcasts the shot plus the resulting balls, hash and rack state.
+   - Clients replay the shot in real time, then snap to the server state at rest.
+   - Relay aim at 10 Hz so others watch the cue move.
+   - Labelled bot seats; late joiners watch; a 20 s reconnect.
+   - Mirror the `ChickenzRoom` patterns and the protocol in `packages/protocol/src/pool.ts`.
+2. Pool S16: a hands-on tutorial (aim → power → spin → pot → ball in hand → call the 8).
+3. Pool S15: the wager spike (novelty check against Clatter and Roll Call).
+4. Unhide Pool, then Soccer (S17–S21) and Runner (S22–S26), play-first.
+5. The four-game hub landing (see ADR-007's follow-up).
+6. The Chickenz feel gaps listed in the ledger audit.
+7. ✱E is deferred until all four games exist.
 
 **Uncommitted work:** none.
 
