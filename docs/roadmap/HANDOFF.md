@@ -1,6 +1,6 @@
 # HANDOFF (updated 2026-09-25 by session 4)
 
-**Stage:** S19 Soccer room is next (S18 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
+**Stage:** S21 Soccer tutorial is next (S18 + S19 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
 
 **Last completed (session 3):**
 - Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
@@ -42,7 +42,8 @@
 - Camera uses rig `pose` (tilted down, width-fit, lifts for high balls). Screenshot helper: `tooling/browser-checks/src/soccer-shots.ts`.
 
 **NEXT ACTION:**
-1. **Soccer S19: SoccerRoom** (server-authoritative lockstep like PoolRoom, client prediction of own egg; reuse `features/rooms` kit + lobby sheet; labelled bots, watchers, invite links). The presenter in `match/flow.ts` reads sim state (not timers), so online presents identically. Then S21 tutorial, S20 wager (novelty check).
+1. **Soccer S21: tutorial** (hands-on lessons: move, jump/hold, kick on the run, header, power-ups; the first-visit How to play card can hand off to it, like Pool's TutorialOffer). Then **S20 wager** (novelty check per ADR-001).
+   - S19 is done: `SoccerRoom` is live on Coolify with whole-world prediction, 1v1/2v2, bots, watchers, invite links and walkout → bot. Check it with `pnpm -F @arena/browser-checks soccer-room` (needs :5173 and a local server on :2567).
 2. Runner S22–S26, play-first.
 3. Keep the controls rule for every game: controls never fight the pointer; every control written on screen.
 4. Four-game hub landing (ADR-007 follow-up).
@@ -63,6 +64,7 @@
 - Toolchain: node 25.9 (the repo pins 24.21.0), pnpm 10.34.5, forge 1.7.1, rustc 1.98.1 with the wasm32 target, nixpacks 1.41, docker (OrbStack), and the elevenlabs, 21st, vercel, coolify and convex CLIs. **wasm-pack is not installed** (S06 needs it).
 
 **Last green verification (session 4):**
+- `soccer-room` PASS (2v2 + watcher + walkout, 163/163 in tolerance). Production: server commit 99a86ee is healthy, and an SDK 1v1 gets 20 Hz snapshots.
 - `pnpm verify` passes; web build + budgets pass (shell 150.2 / 155 KB gz). Soccer screenshots at 1280×720 and 844×390 touch 2v2: no console errors; goal → FULL TIME → results/rematch verified.
 
 **Verification (session 3):**
