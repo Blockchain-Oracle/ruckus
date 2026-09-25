@@ -1,3 +1,5 @@
+import { KeyboardInput } from '../input/keyboard.ts';
+import { TouchSticks } from '../input/touch.ts';
 import type { ChickenzDriver } from '../sim/driver.ts';
 
 /**
@@ -10,3 +12,8 @@ export const setDriver = (d: ChickenzDriver | null) => {
   driver = d;
 };
 export const getDriver = () => driver;
+
+/** One input manager per page: keyboard/mouse, with the on-screen sticks ORed in on touch. */
+export const input = new KeyboardInput();
+export const touch = new TouchSticks();
+input.touch = touch;

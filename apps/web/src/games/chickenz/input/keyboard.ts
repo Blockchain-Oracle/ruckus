@@ -19,8 +19,8 @@ const CAPTURED = new Set<string>(Object.values(DEFAULT_BINDINGS).flat());
 
 export class KeyboardInput {
   private down = new Set<string>();
-  private touchButtons = 0;
-  private touchAim = 0;
+  /** Touch sticks OR their state in, like Chickenz's `setTouchState`. */
+  touch: { buttons(): number; aimX(): number } | null = null;
   private lastAim: -1 | 1 = 1;
   private detach: () => void = () => {};
 
@@ -64,19 +64,14 @@ export class KeyboardInput {
     this.detach();
   }
 
-  /** Touch controls OR their state in, like Chickenz's `setTouchState`. */
-  setTouch(buttons: number, aim: number) {
-    this.touchButtons = buttons;
-    this.touchAim = aim;
-  }
-
   private pressed(action: Action) {
     const [a, b] = DEFAULT_BINDINGS[action];
     return this.down.has(a) || this.down.has(b);
   }
 
   read(): { buttons: number; aimX: -1 | 0 | 1 } {
-    let buttons = this.touchButtons;
+    let buttons = this.touch?.buttons() ?? 0;
+    const touchAim = this.touch?.aimX() ?? 0;
     const left = this.pressed('left');
     const right = this.pressed('right');
     if (left) buttons |= Button.Left;
@@ -86,7 +81,7 @@ export class KeyboardInput {
     if (this.pressed('taunt')) buttons |= Button.Taunt;
     if (left && !right) this.lastAim = -1;
     else if (right && !left) this.lastAim = 1;
-    if (this.touchAim) this.lastAim = this.touchAim > 0 ? 1 : -1;
-    return { buttons, aimX: left || right || this.touchAim ? this.lastAim : 0 };
+    if (touchAim) this.lastAim = touchAim > 0 ? 1 : -1;
+    return { buttons, aimX: left || right || touchAim ? this.lastAim : 0 };
   }
 }

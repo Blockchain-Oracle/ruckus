@@ -38,7 +38,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
 
   return (
     <div className="pointer-events-none absolute inset-0 font-pixel">
-      <div className="absolute inset-x-0 top-20 flex justify-center gap-2 px-4 sm:top-4 sm:gap-3">
+      <div className="absolute inset-x-0 top-3 flex justify-center gap-2 pr-4 pl-16 sm:gap-3 [@media(pointer:fine)]:top-4 [@media(pointer:fine)]:px-4">
         {heroes.map((hero, slot) => {
           const b = playerBase(slot);
           const hp = Math.max(0, v[b + P.health] ?? 0);
@@ -87,7 +87,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         })}
       </div>
 
-      <div className="tabular absolute top-4 right-4 hidden text-xl text-cream sm:block sm:top-24 sm:right-8">
+      <div className="tabular absolute top-20 right-4 text-lg text-cream sm:top-24 sm:right-8 sm:text-xl">
         {status === 'playing' || status === 'roundOver' ? `${secondsLeft}s` : ''}
       </div>
 
@@ -125,14 +125,22 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         </div>
       )}
 
-      <div className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream-dim sm:block sm:left-8">
+      <div className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream-dim [@media(pointer:fine)]:sm:block sm:left-8">
         A/D move · W jump · Space shoot · S taunt
       </div>
 
       <div className="pointer-events-auto absolute top-20 left-4 sm:top-4 sm:left-auto sm:right-auto">
         <span className="sr-only">{status}</span>
       </div>
-      <div className="pointer-events-auto absolute bottom-16 right-4 sm:bottom-6 sm:right-auto sm:left-1/2 sm:-translate-x-1/2">
+      <button
+        type="button"
+        aria-label="Leave match"
+        onClick={onLeave}
+        className="pointer-events-auto absolute top-3 left-3 grid size-11 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream [@media(pointer:fine)]:hidden"
+      >
+        <ArrowLeftIcon weight="bold" className="size-5" />
+      </button>
+      <div className="pointer-events-auto absolute bottom-6 left-1/2 hidden -translate-x-1/2 [@media(pointer:fine)]:block">
         <Button size="sm" sound="ui.back" onClick={onLeave}>
           <ArrowLeftIcon weight="bold" /> Leave
         </Button>

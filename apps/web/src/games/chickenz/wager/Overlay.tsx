@@ -5,6 +5,7 @@ import { useGameMachine } from '@/engine/gameMachine.ts';
 
 import { DiamondWipe } from '../hud/DiamondWipe.tsx';
 import { MatchHud, MatchResults } from '../hud/MatchHud.tsx';
+import { TouchControls, useCoarsePointer } from '../hud/TouchControls.tsx';
 import { useMatch } from '../match/store.ts';
 import { getDirector } from '../Scene.tsx';
 import { BetSheet } from './BetSheet.tsx';
@@ -26,6 +27,9 @@ export function ChickenzOverlay() {
   const matchStatus = useMatch((s) => s.status);
   const setGameOwnsHud = useShell((s) => s.setGameOwnsHud);
   const setImmersive = useShell((s) => s.setImmersive);
+  const coarse = useCoarsePointer();
+  const controlling =
+    matchStatus === 'countdown' || matchStatus === 'playing' || matchStatus === 'roundOver';
   useEffect(() => {
     setGameOwnsHud(wagerPhase !== 'idle' || matchStatus !== 'off');
     setImmersive(matchStatus !== 'off');
@@ -38,6 +42,7 @@ export function ChickenzOverlay() {
   return (
     <>
       <MatchHud onLeave={leave} />
+      {coarse && controlling && <TouchControls />}
       <DiamondWipe />
       <MatchResults onRematch={() => getDirector()?.rematch()} onLeave={leave} />
       <BetSheet />

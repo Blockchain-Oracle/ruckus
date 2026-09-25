@@ -7,9 +7,8 @@ import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
 import { BATTLE_TRACKS } from './audio/music.ts';
 import { playEvents } from './audio/sfx.ts';
-import { KeyboardInput } from './input/keyboard.ts';
 import { MatchDirector } from './match/director.ts';
-import { setDriver } from './match/runtime.ts';
+import { input, setDriver } from './match/runtime.ts';
 import { useMatch } from './match/store.ts';
 import { Arena } from './render/Arena.tsx';
 import { Bird } from './render/Bird.tsx';
@@ -56,7 +55,6 @@ export function ChickenzScene({ generation }: GameSceneProps) {
       effects.clear();
       setRound(driver.round);
     };
-    const input = new KeyboardInput();
     input.attach();
     driver.readInput = () => input.read();
     return () => {
