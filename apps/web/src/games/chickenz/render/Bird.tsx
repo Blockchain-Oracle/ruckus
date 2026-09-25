@@ -41,9 +41,9 @@ const GUN_BOB_PX = 0.8;
 const SETTLED_DROP_PX = 6;
 const RAGDOLL_ALPHA = 0.9;
 const SETTLED_ALPHA = 0.5;
-/** "Yours" arrow: tomato (Art Bible), bobbing above the marked hero. */
+/** "Yours" arrow: tomato (Art Bible), bobbing above the marked hero's nameplate. */
 const MARKER_COLOR = '#ff5a36';
-const MARKER_GAP_PX = 6;
+const MARKER_GAP_PX = 22;
 const MARKER_BOB_HZ = 1.6;
 const MARKER_SHAPE = (() => {
   const s = new Shape();

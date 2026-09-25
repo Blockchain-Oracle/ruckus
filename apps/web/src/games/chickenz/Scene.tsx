@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useState } from 'react';
 
+import { useProfile } from '@/app/stores/profile.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
 import type { GameSceneProps } from '@/engine/types.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
@@ -10,16 +11,18 @@ import { onPlay, stopAll } from './flow.ts';
 import { MatchDirector } from './match/director.ts';
 import { input, setDirectors, setDriver } from './match/runtime.ts';
 import { useMatch } from './match/store.ts';
+import { useChickenzPrefs } from './prefs.ts';
 import { Arena } from './render/Arena.tsx';
 import { Bird } from './render/Bird.tsx';
 import { Effects } from './render/Effects.tsx';
 import { ChickenzEffects } from './render/effects.ts';
+import { Nameplate } from './render/Nameplates.tsx';
 import { Pickups } from './render/Pickups.tsx';
 import { Projectiles } from './render/Projectiles.tsx';
 import { layoutFrom } from './render/terrain.ts';
 import { Zone } from './render/Zone.tsx';
 import { ChickenzDriver } from './sim/driver.ts';
-import { HEROES, type Hero } from './sprites.ts';
+import { HERO_NAMES, HEROES, type Hero } from './sprites.ts';
 import { TutorialDirector, useTutorial } from './tutorial/director.ts';
 import { useOnboarding } from './tutorial/onboarding.ts';
 import { PRESENTATION } from './wager/constants.ts';
@@ -28,6 +31,12 @@ import { heroesForFight, useWager } from './wager/store.ts';
 /** Attract seed: fixed per scene generation, so a revisit shows a fresh exhibition. */
 const ATTRACT_SEED_BASE = 0x5eed;
 const MS_PER_S = 1000;
+/**
+ * Plates over the birds carry the name in the slot colour the HUD cards use; the "Bot ·" label stays
+ * on the cards and results, so four long labels never pile up over a scrum.
+ */
+const BOT_PREFIX = /^Bot · /;
+const SLOT_COLORS = ['#ff5a36', '#2ec4b6', '#8c6bff', '#9be15d'] as const;
 
 export function ChickenzScene({ generation }: GameSceneProps) {
   const driver = useMemo(() => new ChickenzDriver(ATTRACT_SEED_BASE + generation), [generation]);
@@ -40,9 +49,12 @@ export function ChickenzScene({ generation }: GameSceneProps) {
   const wagerPhase = useWager((s) => s.phase);
   const fight = useWager((s) => s.fight);
   const backed = useWager((s) => s.hero);
+  const myHero = useChickenzPrefs((s) => s.hero);
   const skipRequested = useWager((s) => s.skipRequested);
   const matchStatus = useMatch((s) => s.status);
   const matchHeroes = useMatch((s) => s.heroes);
+  const matchNames = useMatch((s) => s.names);
+  const profileName = useProfile((s) => s.name);
 
   const presenting = driver.kind === 'fight' && (wagerPhase === 'fight' || wagerPhase === 'result');
   const inMatch = matchStatus !== 'off' || tutorialStep >= 0;
@@ -51,7 +63,7 @@ export function ChickenzScene({ generation }: GameSceneProps) {
     : matchStatus !== 'off'
       ? matchHeroes
       : tutorialStep >= 0
-        ? heroesForFight(backed)
+        ? heroesForFight(myHero)
         : [...HEROES];
 
   useEffect(() => {
@@ -132,6 +144,14 @@ export function ChickenzScene({ generation }: GameSceneProps) {
     driver.update(delta);
   });
 
+  // Nameplates label real play and presented fights; the attract backdrop stays clean.
+  const plateNames: readonly string[] | null = presenting
+    ? heroes.map((h) => HERO_NAMES[h])
+    : matchStatus !== 'off'
+      ? matchNames
+      : tutorialStep >= 0
+        ? [profileName, 'Dummy']
+        : null;
   const markedSlot = presenting ? 0 : inMatch ? driver.humanSlot : -1;
 
   return (
@@ -147,6 +167,16 @@ export function ChickenzScene({ generation }: GameSceneProps) {
           driver={driver}
           platforms={layout.platforms}
           marked={slot === markedSlot}
+        />
+      ))}
+      {plateNames?.map((name, slot) => (
+        <Nameplate
+          key={`${slot}:${name}`}
+          slot={slot}
+          name={name.replace(BOT_PREFIX, '')}
+          color={SLOT_COLORS[slot] ?? SLOT_COLORS[0]}
+          driver={driver}
+          front={slot === markedSlot}
         />
       ))}
       <Projectiles driver={driver} />

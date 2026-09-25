@@ -23,11 +23,10 @@ const PLAYER_COLORS = [
   'var(--player-3)',
   'var(--player-4)',
 ] as const;
-const SHAKE_THRESHOLD = 100;
 
 export function MatchHud({ onLeave }: { onLeave: () => void }) {
   useTick(HUD_HZ);
-  const { heroes, names, wins, announce, status, localSlot } = useMatch();
+  const { heroes, names, wins, announce, status, localSlot, round } = useMatch();
   const driver = getDriver();
   const v = driver?.curr;
   if (!v || status === 'off') return null;
@@ -36,8 +35,6 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
   const roundTicks = driver?.sim.round_ticks() ?? 0;
   const secondsLeft = Math.max(0, Math.ceil((roundTicks - tick) / TICK_HZ));
   const suddenDeath = (v[H.zoneLeft] ?? 0) > 0 && !(v[H.matchOver] ?? 0);
-  const lb = playerBase(localSlot);
-  const shake = (v[lb + P.stompedBy] ?? -1) >= 0 ? (v[lb + P.shakeProgress] ?? 0) : -1;
 
   return (
     <div className="pointer-events-none absolute inset-0 font-pixel">
@@ -114,21 +111,12 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         </div>
       )}
 
-      {shake >= 0 && (
-        <div className="absolute inset-x-0 bottom-32 flex flex-col items-center gap-1">
-          <div className="text-sm text-cream" style={{ textShadow: '2px 2px 0 #000' }}>
-            SHAKE HIM OFF! ← →
-          </div>
-          <div className="h-2 w-40 overflow-hidden rounded-sm border border-black bg-black/60">
-            <div
-              className="h-full bg-[#ffee58]"
-              style={{ width: `${Math.min(100, (shake / SHAKE_THRESHOLD) * 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream [text-shadow:1px_1px_0_#000] [@media(pointer:fine)]:sm:block sm:left-8">
+      {/* The key reminder is for the opening round; after that the floor belongs to the fight. */}
+      <div
+        aria-hidden={round > 1}
+        className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream [text-shadow:1px_1px_0_#000] [@media(pointer:fine)]:sm:block sm:left-8 transition-opacity duration-700"
+        style={{ opacity: round > 1 ? 0 : 1 }}
+      >
         <ControlsHint />
       </div>
 
@@ -149,16 +137,12 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
       <button
         type="button"
         aria-label="Leave match"
+        title="Leave match"
         onClick={onLeave}
-        className="pointer-events-auto absolute top-3 left-3 grid size-11 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream [@media(pointer:fine)]:hidden"
+        className="pointer-events-auto absolute top-3 left-3 grid size-10 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream hover:border-cream-dim sm:left-8 [@media(pointer:fine)]:top-4"
       >
         <ArrowLeftIcon weight="bold" className="size-5" />
       </button>
-      <div className="pointer-events-auto absolute bottom-6 left-1/2 hidden -translate-x-1/2 [@media(pointer:fine)]:block">
-        <Button size="sm" sound="ui.back" onClick={onLeave}>
-          <ArrowLeftIcon weight="bold" /> Leave
-        </Button>
-      </div>
     </div>
   );
 }
