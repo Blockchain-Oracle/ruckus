@@ -28,6 +28,8 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
   const release = () => {
     if (start.current === null) return;
     start.current = null;
+    // Calling a shot (the wager) keeps the power you set; a normal turn shoots on release.
+    if (getDirector()?.mode === 'wager') return;
     if (aim.power >= MIN_SHOT) getDirector()?.shootHuman();
     aim.power = 0;
     setPower(0);

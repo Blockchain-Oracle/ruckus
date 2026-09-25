@@ -13,7 +13,8 @@
     "chickenz-room": "tsx src/chickenz-room.ts",
     "firefox": "tsx src/firefox-probe.ts",
     "back-bird": "tsx src/back-bird-e2e.ts",
-    "pool-room": "tsx src/pool-room.ts"
+    "pool-room": "tsx src/pool-room.ts",
+    "pool-wager": "tsx src/pool-wager-e2e.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

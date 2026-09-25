@@ -1,9 +1,9 @@
 import { GlobeIcon } from '@phosphor-icons/react';
 
+import { loadWagerSounds } from '@/lib/audio/wager.ts';
 import { Button } from '@/ui/Button.tsx';
 
 import { useRoomSheet } from '../net/sheetStore.ts';
-import { loadWagerSounds } from './audio.ts';
 import { useWager } from './store.ts';
 
 /** Cabinet actions beside Play (practice): play online with friends, and the gold money button. */

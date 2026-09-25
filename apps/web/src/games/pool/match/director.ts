@@ -5,6 +5,7 @@ import {
   HEAD_STRING_X,
   isSolid,
   isStripe,
+  layout,
   onEight,
   onTable,
   type RackState,
@@ -14,6 +15,7 @@ import {
 
 import { playStrike } from '../audio/sfx.ts';
 import { LESSONS } from '../tutorial/lessons.ts';
+import { useShotBet } from '../wager/store.ts';
 import { aim } from './aim.ts';
 import { thinkBot } from './bot.ts';
 import { PoolDriver, type Seat } from './driver.ts';
@@ -52,7 +54,7 @@ const leftOf = (d: PoolDriver, g: Group | null) => {
  */
 export class PoolDirector {
   driver: PoolDriver;
-  mode: 'exhibition' | 'match' | 'online' | 'tutorial' = 'exhibition';
+  mode: 'exhibition' | 'match' | 'online' | 'tutorial' | 'wager' = 'exhibition';
   private lesson = -1;
   /** Dev-only timeline for browser checks (never read in production). */
   log: string[] = [];
@@ -74,9 +76,46 @@ export class PoolDirector {
   }
 
   humanTurn() {
+    if (this.mode === 'wager')
+      return this.driver.phase === 'aim' && useShotBet.getState().phase === 'setup';
     if (this.mode === 'tutorial') return this.lesson >= 0;
     if (this.mode === 'online') return this.driver.shooter === this.mySlot;
     return this.mode === 'match' && !this.driver.seats[this.driver.shooter].bot;
+  }
+
+  // ── Call Your Shot (wager) ───────────────────────────────────────────────
+
+  /** A fresh practice layout to call a shot on. */
+  startWager(seed: number) {
+    this.mode = 'wager';
+    this.timers = [];
+    this.stroke = null;
+    this.driver = new PoolDriver(seed, [
+      { name: 'You', bot: false, difficulty: 0 },
+      { name: 'The house', bot: false, difficulty: 0 },
+    ]);
+    this.driver.load(layout(seed), {
+      shooter: 0,
+      groups: [null, null],
+      isBreak: false,
+      ballInHand: 'none',
+      winner: -1,
+    });
+    this.driver.sandbox = true;
+    aim.power = 0;
+    aim.spinX = 0;
+    aim.spinY = 0;
+    this.sync(null);
+    usePool.getState().set({ status: 'off' });
+    useShotBet.getState().set({ phase: 'setup', layoutSeed: seed, result: null, call: null });
+  }
+
+  private wagerDone: (() => void) | null = null;
+  /** Play the realised stroke; `done` fires when everything stops. */
+  playWagerShot(shot: Shot, done: () => void) {
+    this.wagerDone = done;
+    this.driver.shoot(shot, -1);
+    playStrike(shot.power, this.driver.balls[CUE_BALL * STRIDE] ?? 0);
   }
 
   // ── tutorial ───────────────────────────────────────────────────────────
@@ -228,6 +267,7 @@ export class PoolDirector {
 
   startExhibition() {
     this.trace('exhibition');
+    if (useShotBet.getState().phase !== 'off') useShotBet.getState().set({ phase: 'off' });
     this.mode = 'exhibition';
     this.lesson = -1;
     usePool.getState().set({ lesson: -1, lessonNote: null, offerTutorial: false });
@@ -274,6 +314,8 @@ export class PoolDirector {
 
   /** Human shot from the HUD/input. */
   shootHuman() {
+    // Calling a shot bets it; the cue itself never fires the stroke.
+    if (this.mode === 'wager') return;
     const d = this.driver;
     if (!this.humanTurn() || d.phase !== 'aim') return;
     const { calledPocket, mustCall } = usePool.getState();
@@ -309,6 +351,14 @@ export class PoolDirector {
     this.advanceStroke(dtS);
     const d = this.driver;
     d.update(dtS);
+    if (this.mode === 'wager') {
+      if (d.takeRested()) {
+        const done = this.wagerDone;
+        this.wagerDone = null;
+        done?.();
+      }
+      return;
+    }
     if (this.mode === 'tutorial') {
       if (d.takeRested()) this.tutorialRested();
       else this.tutorialTick();

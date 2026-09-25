@@ -14,10 +14,10 @@ import { BET_TYPE, bankMapFor, presentationSeed, type SeedBank } from '@arena/ca
 import bankJson from '@arena/casino-math/seedbanks/chickenz-back-bird.v1.json';
 
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { loadWagerSounds, playWager, startSuspense, stopSuspense } from '@/lib/audio/wager.ts';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 
 import { HEROES } from '../sprites.ts';
-import { loadWagerSounds, playWager, startSuspense, stopSuspense } from './audio.ts';
 import { MIN_SUSPENSE_MS, PRESENTATION } from './constants.ts';
 import { useWager } from './store.ts';
 

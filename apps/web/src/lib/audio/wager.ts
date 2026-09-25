@@ -1,17 +1,16 @@
 import type { SpriteMap } from '@arena/audio';
 
+import wagerMap from '@/assets/audio/wager.json';
+import wagerM4a from '@/assets/audio/wager.m4a?url';
+import wagerWebm from '@/assets/audio/wager.webm?url';
 import { getAudio } from '@/lib/audio/index.ts';
-
-import wagerMap from '../assets/audio/wager.json';
-import wagerM4a from '../assets/audio/wager.m4a?url';
-import wagerWebm from '../assets/audio/wager.webm?url';
 
 let loading: Promise<void> | null = null;
 
-/** Wager sounds live in the Chickenz chunk and load the first time the bet sheet opens. */
+/** Wager sounds (every game's casino rounds) load the first time a bet sheet opens. */
 export function loadWagerSounds() {
   loading ??= getAudio()
-    .loadSprite('chickenz-wager', [wagerWebm, wagerM4a], wagerMap as SpriteMap)
+    .loadSprite('wager', [wagerWebm, wagerM4a], wagerMap as SpriteMap)
     .catch((error: unknown) => {
       loading = null;
       console.warn('Wager sounds unavailable', error);

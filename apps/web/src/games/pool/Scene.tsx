@@ -1,7 +1,16 @@
 import { type ThreeEvent, useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 
-import { BALL_RADIUS_M, CUE_BALL, canPlaceCue, F, HALF_L, HALF_W, STRIDE } from '@arena/sim-pool';
+import {
+  BALL_RADIUS_M,
+  CUE_BALL,
+  canPlaceCue,
+  F,
+  HALF_L,
+  HALF_W,
+  made,
+  STRIDE,
+} from '@arena/sim-pool';
 
 import { useProfile } from '@/app/stores/profile.ts';
 import type { GameSceneProps } from '@/engine/types.ts';
@@ -25,6 +34,8 @@ import { Cue } from './render/Cue.tsx';
 import { PocketMarkers } from './render/PocketMarkers.tsx';
 import { Room } from './render/Room.tsx';
 import { Table } from './render/Table.tsx';
+import { readWagerCall } from './wager/live.ts';
+import { useShotBet } from './wager/store.ts';
 
 const ATTRACT_SEED = 0x8ba11;
 const R = BALL_RADIUS_M;
@@ -39,7 +50,7 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
     if (import.meta.env.DEV)
       Object.assign(globalThis, {
         __ruckusPool: director,
-        __ruckusPoolKit: { aim, usePool, thinkBot },
+        __ruckusPoolKit: { aim, usePool, thinkBot, useShotBet, made },
       });
     director.startExhibition();
     resetPoolCamera();
@@ -52,7 +63,12 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
   useEffect(() => {
     setPoolBackdrop(phase === 'attract' || phase === 'leaving');
     // In a room the server starts the rack; never start a local practice match meanwhile.
-    if (phase === 'entering' && director.mode === 'exhibition' && !poolRooms.inRoom()) {
+    if (
+      phase === 'entering' &&
+      director.mode === 'exhibition' &&
+      !poolRooms.inRoom() &&
+      useShotBet.getState().phase === 'off'
+    ) {
       director.playerName = useProfile.getState().name;
       // First visit: offer the one-minute lesson before the first rack.
       if (tutorialDone()) director.startMatch(director.playerName);
@@ -71,6 +87,7 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
     const dt = Math.min(delta, 0.1);
     if (director.humanTurn() && director.driver.phase === 'aim') {
       applyHeldKeys(dt);
+      if (director.mode === 'wager') readWagerCall(director.driver.balls);
       if (director.mode === 'online') relayAim(performance.now());
     }
     director.tick(dt);
@@ -116,7 +133,13 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
       <Room showLamp={phase === 'attract' || phase === 'leaving'} />
       <Table />
       <Balls driver={driver} />
-      <Cue driver={driver} show={() => true} />
+      <Cue
+        driver={driver}
+        show={() =>
+          director.mode !== 'wager' ||
+          ['setup', 'checking', 'placing', 'waiting'].includes(useShotBet.getState().phase)
+        }
+      />
       <AimGuide driver={driver} show={() => director.humanTurn()} />
       <PocketMarkers />
       <mesh

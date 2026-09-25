@@ -6,11 +6,11 @@ import { formatUnits } from 'viem';
 import { countUpValue, tierFor } from '@arena/fx';
 
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { playWager } from '@/lib/audio/wager.ts';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { Button } from '@/ui/Button.tsx';
 
 import { HERO_NAMES } from '../sprites.ts';
-import { playWager } from './audio.ts';
 import { RESULT_COUNT_UP_MS, SLOW_VRF_MS } from './constants.ts';
 import { HeroPortrait } from './HeroPortrait.tsx';
 import { useWager } from './store.ts';

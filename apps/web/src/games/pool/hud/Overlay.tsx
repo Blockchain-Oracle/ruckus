@@ -11,6 +11,9 @@ import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 import { getDirector } from '../match/runtime.ts';
 import { usePool } from '../match/store.ts';
 import { poolRooms, watchRoomPhase } from '../net/online.ts';
+import { useCallShotController } from '../wager/controller.ts';
+import { useShotBet } from '../wager/store.ts';
+import { CallShotHud } from '../wager/WagerHud.tsx';
 import { LessonCard, TutorialOffer } from './Lesson.tsx';
 import { PoolHud } from './PoolHud.tsx';
 import { PoolResults } from './Results.tsx';
@@ -33,7 +36,9 @@ export function PoolOverlay() {
   const status = usePool((s) => s.status);
   const setGameOwnsHud = useShell((s) => s.setGameOwnsHud);
   const setImmersive = useShell((s) => s.setImmersive);
-  const busy = status !== 'off';
+  useCallShotController();
+  const betting = useShotBet((s) => s.phase !== 'off');
+  const busy = status !== 'off' || betting;
   useEffect(() => watchRoomPhase(), []);
   // `?game=pool&room=CODE` invite links drop you straight into that room.
   useEffect(() => {
@@ -55,6 +60,7 @@ export function PoolOverlay() {
   return (
     <>
       <PoolHud onLeave={leave} />
+      <CallShotHud onLeave={leave} />
       <LessonCard />
       <TutorialOffer />
       <PoolResults online={online} onRematch={() => getDirector()?.rematch()} onLeave={leave} />
