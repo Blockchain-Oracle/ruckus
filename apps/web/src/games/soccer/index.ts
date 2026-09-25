@@ -2,6 +2,7 @@ import type { GameModule } from '@/engine/types.ts';
 
 import { loadSoccerSfx } from './audio/sfx.ts';
 import { rig } from './config.ts';
+import { SoccerHubActions } from './hud/HubActions.tsx';
 import { SoccerOverlay } from './hud/Overlay.tsx';
 import { SoccerSettings } from './hud/SoccerSettings.tsx';
 import { footballTexture } from './render/toon.ts';
@@ -14,4 +15,5 @@ export const soccer: GameModule = {
   preload: () => Promise.all([loadSoccerSfx(), Promise.resolve().then(footballTexture)]),
   Overlay: SoccerOverlay,
   Settings: SoccerSettings,
+  HubActions: SoccerHubActions,
 };

@@ -8,11 +8,13 @@ import { KITS } from '../config.ts';
 export function Results({
   w,
   you,
+  online,
   onRematch,
   onLeave,
 }: {
   w: World;
   you: number;
+  online: boolean;
   onRematch: () => void;
   onLeave: () => void;
 }) {
@@ -32,12 +34,17 @@ export function Results({
           <span className="text-2xl text-cream-dim">–</span>
           <span style={{ color: KITS[1].body }}>{b}</span>
         </div>
+        {online && (
+          <p className="text-xs text-cream-dim">Back to the room in a moment for the next match.</p>
+        )}
         <div className="flex gap-3">
-          <Button variant="tomato" sound="ui.confirm" onClick={onRematch}>
-            Rematch
-          </Button>
+          {!online && (
+            <Button variant="tomato" sound="ui.confirm" onClick={onRematch}>
+              Rematch
+            </Button>
+          )}
           <Button sound="ui.back" onClick={onLeave}>
-            Back to hub
+            {online ? 'Leave room' : 'Back to hub'}
           </Button>
         </div>
       </div>

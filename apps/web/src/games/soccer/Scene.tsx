@@ -13,6 +13,7 @@ import { SoccerDriver } from './match/driver.ts';
 import { presenter, startMatch, stopMatch } from './match/flow.ts';
 import { setDriver } from './match/runtime.ts';
 import { useSoccer } from './match/store.ts';
+import { applyPendingMatch, soccerRooms } from './net/online.ts';
 import { Ball, Shadows } from './render/Ball.tsx';
 import { Egg } from './render/Egg.tsx';
 import { SoccerFx } from './render/fx.ts';
@@ -37,6 +38,8 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
     driver.readInput = readInput;
     if (import.meta.env.DEV) Object.assign(globalThis, { __ruckusSoccer: driver });
     const detach = attachKeys();
+    // A room match that arrived before this scene mounted (invite links) takes over now.
+    applyPendingMatch();
     return () => {
       detach();
       setDriver(null);
@@ -47,7 +50,8 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
   // bots' exhibition under the hub menu.
   useEffect(() => {
     if (phase === 'attract') setCrowdBed('backdrop');
-    if (phase === 'entering' && useSoccer.getState().status === 'off') {
+    // In a room the server starts the match; never start local practice meanwhile.
+    if (phase === 'entering' && useSoccer.getState().status === 'off' && !soccerRooms.inRoom()) {
       fx.clear();
       if (controlsSeen()) startMatch();
       else useSoccer.getState().set({ status: 'intro' });
@@ -66,7 +70,7 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
     const events = driver.drain();
     fx.ingest(events, driver.world);
     playSoccerEvents(events, driver.world);
-    presenter.update(driver.world, dt, driver.mode.kind === 'match');
+    presenter.update(driver.world, dt, driver.mode.kind !== 'exhibition');
     keepCrowdBed();
     const g = stage.current;
     if (g) {

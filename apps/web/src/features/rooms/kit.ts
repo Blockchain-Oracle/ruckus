@@ -121,6 +121,8 @@ export function createRoomKit(cfg: KitConfig) {
       useRoom.getState().set({ status: 'offline', seats: [], code: '', phase: 'lobby' });
     },
     send: (type: string, payload?: unknown) => room?.send(type, payload),
+    /** Binary messages (real-time inputs). */
+    sendBytes: (type: string, bytes: Uint8Array) => room?.sendBytes(type, bytes),
     inRoom: () => room !== null,
   };
 }

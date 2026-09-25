@@ -26,6 +26,7 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
   useTick(HUD_HZ);
   const status = useSoccer((s) => s.status);
   const names = useSoccer((s) => s.names);
+  const online = useSoccer((s) => s.online);
   const coarse = useCoarse();
   const d = getDriver();
   if (status === 'off' || !d) return null;
@@ -77,7 +78,7 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
       </div>
 
       {status === 'over' && !useSoccer.getState().announce && (
-        <Results w={w} you={you} onRematch={startMatch} onLeave={onLeave} />
+        <Results w={w} you={you} online={online} onRematch={startMatch} onLeave={onLeave} />
       )}
     </div>
   );

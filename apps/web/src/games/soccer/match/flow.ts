@@ -1,3 +1,4 @@
+import type { SoccerMatchStart } from '@arena/protocol/soccer';
 import { KICKOFF_FREEZE_S, TICK_HZ, type World } from '@arena/sim-soccer';
 
 import { useProfile } from '@/app/stores/profile.ts';
@@ -30,7 +31,18 @@ export function startMatch() {
   const names = d.world.players.map((_, i) => (i === 0 ? you : `Bot · ${pick(i)}`));
   matches += 1;
   presenter.reset();
-  useSoccer.getState().set({ status: 'playing', names, announce: null });
+  useSoccer.getState().set({ status: 'playing', names, announce: null, online: false });
+  setCrowdBed('match');
+  playMusic(STADIUM_TRACK);
+}
+
+/** A room match: names and bots come from the server; my seat is `slot` (−1 watching). */
+export function startOnlineMatch(e: SoccerMatchStart, slot: number) {
+  const d = getDriver();
+  if (!d) return;
+  d.startOnline(e.seed, e.perTeam, e.bots, slot);
+  presenter.reset();
+  useSoccer.getState().set({ status: 'playing', names: e.names, announce: null, online: true });
   setCrowdBed('match');
   playMusic(STADIUM_TRACK);
 }
@@ -38,7 +50,7 @@ export function startMatch() {
 export function stopMatch() {
   getDriver()?.exhibit();
   presenter.reset();
-  useSoccer.getState().set({ status: 'off', announce: null });
+  useSoccer.getState().set({ status: 'off', announce: null, online: false });
 }
 
 /**

@@ -1,13 +1,27 @@
-import { DT, type Input, newWorld, type SimEvent, tick, type World } from '@arena/sim-soccer';
+import {
+  DT,
+  type Input,
+  newWorld,
+  type SimEvent,
+  tick,
+  unpackWorld,
+  type World,
+} from '@arena/sim-soccer';
 
 import { EXHIBITION_RESTART_S, EXHIBITION_SKILL, SLOWMO_S, SLOWMO_SCALE } from '../config.ts';
 
 export type SoccerMode =
   | { kind: 'exhibition' }
-  | { kind: 'match'; perTeam: 1 | 2; bot: number; humanSlot: number };
+  | { kind: 'match'; perTeam: 1 | 2; bot: number; humanSlot: number }
+  /** A room match: `humanSlot` is −1 for watchers. */
+  | { kind: 'online'; perTeam: 1 | 2; humanSlot: number };
 
 /** Longest frame we'll catch up on; beyond this the match just slows rather than spiralling. */
 const MAX_STEPS_PER_FRAME = 8;
+/** Unacknowledged inputs kept for replay (~1 s at 60 Hz). */
+const MAX_PENDING = 60;
+/** Corrections melt away at this rate (1/s), so a remote egg glides instead of snapping. */
+const SMOOTH_RATE = 14;
 const IDLE: Input = { h: 0, jump: false };
 
 type Pose = { x: number; y: number };
@@ -15,6 +29,7 @@ type Pose = { x: number; y: number };
 /**
  * Runs the deterministic sim at a fixed 60 Hz under the render loop, keeping the previous tick's
  * positions so bodies draw interpolated between ticks (smooth on 120 Hz screens, honest on 30).
+ * Online it predicts the whole world and reconciles to the server's snapshots.
  */
 export class SoccerDriver {
   world: World;
@@ -28,10 +43,14 @@ export class SoccerDriver {
   alpha = 0;
   prevBall: Pose = { x: 0, y: 0 };
   prevPlayers: Pose[] = [];
+  /** Visual offsets left over from a correction, decaying to zero (ball, then each player). */
+  private smooth: Pose[] = [];
   /** Events since the last drain (audio, effects, HUD). */
   private queue: SimEvent[] = [];
+  private seq = 0;
+  private pending: { seq: number; input: Input }[] = [];
   readInput: () => Input = () => IDLE;
-  onFullTime: (() => void) | null = null;
+  sendInput: ((seq: number, input: Input) => void) | null = null;
 
   constructor(seed: number) {
     this.seed = seed >>> 0 || 1;
@@ -65,16 +84,26 @@ export class SoccerDriver {
     this.reset();
   }
 
+  /** A room match: the same world every client builds from the server's seed. */
+  startOnline(seed: number, perTeam: 1 | 2, bots: readonly number[], humanSlot: number) {
+    this.mode = { kind: 'online', perTeam, humanSlot };
+    this.world = newWorld(seed, perTeam, bots);
+    this.reset();
+  }
+
   private reset() {
     this.acc = 0;
     this.slowmo = 0;
     this.restartIn = -1;
     this.queue.length = 0;
+    this.pending = [];
+    this.seq = 0;
+    this.smooth = Array.from({ length: this.world.players.length + 1 }, () => ({ x: 0, y: 0 }));
     this.snapshot();
   }
 
   get humanSlot() {
-    return this.mode.kind === 'match' ? this.mode.humanSlot : -1;
+    return this.mode.kind === 'exhibition' ? -1 : this.mode.humanSlot;
   }
 
   private snapshot() {
@@ -86,6 +115,11 @@ export class SoccerDriver {
 
   update(delta: number) {
     const w = this.world;
+    for (const s of this.smooth) {
+      const k = Math.exp(-SMOOTH_RATE * delta);
+      s.x *= k;
+      s.y *= k;
+    }
     if (w.phase === 'over') {
       if (this.mode.kind === 'exhibition') {
         if (this.restartIn < 0) this.restartIn = EXHIBITION_RESTART_S;
@@ -101,21 +135,67 @@ export class SoccerDriver {
     }
     this.acc += scaled;
     let steps = 0;
+    const online = this.mode.kind === 'online';
     while (this.acc >= DT && steps < MAX_STEPS_PER_FRAME) {
       this.acc -= DT;
       steps += 1;
       this.snapshot();
       const human = w.players[this.humanSlot];
-      if (human) human.input = this.readInput();
+      if (human) {
+        human.input = this.readInput();
+        if (online) {
+          this.seq += 1;
+          this.pending.push({ seq: this.seq, input: human.input });
+          if (this.pending.length > MAX_PENDING) this.pending.shift();
+          this.sendInput?.(this.seq, human.input);
+        }
+      }
       tick(w);
       for (const e of w.events) {
         this.queue.push(e);
-        if (e.kind === 'goal') this.slowmo = SLOWMO_S;
-        if (e.kind === 'whistle' && e.what === 'fulltime') this.onFullTime?.();
+        // Slow motion would put an online client behind the server's clock: offline only.
+        if (e.kind === 'goal' && !online) this.slowmo = SLOWMO_S;
       }
     }
     if (steps === MAX_STEPS_PER_FRAME) this.acc = 0;
     this.alpha = this.acc / DT;
+  }
+
+  /**
+   * Server snapshot: restore its exact world, drop inputs it has applied, and replay the rest so
+   * our own egg stays where our fingers put it. Remote eggs keep their last applied input until
+   * the next snapshot (whole-world prediction). The visual jump is absorbed by decaying offsets.
+   */
+  applySnapshot(ack: number, packed: Float64Array) {
+    if (this.mode.kind !== 'online') return;
+    const w = this.world;
+    const shown = [this.ballAt(), ...w.players.map((_, i) => this.playerAt(i))];
+    const score: [number, number] = [w.score[0], w.score[1]];
+    const wasOver = w.phase === 'over';
+    if (!unpackWorld(w, packed)) return;
+    this.pending = this.pending.filter((p) => p.seq > ack);
+    const human = w.players[this.humanSlot];
+    if (human && w.phase !== 'over') {
+      for (const p of this.pending) {
+        human.input = p.input;
+        tick(w);
+        if (isOver(w)) break;
+      }
+    }
+    // Moments only the server saw (a goal we didn't predict, the final whistle) still get their
+    // sounds and call-outs; everything else in the replay already played when predicted.
+    for (const team of [0, 1] as const)
+      if (w.score[team] > score[team]) this.queue.push({ kind: 'goal', team });
+    if (w.phase === 'over' && !wasOver) this.queue.push({ kind: 'whistle', what: 'fulltime' });
+    this.snapshot();
+    const now = [w.ball, ...w.players];
+    now.forEach((b, i) => {
+      const s = this.smooth[i];
+      const was = shown[i];
+      if (!s || !was) return;
+      s.x = was.x - b.x;
+      s.y = was.y - b.y;
+    });
   }
 
   drain(): SimEvent[] {
@@ -125,13 +205,14 @@ export class SoccerDriver {
     return out;
   }
 
-  /** Interpolated draw positions. */
+  /** Interpolated draw positions (plus any correction still melting away). */
   ballAt(): Pose {
     const b = this.world.ball;
     const a = this.alpha;
+    const s = this.smooth[0];
     return {
-      x: this.prevBall.x + (b.x - this.prevBall.x) * a,
-      y: this.prevBall.y + (b.y - this.prevBall.y) * a,
+      x: this.prevBall.x + (b.x - this.prevBall.x) * a + (s?.x ?? 0),
+      y: this.prevBall.y + (b.y - this.prevBall.y) * a + (s?.y ?? 0),
     };
   }
 
@@ -139,10 +220,16 @@ export class SoccerDriver {
     const p = this.world.players[i];
     const q = this.prevPlayers[i];
     if (!p) return { x: 0, y: 0 };
+    const s = this.smooth[i + 1];
     if (!q) return { x: p.x, y: p.y };
     const a = this.alpha;
-    return { x: q.x + (p.x - q.x) * a, y: q.y + (p.y - q.y) * a };
+    return {
+      x: q.x + (p.x - q.x) * a + (s?.x ?? 0),
+      y: q.y + (p.y - q.y) * a + (s?.y ?? 0),
+    };
   }
 }
 
 const EMPTY: SimEvent[] = [];
+/** Read through a call: `tick` mutates the phase, which narrowing can't see. */
+const isOver = (w: World) => w.phase === 'over';
