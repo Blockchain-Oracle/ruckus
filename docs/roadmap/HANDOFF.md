@@ -1,6 +1,6 @@
 # HANDOFF (updated 2026-09-25 by session 4)
 
-**Stage:** S21 Soccer tutorial is next (S18 + S19 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
+**Stage:** S20 Soccer wager is next (S18, S19 and S21 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
 
 **Last completed (session 3):**
 - Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
@@ -42,8 +42,9 @@
 - Camera uses rig `pose` (tilted down, width-fit, lifts for high balls). Screenshot helper: `tooling/browser-checks/src/soccer-shots.ts`.
 
 **NEXT ACTION:**
-1. **Soccer S21: tutorial** (hands-on lessons: move, jump/hold, kick on the run, header, power-ups; the first-visit How to play card can hand off to it, like Pool's TutorialOffer). Then **S20 wager** (novelty check per ADR-001).
-   - S19 is done: `SoccerRoom` is live on Coolify with whole-world prediction, 1v1/2v2, bots, watchers, invite links and walkout → bot. Check it with `pnpm -F @arena/browser-checks soccer-room` (needs :5173 and a local server on :2567).
+1. **Soccer S20: wager** (novelty check per ADR-001; one VRF class-table contract at a single RTP within 93–98%; presented with seed banks like Back a Bird and Call Your Shot; simulator e2e including the top multiplier).
+   - S21 is done: five lessons judged by the live sim, first-visit offer, and Settings → Replay tutorial. Check with `pnpm -F @arena/browser-checks soccer-tutorial`.
+   - S19 is done: `SoccerRoom` is live (check with `soccer-room`).
 2. Runner S22–S26, play-first.
 3. Keep the controls rule for every game: controls never fight the pointer; every control written on screen.
 4. Four-game hub landing (ADR-007 follow-up).
