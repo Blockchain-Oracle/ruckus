@@ -1,5 +1,6 @@
 export { thinkBot } from './bot.ts';
 export * from './constants.ts';
+export * from './serialize.ts';
 export { step } from './step.ts';
 export * from './world.ts';
 

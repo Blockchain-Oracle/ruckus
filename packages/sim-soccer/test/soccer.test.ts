@@ -9,9 +9,11 @@ import {
   JUMP_SPEED,
   newWorld,
   PLAYER_RADIUS,
+  packWorld,
   step,
   TICK_HZ,
   tick,
+  unpackWorld,
 } from '../src/index.ts';
 
 const play = (w: ReturnType<typeof newWorld>) => {
@@ -86,5 +88,27 @@ describe('head soccer', () => {
       goals += w.score[0] + w.score[1];
     }
     expect(goals).toBeGreaterThan(2);
+  });
+});
+
+describe('snapshots', () => {
+  it('pack → unpack continues bit-identically (the room netcode relies on it)', () => {
+    const a = newWorld(9, 2, [60, 70, 80, 90]);
+    for (let i = 0; i < 1000; i++) tick(a);
+    const b = newWorld(1, 2, [0, 0, 0, 0]);
+    expect(unpackWorld(b, packWorld(a))).toBe(true);
+    expect(hashWorld(b)).toBe(hashWorld(a));
+    for (let i = 0; i < 2000; i++) {
+      tick(a);
+      tick(b);
+    }
+    expect(hashWorld(b)).toBe(hashWorld(a));
+    expect(b.score).toEqual(a.score);
+  });
+
+  it('refuses a snapshot for a different format', () => {
+    expect(unpackWorld(newWorld(1, 1, [0, 0]), packWorld(newWorld(1, 2, [0, 0, 0, 0])))).toBe(
+      false,
+    );
   });
 });
