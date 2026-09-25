@@ -17,11 +17,12 @@
   - The 8-step tutorial, first-run prompt and guest username.
 - `docs/assets/chickenz-parity.md` holds the reference parity ledger. Keep its status columns current.
 
-**NEXT ACTION:** Chickenz online rooms (parity §5 item 8, stages S05 and S08).
-- A Colyseus `ChickenzRoom` in `apps/server`, running the wasm sim server-side at 60 Hz.
-- Create or join by 5-letter code and `?room=` links, with ready-up.
-- Labelled bot fill for empty seats.
-- Client prediction and smoothing.
+**NEXT ACTION:** Chickenz online rooms are **done and deployed**. The web is live, and the server is on Coolify at HEAD. Next, in order:
+1. The Chickenz settings parity items: key rebinding, the dynamic-camera toggle, a "my hero" choice.
+2. The nameplates and emote bar.
+3. The Back a Bird simulator e2e (S10a).
+4. ✱E: check the live site as a judge would (desktop, mobile, Firefox), then ask the user about submitting.
+5. Pool, Soccer and Runner, each with the same play-first fidelity: a parity ledger per reference, then a playable game vs bots, then rooms, then the wager.
 
 After that:
 - The Chickenz settings items: rebinding, the dynamic-camera toggle, a hero choice.
@@ -47,6 +48,10 @@ After that:
 - `prod-frame` also boots the real hub framed. Browser checks pass: `casino` (simulator), `prod-frame`, and `connectivity` against both local and **production**.
 
 **Gotchas learned (the rest are in the stage notes):**
+- **Colyseus "seat reservation expired" (4002) on every join** means two peer variants of `@colyseus/core` are installed. The matchmaker and the WS transport then keep separate room registries. apps/server pins `@colyseus/core`, `ws-transport` and `auth` directly to keep them unified. Check `ls node_modules/.pnpm | grep @colyseus+core`.
+- A local "couldn't reach the game server" is usually the local `node apps/server/dist/index.js` being down or stale. Rebuild it and restart it.
+- Firefox and Zen render through WebGL2 (`engine/renderer.ts`). `pnpm -F @arena/browser-checks firefox` probes them (the Playwright Firefox build must match playwright-core).
+- Rooms never lock mid-match. Late joiners are `waiting` seats that spectate, then play the next match.
 - React StrictMode double-mounts effects, so free wasm objects in cleanup and recreate them (`driver.start`/`stop`).
 - HMR resets zustand stores mid-game, so reload the page before judging state bugs.
 - Dev QA handles are `window.__ruckusMachine`, `__ruckusWager`, `__ruckusMatch` and `__ruckusTutorial` (DEV builds only).

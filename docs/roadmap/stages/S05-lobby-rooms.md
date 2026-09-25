@@ -35,3 +35,15 @@
 
 ## Exit checklist
 ROADMAP · HANDOFF · LOG · commits
+
+## Notes (session 2): Chickenz-first implementation
+- **Done for Chickenz:**
+  - `ChickenzRoom`: codes, links, host bots, ready-up, first to 3, reconnect with bot takeover, watchers joining mid-match.
+  - Predicted netcode: restore and replay, 20 Hz per-client snapshots.
+  - The room sheet UI.
+  - Prod smoke: `SERVER_URL=wss://ruckus-play.84.46.247.92.sslip.io pnpm -F @arena/browser-checks chickenz-room`.
+- **Still open:**
+  - The generic `packages/netcode` extraction, when the second networked game arrives.
+  - The realtime lobby list.
+  - Emote UI and rematch vote.
+  - The reconnect e2e test.
