@@ -30,7 +30,7 @@ page.on('console', (m) => {
   if (m.type() === 'error' || m.type() === 'warning') logs.push(`[${m.type()}] ${m.text()}`);
 });
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
-await page.goto('http://127.0.0.1:5173/?game=soccer');
+await page.goto(`${process.env.SOCCER_URL ?? 'http://127.0.0.1:5173/'}?game=soccer`);
 await page.waitForTimeout(6000);
 await page.screenshot({ path: `${out}/soccer-attract.png` });
 await page.evaluate("window.__ruckusMachine?.getState?.().send('entering')");
