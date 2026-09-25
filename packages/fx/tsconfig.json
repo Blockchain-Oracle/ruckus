@@ -1,0 +1,4 @@
+{
+  "extends": "@arena/tsconfig/base.json",
+  "include": ["src"]
+}
