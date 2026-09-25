@@ -6,7 +6,7 @@
   - Every redeploy gets a new address. After submission, the Chain maintainers audit and whitelist a *specific* address.
 
 ## Decision
-- **One generic class-table contract** named `<Name>Game.sol`, with the name set at checkpoint ✱N. `canonicalCasinoGameId` strips the trailing "Game", lowercases the rest and keeps only alphanumerics.
+- **One generic class-table contract** named **`RuckusGame.sol`**, which gives the gameId **`ruckus`** (the name was decided on 2026-09-25). `canonicalCasinoGameId` strips the trailing "Game", lowercases the rest and keeps only alphanumerics.
   - `gameData = abi.encode(uint8 betType, uint8 presentationVersion, bytes params)`.
   - Each `betType` is a constant table: `weights[]`, `multipliers[]` and a denominator `D`.
   - **Everything goes through one `_payout(wager, betType, class)`**, which feeds `quoteCaps`, `quoteRiskParams`, `onSessionStart` and `onRandomness`. This avoids the "payout exceeds reserve by 1 wei" trap described in `CONTRACT_CONSTRAINTS.md`.

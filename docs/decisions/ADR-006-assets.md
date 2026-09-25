@@ -20,12 +20,13 @@
   - Jestan's weapons pack.
   - Udio.
   - Stock-music plans that gate game use behind enterprise terms (Epidemic, Artlist), and Uppbeat.
-- **ElevenLabs is pending written clarification.**
-  - Its Prohibited Use Policy §3(c) bans "facilitat[ing] real-money gambling activities" and applies to outputs.
-  - We do not reword prompts to get around the policy.
-  - The request draft is in `docs/assets/elevenlabs-request.md`. If they approve, we use the `sound-effects` and `music` skills on the Starter plan (39,855 credits per month).
+- **ElevenLabs is the primary source for SFX and music** (the user decided this on 2026-09-25, on their paid Starter plan).
+  - Tools: the `sound-effects` and `music` skills, or the `elevenlabs` CLI 1.4.0 (`elevenlabs text-to-sound-effects convert --json '{...}' -o <file>`).
+  - Budget: 39,855 credits per month (a 1 s SFX costs 40 credits; music costs 900 per minute).
+  - Keep every take in `assets-src/<game>/{sfx,music}/`, and log the prompt, model and date in `docs/assets/<game>.md`.
+  - Library sounds (Kenney CC0, Silverplatter, Sonniss) are for layering and fill-in.
 - **Every asset** gets a row in `docs/CREDITS.md` and an entry in the in-game credits screen.
-- **Raw sources whose licence restricts redistribution** (Sonniss WAVs) live in the gitignored `assets-src/`. Only processed output is committed.
+- **Raw sources** live in `assets-src/<game>/` and are committed. The exception is sources whose licence restricts redistribution (Sonniss WAVs): those go in `assets-src/**/restricted/`, which is gitignored.
 
 ## Pipeline (`packages/assets-pipeline`, built in S03)
 - **Flow:** `assets-src/<game>/` → scripts → `apps/web/public/assets/<game>/`. Output is committed, with Git LFS for binaries over 1 MB and LFS enabled on Vercel.

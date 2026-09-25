@@ -1,6 +1,6 @@
 # ElevenLabs: written-clarification request
 
-**Status:** ✱ waiting for the user to send the request, then for ElevenLabs to reply. Record the reply here, and update ADR-006 and memory.
+**Status: SUPERSEDED (2026-09-25).** The user decided to use ElevenLabs directly on their paid plan. Nothing needs to be sent. This file is kept only as a record.
 
 **Why:**
 - The Prohibited Use Policy §3(c) (updated 17 Aug 2026, https://elevenlabs.io/use-policy) bans using the Services to "facilitate real-money gambling activities".

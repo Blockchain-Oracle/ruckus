@@ -1,4 +1,6 @@
-# Product requirements (from the user, running list)
+# RUCKUS: product requirements (from the user, running list)
+
+- **Name: RUCKUS** (the user delegated the choice). The contract is `RuckusGame`, so the gameId is `ruckus`. Repo: https://github.com/Blockchain-Oracle/ruckus (private).
 
 ## Concept
 - A multiplayer **arena game hub** built from four references:
@@ -34,5 +36,5 @@
 - **Shared brand, native game styles.** One hub identity (palette, fonts, buttons, sounds, transitions, celebrations) wraps each game's native look.
 - **Licensing:** only licences valid for real-money gambling products, all logged in `docs/CREDITS.md`.
 - **Paid asset packs are OK** where they clearly raise quality, and free trials are welcome. The user approves each purchase.
-- **ElevenLabs:** the user has a paid Starter plan. It can't be used for this product until ElevenLabs confirms in writing (see `docs/assets/elevenlabs-request.md`).
+- **ElevenLabs** (paid Starter plan) is the main tool for generating the game's sound effects and music. The user wants it used.
 - **Workflow:** work in stages with an on-disk handoff (`docs/roadmap/`), so any session can resume after a context clear.

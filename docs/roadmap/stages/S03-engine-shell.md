@@ -11,10 +11,9 @@
 
 ## Tasks
 1. [ ] **✱N Name and brand.**
-   - Propose 3–5 names, with no collision with `docs/competitors.md` and a clean `canonicalCasinoGameId`.
+   - The name is decided: **RUCKUS** (gameId `ruckus`).
    - Use the **21st-ui-explore** skill to show 2–3 distinct brand directions.
    - The user picks one. Write `docs/assets/ART-BIBLE.md`: palette tokens (gold reserved for money), type (display + body fonts, tabular numbers), button language, iconography (Phosphor), motion rules and audio identity.
-   - Rename the contract/manifest `gameId`.
 2. [ ] **Engine:** `apps/web/src/engine/`
    - `GameShell` (R3F `<Canvas>` with WebGPURenderer, WebGL2 fallback, GPU tier detection, `?forceWebGL`)
    - `cameraDirector` (attract orbit and play dolly)

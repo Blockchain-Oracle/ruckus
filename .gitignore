@@ -26,8 +26,8 @@ contracts/out/
 contracts/cache/
 contracts/broadcast/
 
-# Raw asset sources (some licences forbid redistribution)
-assets-src/
+# Raw asset sources whose licences forbid redistribution (e.g. Sonniss WAVs)
+assets-src/**/restricted/
 
 # Env & secrets
 .env

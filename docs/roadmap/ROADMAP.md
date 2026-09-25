@@ -5,7 +5,7 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | # | Stage | Status | File |
 |---|---|---|---|
 | 1 | S00a Resume system and repo init | done | [stages/S00a-resume-system.md](stages/S00a-resume-system.md) |
-| 2 | S00b Toolchain and monorepo skeleton (✱ GitHub repo) | todo | [stages/S00b-toolchain.md](stages/S00b-toolchain.md) |
+| 2 | S00b Toolchain and monorepo skeleton (GitHub repo created) | todo | [stages/S00b-toolchain.md](stages/S00b-toolchain.md) |
 | 3 | S01 Casino core: contract, math, bridge, DemoHost, prod-frame | todo | [stages/S01-casino-core.md](stages/S01-casino-core.md) |
 | 4 | S02 Deploy skeleton: Coolify/Nixpacks, Vercel, Convex (✱ context) | todo | [stages/S02-deploy-skeleton.md](stages/S02-deploy-skeleton.md) |
 | 5 | ✱E Early eligible submission | todo | [stages/E-early-submission.md](stages/E-early-submission.md) |
@@ -39,9 +39,7 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 33 | S29 Final feel pass and submission update (✱) | todo | [stages/S29-final-polish.md](stages/S29-final-polish.md) |
 
 ## Open user checkpoints
-- ✱ ElevenLabs clarification email: the user sends it (`docs/assets/elevenlabs-request.md`).
-- ✱ GitHub repo name and visibility (S00b).
 - ✱ Coolify context/server and subdomain (S02).
-- ✱ Hub name and brand direction (S03, ✱N).
+- ✱ Brand and visual direction (S03, ✱N). The name is already decided: **RUCKUS**.
 - ✱ Asset purchases (S07 onward).
 - ✱ Jam submissions (E, S11, S29).

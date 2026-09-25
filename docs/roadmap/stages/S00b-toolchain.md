@@ -45,7 +45,7 @@
     - Convex is spiked in S02
     - if anything fails, pin TS 6.x in the catalog and record why in ADR-002
 12. [ ] **`.env.example`** with every planned variable (see PLAN §3)
-13. [ ] ✱ **GitHub:** ask the user for the repo name and visibility (the plan says private), then `gh repo create`, push, invite reviewers later
+13. [x] **GitHub:** done. https://github.com/Blockchain-Oracle/ruckus (private, remote `origin`). Invite jam reviewers at ✱E.
 
 ## Acceptance
 - `pnpm install && pnpm check && pnpm typecheck && pnpm test` are green locally and in CI.

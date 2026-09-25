@@ -1,38 +1,42 @@
 # HANDOFF (updated 2026-09-25 by session 1)
 
-**Stage:** S00a is done. Next up is **S00b Toolchain and monorepo skeleton**, step 1 of 13. [stages/S00b-toolchain.md](stages/S00b-toolchain.md)
+**Stage:** S00a is done. Next is **S00b Toolchain and monorepo skeleton**, step 1 of 13. Step 13 (GitHub) is already done. [stages/S00b-toolchain.md](stages/S00b-toolchain.md)
 
-**Last completed:** the S00a resume system, ADRs 001–006, CLAUDE.md, the memory files and the first commit (see `git log -1`).
+**Last completed:**
+- The name is **RUCKUS**. The contract is `RuckusGame`, so the gameId is `ruckus`.
+- The private repo https://github.com/Blockchain-Oracle/ruckus is pushed.
+- ElevenLabs is set up as the primary source for sound effects and music: CLI 1.4.0 installed, and a smoke-test sound effect generated.
 
 **NEXT ACTION:** open `stages/S00b-toolchain.md` and do task 1: check the latest pnpm 10 with `npm view pnpm@10 version`, then write the root `package.json`.
 
 **Uncommitted work:** none.
 
-**Blocked on user (✱):**
-- The ElevenLabs clarification email (draft in `docs/assets/elevenlabs-request.md`). This doesn't block anything; we use licensed audio in the meantime.
-- The GitHub repo name and visibility, needed at the end of S00b.
+**Blocked on the user:** nothing.
 
 **Environment state:**
-- Simulator: not running yet (starts in S01 with `cd casino-sdk && npm install && npm start` → :3300, chain :8545).
-- Local contract address: none yet.
-- Convex deployment, server URL, Vercel URL: none yet.
-- Branch: `main`, local only (no remote yet).
-- Toolchain: node 25.9.0 locally (CI uses 24), pnpm 11.24 locally (the repo will pin 10.x), rustc 1.98.1 with the wasm32 target, Foundry installed, the 21st CLI installed.
-- **wasm-pack is not installed.** It's needed in S06.
-- The ElevenLabs key is set (Starter, 39,855 credits); its use is pending clarification.
+- The simulator isn't running yet (S01: `cd casino-sdk && npm install && npm start` → :3300, chain :8545).
+- There are no contract, Convex, server or Vercel URLs yet.
+- Branch `main` tracks `origin` (GitHub).
+- Local toolchain:
+  - node 25.9.0 (CI uses 24)
+  - pnpm 11.24 (the repo pins 10.x)
+  - rustc 1.98.1 with the wasm32 target
+  - Foundry, the 21st CLI and `elevenlabs` CLI 1.4.0
+- **wasm-pack is not installed.** S06 needs it.
+- ElevenLabs: Starter plan, about 39.8k credits; the key is in `ELEVENLABS_API_KEY`. Generate with `elevenlabs text-to-sound-effects convert --json '{"text":…,"duration_seconds":…,"prompt_influence":…,"model_id":"eleven_text_to_sound_v2"}' -o assets-src/<game>/sfx/<name>.mp3`. Log every take in `docs/assets/<game>.md`.
 
-**Last green verification:** none yet; no code exists.
+**Last green verification:** the ElevenLabs SFX smoke test gave `assets-src/chickenz/sfx/jump_v1.mp3` (44.1 kHz stereo).
 
 **Gotchas learned:**
-- Nixpacks only supports pnpm 6–10, so pin 10.x.
+- Pin pnpm 10.x, because Nixpacks only supports pnpm 6–10.
 - The Coolify Base Directory must be `/`.
-- `casino-sdk/` must stay out of the pnpm workspace.
-- `references/` is gitignored (168 MB, includes GPL code).
-- ElevenLabs' use policy §3(c) bans real-money gambling use. Don't generate or ship ElevenLabs audio until they approve.
-- The Chickenz README is wrong in places. Trust `docs/research/deep/chickenz.md`, which was traced from the code.
+- Keep `casino-sdk/` out of the pnpm workspace.
+- `references/` is gitignored.
+- The Chickenz README is wrong in places. Trust `docs/research/deep/chickenz.md`.
+- The user doesn't want the ElevenLabs policy raised again. Just use it.
 
 **New ADRs:** ADR-001 to ADR-006.
 
-**Research to read before resuming:** S00b's "Read first" list only.
+**Research to read before resuming:** only the "Read first" list in S00b.
 
-**Deadline status:** the site closes submissions Sun Sep 27 23:59 UTC. The user decided not to cut quality for it; the plan submits an early eligible slice at ✱E. **Submitted build:** none.
+**Deadline status:** the site closes submissions on Sun Sep 27 at 23:59 UTC. The user doesn't want quality cut for it. An early eligible slice is planned at ✱E. **Submitted build:** none.

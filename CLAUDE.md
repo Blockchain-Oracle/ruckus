@@ -1,4 +1,4 @@
-# Chain Jam Vol. 1: multiplayer game hub with VRF casino wagers
+# RUCKUS: a multiplayer party arena for Chain Jam Vol. 1
 
 This is a premium, GamePigeon-style multiplayer arena. It has four games, each adapted from a reference:
 - **Chickenz**: a 4-player free-for-all platform shooter. This is the flagship.
@@ -95,9 +95,7 @@ references/         cloned reference games (gitignored, read-only; never copy GP
 ## Assets (ADR-006, docs/research/deep/asset-sources.md)
 - **Look:** one shared brand across the hub, with each game in its native style.
 - **Licences:** only licences that allow real-money gambling use. Every asset goes in `docs/CREDITS.md`.
-- **ElevenLabs is not to be used for this product** until the user receives written permission (`docs/assets/elevenlabs-request.md`, `docs/research/deep/elevenlabs.md`).
-  - Never reword prompts to get around its policy.
-  - It may still be used for things outside this product.
+- **ElevenLabs is the primary source for sound effects and music.** Use the `sound-effects` and `music` skills, or the `elevenlabs` CLI. The budget is 39,855 credits per month on the Starter plan. Raw takes go in `assets-src/`.
 
 ## Judging (unweighted)
 Novelty · Fun (still fun after 10h?) · Simplicity (no manual needed) · Visual & sound (no AI slop).
