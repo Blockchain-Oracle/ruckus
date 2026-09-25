@@ -27,6 +27,12 @@ contract ParityTest is Test {
         _replay("call-shot-4.json", game.BET_CALL_SHOT_LONG(), params);
     }
 
+    function test_finish_matchesTsMirror() public view {
+        for (uint8 betType = game.BET_FINISH_FIRST(); betType <= game.BET_FINISH_LAST(); ++betType) {
+            _replay(string.concat("finish-", vm.toString(betType), ".json"), betType, bytes(""));
+        }
+    }
+
     function _replay(string memory file, uint8 betType, bytes memory params) private view {
         string memory json = vm.readFile(string.concat(vm.projectRoot(), "/vectors/", file));
         bytes32[] memory randomness = vm.parseJsonBytes32Array(json, ".randomness");

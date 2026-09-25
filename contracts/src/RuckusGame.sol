@@ -13,6 +13,7 @@ import {ICasinoGameV2, SessionContext, SessionPhase, StepResult} from "./interfa
 ///                                uint8 outcomeClass, uint256 payout)   (outcomeClass = CLASS_PENDING until settled)
 contract RuckusGame is ICasinoGameV2 {
     uint256 private constant BPS = 10_000;
+    uint256 private constant DECLARED_RTP_BPS = 9_600;
     /// @dev 1e18 (WAD) / 1e8 (BPS²): converts a per-unit variance numerator in BPS² into WAD units.
     uint256 private constant VARIANCE_BPS2_TO_WAD = 1e10;
     uint256 private constant WAD = 1e18;
@@ -32,6 +33,15 @@ contract RuckusGame is ICasinoGameV2 {
     uint8 public constant BET_CALL_SHOT_LONG = 4;
     uint8 public constant POOL_OBJECT_BALLS = 15;
     uint8 public constant POOL_POCKETS = 6;
+    /// @notice Egg Soccer "Call the Finish": a VRF-seeded 2v2 bot match plays 20 s of golden goal;
+    ///         you call how it ends. The finish table (twentieths) per team is shot 3, header 3,
+    ///         off the woodwork 2, plus no goal 4. Each call is its own two-class table (make, miss)
+    ///         covering some of those finishes, paying 96% exactly. params = empty.
+    ///         Order: Tomato, Violet, Tomato shot/header/wood, Violet shot/header/wood,
+    ///         either shot/header/wood, any goal, no goal.
+    uint8 public constant BET_FINISH_FIRST = 5;
+    uint8 public constant BET_FINISH_LAST = 17;
+    uint256 private constant FINISH_DENOMINATOR = 20;
 
     error RuckusGame__UnknownBetType(uint8 betType);
     error RuckusGame__InvalidParams(uint8 betType);
@@ -147,6 +157,11 @@ contract RuckusGame is ICasinoGameV2 {
         if (betType == BET_CALL_SHOT_CUT) return _makeMiss(1, 1, 19_200); //      1/2 × 1.92
         if (betType == BET_CALL_SHOT_THIN) return _makeMiss(1, 3, 38_400); //     1/4 × 3.84
         if (betType == BET_CALL_SHOT_LONG) return _makeMiss(1, 9, 96_000); //     1/10 × 9.6
+        if (betType >= BET_FINISH_FIRST && betType <= BET_FINISH_LAST) {
+            uint256 make = _finishCover(betType);
+            // make/20 × (0.96·20/make) = 96.00%; every cover divides 192_000 exactly.
+            return _makeMiss(make, FINISH_DENOMINATOR - make, (DECLARED_RTP_BPS * FINISH_DENOMINATOR) / make);
+        }
         revert RuckusGame__UnknownBetType(betType);
     }
 
@@ -159,6 +174,12 @@ contract RuckusGame is ICasinoGameV2 {
         multipliersBps = new uint256[](2);
         (weights[0], multipliersBps[0]) = (makeWeight, makeBps); // make
         (weights[1], multipliersBps[1]) = (missWeight, 0); //       miss
+    }
+
+    /// @dev How many twentieths of the golden-goal finish table a call covers.
+    function _finishCover(uint8 betType) internal pure returns (uint256) {
+        uint8[13] memory cover = [8, 8, 3, 3, 2, 3, 3, 2, 6, 6, 4, 16, 4];
+        return cover[betType - BET_FINISH_FIRST];
     }
 
     function _decodeBet(bytes calldata gameData)
@@ -176,6 +197,9 @@ contract RuckusGame is ICasinoGameV2 {
             if (params.length != 32) revert RuckusGame__InvalidParams(betType);
             uint8 fighter = abi.decode(params, (uint8));
             if (fighter >= CHICKENZ_FIGHTERS) revert RuckusGame__InvalidParams(betType);
+        } else if (betType >= BET_FINISH_FIRST) {
+            // Call the Finish: the call is the bet type itself.
+            if (params.length != 0) revert RuckusGame__InvalidParams(betType);
         } else {
             // Call Your Shot: a real object ball and one of the six pockets.
             if (params.length != 64) revert RuckusGame__InvalidParams(betType);

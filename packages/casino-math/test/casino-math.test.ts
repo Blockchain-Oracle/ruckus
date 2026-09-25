@@ -11,6 +11,7 @@ import {
   buildParityVectors,
   DECLARED_RTP_BPS,
   drawClass,
+  FINISH_CALLS,
   getBetTable,
   maxMultiplierX,
   maxReservedProfit,
@@ -25,6 +26,7 @@ const VECTOR_FILES = [
   [BET_TYPE.callShotCut, 'call-shot-2.json'],
   [BET_TYPE.callShotThin, 'call-shot-3.json'],
   [BET_TYPE.callShotLong, 'call-shot-4.json'],
+  ...FINISH_CALLS.map((c) => [c.betType, `finish-${c.betType}.json`] as const),
 ] as const;
 
 describe('bet tables', () => {
