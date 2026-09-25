@@ -13,6 +13,8 @@ import { setDriver } from './match/runtime.ts';
 import { useMatch } from './match/store.ts';
 import { Arena } from './render/Arena.tsx';
 import { Bird } from './render/Bird.tsx';
+import { Effects } from './render/Effects.tsx';
+import { ChickenzEffects } from './render/effects.ts';
 import { Pickups } from './render/Pickups.tsx';
 import { Projectiles } from './render/Projectiles.tsx';
 import { layoutFrom } from './render/terrain.ts';
@@ -32,6 +34,7 @@ export const getDirector = () => director;
 export function ChickenzScene({ generation }: GameSceneProps) {
   const driver = useMemo(() => new ChickenzDriver(ATTRACT_SEED_BASE + generation), [generation]);
   const matchDirector = useMemo(() => new MatchDirector(driver), [driver]);
+  const effects = useMemo(() => new ChickenzEffects(), []);
   const [round, setRound] = useState(0);
   const machinePhase = useGameMachine((s) => s.phase);
   const wagerPhase = useWager((s) => s.phase);
@@ -49,7 +52,10 @@ export function ChickenzScene({ generation }: GameSceneProps) {
     driver.start();
     setDriver(driver);
     director = matchDirector;
-    driver.onRound = () => setRound(driver.round);
+    driver.onRound = () => {
+      effects.clear();
+      setRound(driver.round);
+    };
     const input = new KeyboardInput();
     input.attach();
     driver.readInput = () => input.read();
@@ -60,12 +66,15 @@ export function ChickenzScene({ generation }: GameSceneProps) {
       setDriver(null);
       director = null;
     };
-  }, [driver, matchDirector]);
+  }, [driver, matchDirector, effects]);
 
   // Sounds follow whatever is on screen: full volume in play, a quiet bed behind the menu.
   useEffect(() => {
-    driver.onStep = (prev, curr) => playEvents(prev, curr, heroes, machinePhase !== 'attract');
-  }, [driver, heroes, machinePhase]);
+    driver.onStep = (prev, curr) => {
+      playEvents(prev, curr, heroes, machinePhase !== 'attract');
+      effects.ingest(prev, curr);
+    };
+  }, [driver, heroes, machinePhase, effects]);
 
   // Play starts a real match (you vs bots); leaving returns the backdrop to exhibitions.
   useEffect(() => {
@@ -126,9 +135,17 @@ export function ChickenzScene({ generation }: GameSceneProps) {
       <Arena seed={ATTRACT_SEED_BASE + generation + round} layout={layout} />
       <Pickups driver={driver} />
       {heroes.map((h, slot) => (
-        <Bird key={h} hero={h} slot={slot} driver={driver} marked={slot === markedSlot} />
+        <Bird
+          key={h}
+          hero={h}
+          slot={slot}
+          driver={driver}
+          platforms={layout.platforms}
+          marked={slot === markedSlot}
+        />
       ))}
       <Projectiles driver={driver} />
+      <Effects effects={effects} />
       <Zone driver={driver} />
     </>
   );

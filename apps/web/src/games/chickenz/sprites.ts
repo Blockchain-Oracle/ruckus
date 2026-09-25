@@ -7,6 +7,8 @@ import bgGreen from './assets/bg-green.png';
 import bgPink from './assets/bg-pink.png';
 import bgPurple from './assets/bg-purple.png';
 import bgYellow from './assets/bg-yellow.png';
+import collectedUrl from './assets/collected.png';
+import dustUrl from './assets/dust.png';
 import terrainUrl from './assets/terrain.png';
 
 /** Pixel Adventure 1 by Pixel Frog (CC0). Four heroes, one per FFA slot. */
@@ -45,6 +47,8 @@ export const BACKGROUNDS = [bgBlue, bgBrown, bgGray, bgGreen, bgPink, bgPurple, 
 
 export type Sprites = {
   terrain: HTMLImageElement;
+  dust: Texture;
+  collected: Texture;
   backgrounds: Texture[];
   characters: Record<Hero, Record<Anim, Texture>>;
 };
@@ -71,8 +75,10 @@ let sprites: Sprites | null = null;
 export async function loadSprites(): Promise<Sprites> {
   if (sprites) return sprites;
   const loader = new TextureLoader();
-  const [terrain, backgrounds, characterEntries] = await Promise.all([
+  const [terrain, dust, collected, backgrounds, characterEntries] = await Promise.all([
     loadImage(terrainUrl),
+    loader.loadAsync(dustUrl).then(pixelated),
+    loader.loadAsync(collectedUrl).then(pixelated),
     Promise.all(BACKGROUNDS.map(async (url) => pixelated(await loader.loadAsync(url)))),
     Promise.all(
       HEROES.map(async (hero) => {
@@ -88,6 +94,8 @@ export async function loadSprites(): Promise<Sprites> {
   ]);
   sprites = {
     terrain,
+    dust,
+    collected,
     backgrounds,
     characters: Object.fromEntries(characterEntries) as Sprites['characters'],
   };

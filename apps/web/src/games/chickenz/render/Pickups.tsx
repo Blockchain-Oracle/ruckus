@@ -8,16 +8,21 @@ import { DEPTH, MAP_H_PX, TILE_PX } from '../config.ts';
 import type { ChickenzDriver } from '../sim/driver.ts';
 import { useGunTextures } from './useGunTextures.ts';
 
+/** Chickenz pickup idle: bob sin(tick·0.08)·2 px, alpha 0.9 + sin(tick·0.06)·0.1. */
 const BOB_PX = 2;
-const BOB_HZ = 0.8;
+const BOB_RATE = 0.08;
+const SHIMMER_RATE = 0.06;
+const SHIMMER_BASE = 0.9;
+const SHIMMER_AMP = 0.1;
 
 /** Guns hovering over their pedestals; hidden while a pedestal is recharging. */
 export function Pickups({ driver }: { driver: ChickenzDriver }) {
   const meshes = useRef<(Mesh | null)[]>([]);
   const guns = useGunTextures();
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     const v = driver.curr;
+    const tick = v[H.tick] ?? 0;
     for (let i = 0; i < MAX_PICKUPS; i++) {
       const m = meshes.current[i];
       if (!m) continue;
@@ -31,7 +36,8 @@ export function Pickups({ driver }: { driver: ChickenzDriver }) {
         mat.map = art.texture;
         mat.needsUpdate = true;
       }
-      const bob = Math.sin((clock.elapsedTime * BOB_HZ + i * 0.25) * Math.PI * 2) * BOB_PX;
+      const bob = Math.sin(tick * BOB_RATE) * BOB_PX;
+      mat.opacity = SHIMMER_BASE + Math.sin(tick * SHIMMER_RATE) * SHIMMER_AMP;
       const x = (v[base + PK.x] ?? 0) / FP_ONE;
       const y = (v[base + PK.y] ?? 0) / FP_ONE + bob;
       m.position.set(x / TILE_PX, (MAP_H_PX - y) / TILE_PX, DEPTH.bird - 0.05);
@@ -50,7 +56,7 @@ export function Pickups({ driver }: { driver: ChickenzDriver }) {
           visible={false}
         >
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial transparent alphaTest={0.5} toneMapped={false} side={DoubleSide} />
+          <meshBasicMaterial transparent alphaTest={0.1} toneMapped={false} side={DoubleSide} />
         </mesh>
       ))}
     </>
