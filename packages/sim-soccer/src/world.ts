@@ -50,6 +50,8 @@ export type Player = {
   frozen: number;
   /** Bot difficulty 0–100, or −1 for a human (or remote) seat. */
   bot: number;
+  /** A bot's last decision and when it next re-thinks (part of the state, for replays). */
+  brain: { next: number; h: -1 | 0 | 1; jump: boolean; slop: number };
 };
 
 export type Phase = 'kickoff' | 'play' | 'goal' | 'over';
@@ -111,6 +113,7 @@ export function newWorld(seed: number, perTeam: 1 | 2, bots: readonly number[]):
       shrink: 0,
       frozen: 0,
       bot: bots[i] ?? -1,
+      brain: { next: 0, h: 0, jump: false, slop: 0 },
     });
   }
   const w: World = {
