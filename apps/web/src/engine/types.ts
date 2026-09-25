@@ -24,4 +24,6 @@ export type GameSceneProps = { phase: Phase; generation: number };
 export type GameModule = {
   Scene: ComponentType<GameSceneProps>;
   rig: CameraRig;
+  /** Textures and data the scene reads synchronously; awaited before the scrim lifts. */
+  preload?: () => Promise<unknown>;
 };

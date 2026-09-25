@@ -13,7 +13,8 @@ export function loadGame(id: GameId): Promise<GameModule> {
   if (inflight) return inflight;
   const entry = findGame(id);
   if (!entry) return Promise.reject(new Error(`Unknown game ${id}`));
-  const p = entry.load().then((m) => {
+  const p = entry.load().then(async (m) => {
+    await m.preload?.();
     loaded.set(id, m);
     pending.delete(id);
     return m;

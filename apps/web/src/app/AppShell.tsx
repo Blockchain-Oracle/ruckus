@@ -18,6 +18,7 @@ import { useUi } from './stores/ui.ts';
 const ENTER = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const;
 const EXIT = { duration: 0.16, ease: [0.55, 0, 1, 0.45] } as const;
 const STAGGER_S = 0.045;
+const PLAY_VIGNETTE_OPACITY = 0.25;
 
 /** Animation features and the settings sheet (Radix) stay out of the first-paint chunk. */
 const loadMotionFeatures = () => import('./motionFeatures.ts').then((mod) => mod.default);
@@ -39,7 +40,12 @@ export function AppShell() {
   return (
     <LazyMotion features={loadMotionFeatures} strict>
       <div className="pointer-events-none fixed inset-0 z-10 flex flex-col">
-        <div aria-hidden className="absolute inset-0" style={{ background: 'var(--vignette)' }} />
+        {/* The vignette frames menus; in play it steps back so the arena edges stay readable. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 transition-opacity duration-700"
+          style={{ background: 'var(--vignette)', opacity: inGame ? PLAY_VIGNETTE_OPACITY : 1 }}
+        />
         <TopBar />
         <AnimatePresence mode="wait">
           {showMenu && <HubMenu key="menu" />}
