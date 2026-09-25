@@ -9,7 +9,8 @@
     "prod-frame": "tsx src/prod-frame.ts",
     "typecheck": "tsc --noEmit -p .",
     "check:server": "tsx src/server-hello.ts",
-    "connectivity": "tsx src/connectivity.ts"
+    "connectivity": "tsx src/connectivity.ts",
+    "chickenz-room": "tsx src/chickenz-room.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

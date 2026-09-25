@@ -7,7 +7,8 @@
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./hello": "./src/hello.ts"
+    "./hello": "./src/hello.ts",
+    "./chickenz": "./src/chickenz.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p ."

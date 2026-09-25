@@ -34,14 +34,50 @@ export class MatchDirector {
   private seed = 1;
   private hero: Hero = HEROES[0];
   private readonly driver: ChickenzDriver;
+  /** Online rounds are paced by the server; this director only presents them. */
+  online = false;
 
   constructor(driver: ChickenzDriver) {
     this.driver = driver;
   }
 
-  /** Called by the scene when the current round's sim reaches match over. */
+  /** Called by the scene when the current round's sim reaches match over (practice only). */
   handleRoundEnd() {
-    this.roundOver();
+    if (!this.online) this.roundOver(this.driver.curr[H.winner] ?? -1);
+  }
+
+  /** A server round begins: same wipe → countdown presentation, on a predicted online sim. */
+  onlineRound(
+    round: number,
+    seed: number,
+    mapId: number,
+    players: number,
+    localSlot: number,
+    heroes: Hero[],
+    names: string[],
+    wins: number[],
+  ) {
+    this.online = true;
+    this.timers = [];
+    useMatch.getState().set({ round, heroes, names, localSlot, wins, winner: -1, announce: null });
+    const swap = () => {
+      this.driver.setMode({ kind: 'online', seed, mapId, players, humanSlot: localSlot });
+      this.driver.frozen = true;
+    };
+    // Always wipe online: the wipe plus countdown spans the server's frozen window, so GO! lines up.
+    this.present(swap, true);
+  }
+
+  onlineRoundEnd(winner: number, wins: number[]) {
+    this.roundOver(winner, wins);
+  }
+
+  onlineMatchEnd(winner: number, wins: number[]) {
+    const state = useMatch.getState();
+    const name = (state.names[winner] ?? 'Nobody').replace('Bot · ', '').toUpperCase();
+    const title = winner === state.localSlot ? 'YOU WIN THE MATCH!' : `${name} WINS THE MATCH!`;
+    state.set({ status: 'matchOver', wins, winner, announce: title });
+    this.after(MATCH_OVER_MS, () => useMatch.getState().set({ announce: null }));
   }
 
   private after(ms: number, run: () => void) {
@@ -60,6 +96,7 @@ export class MatchDirector {
   }
 
   start(hero: Hero, seed: number) {
+    this.online = false;
     this.timers = [];
     this.hero = hero;
     this.seed = seed >>> 0 || 1;
@@ -101,6 +138,10 @@ export class MatchDirector {
       });
       this.driver.frozen = true;
     };
+    this.present(swap, withWipe);
+  }
+
+  private present(swap: () => void, withWipe: boolean) {
     if (withWipe) {
       useMatch.getState().set({ status: 'wipe', wipe: 1, announce: null });
       this.after(WIPE_IN_MS, () => {
@@ -127,7 +168,8 @@ export class MatchDirector {
         const go = step === 'GO!';
         playCue(go ? 'cz.go' : 'cz.countdown');
         if (!go) return;
-        this.driver.frozen = false;
+        // Online, the round unfreezes when the server says playing (see net/online.ts).
+        if (!this.online) this.driver.frozen = false;
         useMatch.getState().set({ status: 'playing' });
         const roundNumber = useMatch.getState().round + 1;
         this.after(GO_HOLD_MS, () => {
@@ -141,11 +183,10 @@ export class MatchDirector {
     });
   }
 
-  private roundOver() {
+  private roundOver(winner: number, serverWins?: number[]) {
     const state = useMatch.getState();
-    const winner = this.driver.curr[H.winner] ?? -1;
-    const wins = [...state.wins];
-    if (winner >= 0 && winner < wins.length) wins[winner] = (wins[winner] ?? 0) + 1;
+    const wins = serverWins ? [...serverWins] : [...state.wins];
+    if (!serverWins && winner >= 0 && winner < wins.length) wins[winner] = (wins[winner] ?? 0) + 1;
     const name = (state.names[winner] ?? 'Nobody').replace('Bot · ', '').toUpperCase();
     const who = winner === state.localSlot ? 'YOU WIN' : `${name} WINS`;
     const score = wins.join(' - ');
@@ -157,6 +198,8 @@ export class MatchDirector {
       announce: `Round ${state.round + 1} - ${who}!\n${score}`,
     });
     playCue(matchWon ? 'cz.matchwin' : 'cz.roundwin');
+    // Online, the server decides what comes next (next round or match end).
+    if (this.online) return;
 
     this.after(ROUND_OVER_MS, () => {
       if (matchWon) {

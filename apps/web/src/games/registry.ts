@@ -20,7 +20,7 @@ export const GAMES = [
     title: 'Chickenz',
     taglineKey: 'games.chickenz.tagline',
     players: '2–4',
-    hidden: true,
+    hidden: false,
     load: () => import('./chickenz/index.ts').then((m) => m.chickenz),
   },
 ] as const satisfies readonly GameEntry[];

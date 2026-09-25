@@ -4,6 +4,7 @@ import { ROOM } from '@arena/protocol';
 import { PROTOCOL_VERSION } from '@arena/shared';
 
 import { env } from '#app/config/env.ts';
+import { ChickenzRoom } from '#app/rooms/chickenz/ChickenzRoom.ts';
 import { HelloRoom } from '#app/rooms/hello/HelloRoom.ts';
 
 const BOOTED_AT = Date.now();
@@ -11,6 +12,7 @@ const BOOTED_AT = Date.now();
 export const server = defineServer({
   rooms: {
     [ROOM.hello]: defineRoom(HelloRoom),
+    [ROOM.chickenz]: defineRoom(ChickenzRoom),
   },
   routes: createRouter({
     /** Coolify health check (curl inside the container) and uptime monitor. */

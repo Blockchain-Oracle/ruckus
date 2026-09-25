@@ -13,11 +13,15 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@arena/shared": "workspace:*",
     "@arena/protocol": "workspace:*",
-    "colyseus": "^0.18.8",
+    "@arena/shared": "workspace:*",
+    "@arena/sim-chickenz": "workspace:*",
+    "@colyseus/auth": "0.18.3",
+    "@colyseus/core": "0.18.16",
     "@colyseus/schema": "^5.0.34",
+    "@colyseus/ws-transport": "0.18.3",
     "@t3-oss/env-core": "^0.13.11",
+    "colyseus": "^0.18.8",
     "zod": "catalog:"
   },
   "devDependencies": {

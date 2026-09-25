@@ -120,7 +120,7 @@ function HubMenu() {
           {game ? t(game.taglineKey) : t('hub.welcome.body')}
         </p>
         {game && (
-          <div className="pointer-events-auto mt-5 flex gap-4">
+          <div className="pointer-events-auto mt-5 flex flex-wrap gap-4">
             <Button variant="tomato" size="lg" sound="ui.confirm" onClick={() => send('entering')}>
               {t('hub.play')}
             </Button>

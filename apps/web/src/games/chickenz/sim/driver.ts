@@ -11,6 +11,9 @@ const ATTRACT_DIFFICULTY = [55, 70, 80, 90] as const;
 const ATTRACT_MAPS = [MapId.Arena, MapId.Towers, MapId.Bridges] as const;
 /** Skipping a fight fast-forwards at most this many ticks (well past any round clock). */
 const SKIP_LIMIT_TICKS = 60 * 60;
+/** Unacknowledged inputs kept for replay (~1 s) and the most we re-simulate per snapshot. */
+const MAX_PENDING = 60;
+const MAX_REPLAY = 30;
 
 export type Mode =
   | { kind: 'exhibition' }
@@ -26,7 +29,9 @@ export type Mode =
       difficulty: number;
     }
   /** The hands-on tutorial: you in slot 0, a scripted dummy in slot 1, no clock. */
-  | { kind: 'tutorial'; seed: number };
+  | { kind: 'tutorial'; seed: number }
+  /** A networked round: predicted locally, corrected by server snapshots (no local bots). */
+  | { kind: 'online'; seed: number; mapId: number; players: number; humanSlot: number };
 
 type Input = { buttons: number; aimX: number };
 
@@ -57,6 +62,11 @@ export class ChickenzDriver {
   /** Every simulated tick, with the views either side of it (sound events diff these). */
   onStep?: (prev: Int32Array, curr: Int32Array) => void;
   readInput?: () => Input;
+  /** Online: ship this tick's input to the server (every tick, tagged with a sequence number). */
+  sendInput?: (seq: number, buttons: number, aimX: number) => void;
+  private seq = 0;
+  private pending: { seq: number; buttons: number; aimX: number }[] = [];
+  private remoteInputs = new Int8Array(8);
   /** Runs before every tick with the live sim and this tick's human input (tutorial scripting). */
   beforeStep: ((sim: Sim, input: Input) => void) | undefined;
 
@@ -81,7 +91,7 @@ export class ChickenzDriver {
 
   get humanSlot(): number {
     if (this.mode.kind === 'tutorial') return 0;
-    return this.mode.kind === 'match' ? this.mode.humanSlot : -1;
+    return this.mode.kind === 'match' || this.mode.kind === 'online' ? this.mode.humanSlot : -1;
   }
 
   start() {
@@ -103,6 +113,10 @@ export class ChickenzDriver {
       ATTRACT_DIFFICULTY.forEach((d, slot) => {
         sim.set_bot(slot, d);
       });
+    } else if (m.kind === 'online') {
+      // No local bots: every non-local bird is driven by the server's snapshots and inputs.
+      sim = new Sim(m.seed, m.players, m.mapId);
+      this.remoteInputs.fill(0);
     } else {
       sim = new Sim(m.seed, m.players, m.mapId);
       for (let slot = 0; slot < m.players; slot++) {
@@ -113,6 +127,7 @@ export class ChickenzDriver {
     this.ended = false;
     this.overFor = 0;
     this.accumulator = 0;
+    this.pending = [];
     sim.view(this.curr);
     this.prev.set(this.curr);
     return sim;
@@ -145,6 +160,13 @@ export class ChickenzDriver {
         const input = this.readInput();
         sim.set_input(human, input.buttons, input.aimX, 0);
         this.beforeStep?.(sim, input);
+        if (this.mode.kind === 'online') {
+          this.seq += 1;
+          this.pending.push({ seq: this.seq, buttons: input.buttons, aimX: input.aimX });
+          if (this.pending.length > MAX_PENDING) this.pending.shift();
+          this.sendInput?.(this.seq, input.buttons, input.aimX);
+          this.applyRemoteInputs(sim, human);
+        }
       }
       this.prev.set(this.curr);
       sim.step();
@@ -154,7 +176,9 @@ export class ChickenzDriver {
     }
     this.alpha = this.accumulator / TICK_S;
 
-    if (!this.curr[H.matchOver] || this.mode.kind === 'tutorial') return;
+    // Online rounds end on the server's word, never on a local prediction.
+    if (!this.curr[H.matchOver] || this.mode.kind === 'tutorial' || this.mode.kind === 'online')
+      return;
     if (this.mode.kind !== 'exhibition') {
       if (!this.ended) {
         this.ended = true;
@@ -168,6 +192,40 @@ export class ChickenzDriver {
       this.seed = Math.imul(this.seed ^ (this.round + 1), 2654435761) >>> 0 || 1;
       this.setMode({ kind: 'exhibition' });
     }
+  }
+
+  private applyRemoteInputs(sim: Sim, human: number) {
+    for (let slot = 0; slot < 4; slot++) {
+      if (slot === human) continue;
+      sim.set_input(
+        slot,
+        this.remoteInputs[slot * 2] ?? 0,
+        this.remoteInputs[slot * 2 + 1] ?? 0,
+        0,
+      );
+    }
+  }
+
+  /**
+   * Server snapshot: restore the authoritative state, drop inputs the server has applied, and
+   * re-run the rest so our own bird stays exactly where our fingers put it (Chickenz-style
+   * prediction and reconciliation). Remote birds keep their last known input between snapshots.
+   */
+  applySnapshot(ack: number, remote: Int8Array, body: Uint8Array) {
+    const sim = this.current;
+    if (!sim || this.mode.kind !== 'online') return;
+    if (!sim.restore(body)) return;
+    this.remoteInputs.set(remote);
+    const human = this.mode.humanSlot;
+    this.pending = this.pending.filter((p) => p.seq > ack);
+    if (!this.frozen) {
+      for (const p of this.pending.slice(-MAX_REPLAY)) {
+        sim.set_input(human, p.buttons, p.aimX, 0);
+        this.applyRemoteInputs(sim, human);
+        sim.step();
+      }
+    }
+    sim.view(this.curr);
   }
 
   /** Jump a presented fight to its final frame (tap-to-skip). */
