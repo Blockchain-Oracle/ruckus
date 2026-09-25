@@ -1,13 +1,13 @@
 # HANDOFF (updated 2026-09-25 by session 1)
 
-**Stage:** S00a is done. Next is **S00b Toolchain and monorepo skeleton**, step 1 of 13. Step 13 (GitHub) is already done. [stages/S00b-toolchain.md](stages/S00b-toolchain.md)
+**Stage:** S00b is done. Now on **S01 Casino core**, step 1. [stages/S01-casino-core.md](stages/S01-casino-core.md)
 
 **Last completed:**
 - The name is **RUCKUS**. The contract is `RuckusGame`, so the gameId is `ruckus`.
 - The private repo https://github.com/Blockchain-Oracle/ruckus is pushed.
 - ElevenLabs is set up as the primary source for sound effects and music: CLI 1.4.0 installed, and a smoke-test sound effect generated.
 
-**NEXT ACTION:** open `stages/S00b-toolchain.md` and do task 1: check the latest pnpm 10 with `npm view pnpm@10 version`, then write the root `package.json`.
+**NEXT ACTION:** S01 task 1: run `cd casino-sdk && npm install && npm start` in the background, and check that :3300 serves the harness and coinflip settles.
 
 **Uncommitted work:** none.
 
@@ -25,10 +25,13 @@
 - **wasm-pack is not installed.** S06 needs it.
 - ElevenLabs: Starter plan, about 39.8k credits; the key is in `ELEVENLABS_API_KEY`. Generate with `elevenlabs text-to-sound-effects convert --json '{"text":…,"duration_seconds":…,"prompt_influence":…,"model_id":"eleven_text_to_sound_v2"}' -o assets-src/<game>/sfx/<name>.mp3`. Log every take in `docs/assets/<game>.md`.
 
-**Last green verification:** the ElevenLabs SFX smoke test gave `assets-src/chickenz/sfx/jump_v1.mp3` (44.1 kHz stereo).
+**Last green verification:** CI is green on GitHub (check, typecheck, test). Locally, `pnpm build` for web and server works. Earlier: the ElevenLabs SFX smoke test gave `assets-src/chickenz/sfx/jump_v1.mp3` (44.1 kHz stereo).
 
 **Gotchas learned:**
 - Pin pnpm 10.x, because Nixpacks only supports pnpm 6–10.
+- Pin Node 24.21.0, because 24.12.4 doesn't exist.
+- Biome plugin globs need a `**/` prefix.
+- tsdown needs `fixedExtension: false` to emit `dist/index.js`.
 - The Coolify Base Directory must be `/`.
 - Keep `casino-sdk/` out of the pnpm workspace.
 - `references/` is gitignored.
