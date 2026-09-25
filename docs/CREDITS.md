@@ -14,7 +14,7 @@ Every third-party asset or code source used in the product gets a row. Mirror at
 ## Art
 | Asset | Source | Licence | Price | Date | Used in |
 |---|---|---|---|---|---|
-| Pixel Adventure 1: 4 heroes (Ninja Frog, Mask Dude, Pink Man, Virtual Guy), terrain, 7 backgrounds, dust, collected | Pixel Frog, https://pixelfrog-assets.itch.io/pixel-adventure-1 (files taken from the Chickenz repo's copy) | CC0 | Free | 2026-09-25 | `apps/web/src/games/chickenz/assets/` |
+| Pixel Adventure 1: 4 heroes (Ninja Frog, Mask Dude, Pink Man, Virtual Guy), terrain, 7 backgrounds, dust, collected | Pixel Frog, https://pixelfrog-assets.itch.io/pixel-adventure-1 (files taken from the Chickenz repo's copy) | CC0 | Free | 2026-09-25 | `apps/web/src/games/chickenz/assets/`; Ninja Frog frame also as `apps/web/public/favicon.png`, `apple-touch-icon.png` |
 
 ## Audio
 | Asset | Source | Licence | Price | Date | Used in |
