@@ -1,0 +1,48 @@
+# Vendored read-only references (168 MB, includes GPL code) — never commit
+references/
+
+# Vendored casino SDK runs on npm on its own; keep only its sources
+casino-sdk/node_modules/
+casino-sdk/**/node_modules/
+casino-sdk/package-lock.json
+casino-sdk/simulator/contracts/*Game.sol
+casino-sdk/simulator/.cache/
+casino-sdk/simulator/artifacts/
+casino-sdk/simulator/cache/
+
+# Dependencies & build output
+node_modules/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+coverage/
+
+# Rust
+target/
+
+# Contracts (Foundry)
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Raw asset sources (some licences forbid redistribution)
+assets-src/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+convex/.env.local
+
+# Tooling
+.vercel/
+playwright-report/
+test-results/
+
+# OS / editors
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
