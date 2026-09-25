@@ -1,0 +1,4 @@
+{
+  "extends": "@arena/tsconfig/sim.json",
+  "include": ["src"]
+}

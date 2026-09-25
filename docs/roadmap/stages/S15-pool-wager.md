@@ -45,7 +45,8 @@ The client reads the tier, and the contract trusts it. Every tier has the same E
 - [x] `sim-pool/callshot.ts`: layout, `readCall`/tier, `findMake`, `findMiss` (the jaw-rattle preference), with tests.
 - [x] Client: the wager mode, the live call bar, the power cue keeping its power, CALL IT, suspense, realise in the worker, play, result card, reveal guard.
 - [x] Demo-mode run: bet → settle → realised stroke → result card.
-- [ ] Simulator e2e (`pnpm -F @arena/browser-checks pool-wager`), up to the 9.6× long-shot make.
+- [x] Simulator e2e (`pnpm -F @arena/browser-checks pool-wager`), up to the 9.6× long-shot make.
+  - 2026-09-25 run: 10 settled rounds and 5 refused (unmakeable) calls. Every stroke matched the settled class, and every payout matched to the wei. The long-shot make paid 9.6 tokens on a 1-token stake. PASS.
 
 ## Exit checklist
 ROADMAP · HANDOFF · LOG · commits

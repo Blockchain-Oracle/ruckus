@@ -1,0 +1,21 @@
+{
+  "name": "@arena/sim-soccer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Deterministic head-soccer sim (Eggy League numbers): variable jump, contact kicks with ground assist, crossbar and ceiling bounces, power-ups, bots. + − × ÷ sqrt only, fixed 60 Hz.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.10.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
