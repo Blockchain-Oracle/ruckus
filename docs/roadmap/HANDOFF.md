@@ -1,6 +1,6 @@
 # HANDOFF (updated 2026-09-25 by session 4)
 
-**Stage:** S20 Soccer wager is next (S18, S19 and S21 done in session 4). S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
+**Stage:** Soccer is complete: S17–S21 done in session 4, with Call the Finish (S20) as its wager. **Runner S22 is next.** S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
 
 **Last completed (session 3):**
 - Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
@@ -42,15 +42,15 @@
 - Camera uses rig `pose` (tilted down, width-fit, lifts for high balls). Screenshot helper: `tooling/browser-checks/src/soccer-shots.ts`.
 
 **NEXT ACTION:**
-1. **Soccer S20: wager** (novelty check per ADR-001; one VRF class-table contract at a single RTP within 93–98%; presented with seed banks like Back a Bird and Call Your Shot; simulator e2e including the top multiplier).
-   - S21 is done: five lessons judged by the live sim, first-visit offer, and Settings → Replay tutorial. Check with `pnpm -F @arena/browser-checks soccer-tutorial`.
-   - S19 is done: `SoccerRoom` is live (check with `soccer-room`).
-2. Runner S22–S26, play-first.
-3. Keep the controls rule for every game: controls never fight the pointer; every control written on screen.
-4. Four-game hub landing (ADR-007 follow-up).
-5. Chickenz feel gaps (ledger audit list).
-6. Audit shell bundle growth (143.7 → 150.2 KB gz during Pool/Soccer; budget raised to 155 KB).
-7. ✱E deferred until all four games are done.
+1. **Runner S22–S26** (play-first: sim → render → room → wager → tutorial), after KaspaKinesis. Reuse Soccer's patterns: bit-exact snapshots, whole-world prediction, lessons judged by the live sim, and a finish-style bank-presented wager. Every overlay must fit phone sizes (memory: overlays-fit-screen).
+   - Soccer is done:
+     - S20 **Call the Finish**: 13 calls on how a 20 s 2v2 golden goal ends, bet types 5–17 at 96%, the `soccer-finish.v1` bank. Check with `pnpm -F @arena/browser-checks soccer-finish` (needs the simulator on :3300).
+     - S21 lessons: `soccer-tutorial`. S19 rooms: `soccer-room`.
+2. Keep the controls rule for every game: controls never fight the pointer; every control written on screen.
+3. Four-game hub landing (ADR-007 follow-up).
+4. Chickenz feel gaps (ledger audit list).
+5. Audit shell bundle growth (143.7 → 150.2 KB gz during Pool/Soccer; budget raised to 155 KB).
+6. ✱E deferred until all four games are done.
 
 **Uncommitted work:** none.
 
@@ -65,6 +65,7 @@
 - Toolchain: node 25.9 (the repo pins 24.21.0), pnpm 10.34.5, forge 1.7.1, rustc 1.98.1 with the wasm32 target, nixpacks 1.41, docker (OrbStack), and the elevenlabs, 21st, vercel, coolify and convex CLIs. **wasm-pack is not installed** (S06 needs it).
 
 **Last green verification (session 4):**
+- `soccer-finish` simulator e2e PASS: 43 rounds, 9.6× woodwork paid exactly. The local RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` with bet types 0–17.
 - `soccer-room` PASS (2v2 + watcher + walkout, 163/163 in tolerance). Production: server commit 99a86ee is healthy, and an SDK 1v1 gets 20 Hz snapshots.
 - `pnpm verify` passes; web build + budgets pass (shell 150.2 / 155 KB gz). Soccer screenshots at 1280×720 and 844×390 touch 2v2: no console errors; goal → FULL TIME → results/rematch verified.
 

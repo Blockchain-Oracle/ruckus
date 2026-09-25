@@ -27,7 +27,7 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 21 | S17 Soccer sim | done | [stages/S17-soccer-sim.md](stages/S17-soccer-sim.md) |
 | 22 | S18 Soccer rendering and assets | done | [stages/S18-soccer-rendering.md](stages/S18-soccer-rendering.md) |
 | 23 | S19 Soccer room and bot | done | [stages/S19-soccer-room.md](stages/S19-soccer-room.md) |
-| 24 | S20 Soccer wager | todo | [stages/S20-soccer-wager.md](stages/S20-soccer-wager.md) |
+| 24 | S20 Soccer wager | done | [stages/S20-soccer-wager.md](stages/S20-soccer-wager.md) |
 | 25 | S21 Soccer tutorial, polish, ship | done | [stages/S21-soccer-tutorial.md](stages/S21-soccer-tutorial.md) |
 | 26 | S22 Runner sim | todo | [stages/S22-runner-sim.md](stages/S22-runner-sim.md) |
 | 27 | S23 Runner rendering and assets | todo | [stages/S23-runner-rendering.md](stages/S23-runner-rendering.md) |

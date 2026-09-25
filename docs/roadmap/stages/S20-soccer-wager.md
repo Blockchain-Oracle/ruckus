@@ -65,7 +65,13 @@
   - CI test: every bank entry replays to its finish; a made call always shows a covered finish, and a missed call never does.
 - [x] Client: store, calls, controller (settle → presentation → golden goal → result → reveal guard), FinishHud (fits every screen), hub button, skip, dev evidence `__ruckusFinish`.
 - [x] Demo-mode run at 1280×720, 844×390 and 390×844: the call button is on screen, the played finish equals the promised one, and there are no errors.
-- [ ] Simulator e2e: `pnpm -F @arena/browser-checks soccer-finish`, up to the 9.6× woodwork call.
+- [x] Simulator e2e (`pnpm -F @arena/browser-checks soccer-finish`), up to the 9.6× woodwork call.
+  - 2026-09-25 run: 43 settled rounds. Five opening calls came first (any goal: won 1.2×; off the woodwork: won 4.8×).
+  - Then it chased Tomato · woodwork, which landed on round 43 and paid 9.6 tokens on a 1-token stake.
+  - Every played finish equalled the promised one, every win showed a covered finish and every loss an uncovered one, and every payout matched to the wei. PASS.
+- [x] Fixes found by the run:
+  - Picking a team after "No goal" now returns the call to "Any goal". The team buttons had been dead.
+  - "Skip to the finish" moved to bottom centre. The jam badge in the bottom-right corner swallowed taps on it.
 
 ## Exit checklist
 ROADMAP · HANDOFF · LOG · commits
