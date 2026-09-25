@@ -1,0 +1,23 @@
+{
+  "name": "@arena/sim-chickenz",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./wasm": "./pkg/chickenz_sim_bg.wasm"
+  },
+  "scripts": {
+    "wasm": "scripts/build-wasm.sh",
+    "check:source-hash": "scripts/check-source-hash.sh",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@arena/tsconfig": "workspace:*",
+    "@types/node": "^24.10.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

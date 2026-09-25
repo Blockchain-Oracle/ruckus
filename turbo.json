@@ -19,6 +19,10 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "wasm": {
+      "inputs": ["../../crates/chickenz-sim/**", "../../Cargo.lock", "../../rust-toolchain.toml"],
+      "outputs": ["pkg/**"]
     }
   }
 }

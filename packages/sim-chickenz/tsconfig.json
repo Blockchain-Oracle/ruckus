@@ -1,0 +1,5 @@
+{
+  "extends": "@arena/tsconfig/sim.json",
+  "compilerOptions": { "allowJs": false },
+  "include": ["src"]
+}

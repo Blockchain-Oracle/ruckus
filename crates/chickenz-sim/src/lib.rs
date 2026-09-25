@@ -13,6 +13,7 @@ pub mod runner;
 pub mod state;
 pub mod step;
 pub mod stomp;
+pub mod view;
 pub mod weapons;
 
 #[cfg(feature = "wasm")]
