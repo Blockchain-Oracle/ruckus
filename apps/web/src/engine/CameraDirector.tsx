@@ -25,6 +25,10 @@ const FOLLOW_POS_RATE = 9;
 const FOLLOW_ZOOM_RATE = 3;
 /** World units + zoom: close enough to hand back to the static play pose without a visible cut. */
 const HOME_EPS = 0.01;
+/** Below this aspect the attract view is too narrow for the scene and pulls back to fit it. */
+const PORTRAIT_REF_ASPECT = 1.5;
+/** Share of the half-height the scene rises by on tall screens, clearing the stacked menu. */
+const PORTRAIT_LIFT = 0.45;
 
 /**
  * One camera for the whole hub. Attract orbits the scene; Play dollies the same camera into the
@@ -76,8 +80,14 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
       if (phase === 'leaving' && s.blend === 0) send('attract');
     }
 
-    const distance = attract.distance * ATTRACT_ZOOM;
+    // Tall screens: pull back until the scene's width fits, and lift it above the bottom menu.
+    const pullBack = Math.max(1, PORTRAIT_REF_ASPECT / camera.aspect);
+    const distance = attract.distance * ATTRACT_ZOOM * pullBack;
     attractTarget.set(...attract.target);
+    if (pullBack > 1) {
+      const halfH = distance * Math.tan(MathUtils.degToRad(camera.fov / 2));
+      attractTarget.y -= PORTRAIT_LIFT * halfH * Math.min(1, pullBack - 1);
+    }
     attractPos.set(
       attractTarget.x + Math.sin(s.angle) * distance,
       attractTarget.y + attract.height * ATTRACT_ZOOM,
@@ -112,7 +122,9 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     camera.position.lerpVectors(attractPos, playPos, t);
     lookAt.lerpVectors(attractTarget, playTarget, t);
     camera.lookAt(lookAt);
-    const shift = (attract.lensShift ?? 0) * (1 - t);
+    // The side shift makes room for a left-hand menu; stacked (tall) layouts put it below instead.
+    const wide = MathUtils.clamp((camera.aspect - 1) / (PORTRAIT_REF_ASPECT - 1), 0, 1);
+    const shift = (attract.lensShift ?? 0) * wide * (1 - t);
     if (camera.filmOffset !== shift) {
       camera.filmOffset = shift;
       camera.updateProjectionMatrix();

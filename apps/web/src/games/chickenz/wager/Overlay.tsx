@@ -8,6 +8,7 @@ import { skipTutorial, startMatch, startTutorial } from '../flow.ts';
 import { DiamondWipe } from '../hud/DiamondWipe.tsx';
 import { MatchHud, MatchResults } from '../hud/MatchHud.tsx';
 import { Onboarding } from '../hud/Onboarding.tsx';
+import { RotateHint } from '../hud/RotateHint.tsx';
 import { TouchControls, useCoarsePointer } from '../hud/TouchControls.tsx';
 import { TutorialHud } from '../hud/TutorialHud.tsx';
 import { getDirectors } from '../match/runtime.ts';
@@ -76,6 +77,7 @@ export function ChickenzOverlay() {
     <>
       <MatchHud onLeave={leave} />
       {coarse && controlling && <TouchControls />}
+      {coarse && busy && <RotateHint />}
       <DiamondWipe />
       <MatchResults onRematch={() => getDirectors()?.match.rematch()} onLeave={leave} />
       <TutorialHud

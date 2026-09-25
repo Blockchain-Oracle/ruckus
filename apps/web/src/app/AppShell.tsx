@@ -79,7 +79,7 @@ function TopBar({ hidden }: { hidden: boolean }) {
       <Logo className="text-3xl sm:text-4xl" />
       <div className="pointer-events-auto flex items-center gap-3">
         <BalancePill />
-        <FullscreenButton />
+        <FullscreenButton className="hidden sm:grid" />
         <button
           type="button"
           aria-label="Settings"
@@ -109,7 +109,7 @@ function HubMenu() {
 
   return (
     <m.main
-      className="relative mt-auto flex flex-col gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-8"
+      className="relative mt-auto flex flex-col gap-6 px-4 pb-[max(5rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0, transition: ENTER }}
       exit={{ opacity: 0, y: 16, transition: EXIT }}
@@ -118,22 +118,25 @@ function HubMenu() {
         <h1 className="font-display text-4xl leading-tight sm:text-5xl">
           {game ? game.title : t('hub.welcome.title')}
         </h1>
-        <p className="mt-2 text-lg text-cream-dim">
+        <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)]">
           {game ? t(game.taglineKey) : t('hub.welcome.body')}
         </p>
         {game && (
-          <div className="pointer-events-auto mt-5 flex flex-wrap gap-4">
+          <div className="pointer-events-auto mt-5 flex flex-col gap-3 max-sm:*:h-14 max-sm:*:w-full max-sm:*:text-xl sm:flex-row sm:flex-wrap sm:gap-4">
             <Button variant="tomato" size="lg" sound="ui.confirm" onClick={() => send('entering')}>
               {t('hub.play')}
             </Button>
             {HubActions && <HubActions />}
-            <Button variant="ink" size="lg" sound="ui.back" onClick={() => choose(null)}>
-              {t('hub.back')}
-            </Button>
+            {games.length > 1 && (
+              <Button variant="ink" size="lg" sound="ui.back" onClick={() => choose(null)}>
+                {t('hub.back')}
+              </Button>
+            )}
           </div>
         )}
       </section>
-      {games.length > 0 && (
+      {/* A picker of one just repeats the headline; it earns its place with the second game. */}
+      {games.length > 1 && (
         <nav
           aria-label={t('hub.pickGame')}
           className="pointer-events-auto -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"

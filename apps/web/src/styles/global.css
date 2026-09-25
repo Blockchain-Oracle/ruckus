@@ -72,3 +72,24 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
+
+/* Rotate-your-phone hint: tip to landscape, hold, tip back. */
+@keyframes rotate-hint {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  45%,
+  75% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[rotate-hint_2\.4s_ease-in-out_infinite\] {
+    animation: none;
+    transform: rotate(-90deg);
+  }
+}

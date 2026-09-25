@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 
 import { useGameMachine } from '@/engine/gameMachine.ts';
 import { Scrim } from '@/engine/Scrim.tsx';
-import { findGame } from '@/games/registry.ts';
+import { findGame, visibleGames } from '@/games/registry.ts';
 import { getAudio } from '@/lib/audio/index.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
@@ -26,8 +26,9 @@ export function Hub() {
     const startMusic = () => playMusic(LOBBY_TRACK);
     window.addEventListener('pointerdown', startMusic, { once: true });
     window.addEventListener('keydown', startMusic, { once: true });
-    const deepLinked = findGame(readUrlState().game);
-    if (deepLinked) void useGameMachine.getState().select(deepLinked.id);
+    // No deep link: open on the featured game's live attract rather than an empty room.
+    const opening = findGame(readUrlState().game) ?? visibleGames()[0];
+    if (opening) void useGameMachine.getState().select(opening.id);
   }, []);
 
   return (
