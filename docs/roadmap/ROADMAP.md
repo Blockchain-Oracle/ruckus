@@ -11,12 +11,12 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 5 | ✱E Early eligible submission (waits for a finished slice: hub + Chickenz + Back Your Chicken) | todo | [stages/E-early-submission.md](stages/E-early-submission.md) |
 | 6 | S03 Engine shell, asset pipeline, budgets (✱N name + brand) | done | [stages/S03-engine-shell.md](stages/S03-engine-shell.md) |
 | 7 | S06 Chickenz sim: Rust, 4-player FFA, deterministic bots | done | [stages/S06-chickenz-sim.md](stages/S06-chickenz-sim.md) |
-| 8 | S10a Chickenz wager spike: seed banks + novel wager design | active | [stages/S10a-chickenz-wager-spike.md](stages/S10a-chickenz-wager-spike.md) |
+| 8 | S10a Chickenz wager spike: seed banks + novel wager design | done (simulator e2e PASS to 6×) | [stages/S10a-chickenz-wager-spike.md](stages/S10a-chickenz-wager-spike.md) |
 | 9 | S04 Identity and onboarding | todo | [stages/S04-identity-onboarding.md](stages/S04-identity-onboarding.md) |
-| 10 | S05 Lobby, rooms, netcode framework | todo | [stages/S05-lobby-rooms.md](stages/S05-lobby-rooms.md) |
-| 11 | S07 Chickenz rendering and assets (✱ purchases) | todo | [stages/S07-chickenz-render.md](stages/S07-chickenz-render.md) |
-| 12 | S08 Chickenz netcode | todo | [stages/S08-chickenz-netcode.md](stages/S08-chickenz-netcode.md) |
-| 13 | S09 Chickenz feel, HUD, tutorial, touch, sound | todo | [stages/S09-chickenz-feel.md](stages/S09-chickenz-feel.md) |
+| 10 | S05 Lobby, rooms, netcode framework | done for Chickenz (rooms, invite codes, labelled bots, watchers) | [stages/S05-lobby-rooms.md](stages/S05-lobby-rooms.md) |
+| 11 | S07 Chickenz rendering and assets (✱ purchases) | done (no purchases needed) | [stages/S07-chickenz-render.md](stages/S07-chickenz-render.md) |
+| 12 | S08 Chickenz netcode | done (predicted client; render smoothing of corrections still open, parity ledger) | [stages/S08-chickenz-netcode.md](stages/S08-chickenz-netcode.md) |
+| 13 | S09 Chickenz feel, HUD, tutorial, touch, sound | active (gaps: parity ledger §2) | [stages/S09-chickenz-feel.md](stages/S09-chickenz-feel.md) |
 | 14 | S10b Chickenz wagers (full) | todo | [stages/S10b-chickenz-wagers.md](stages/S10b-chickenz-wagers.md) |
 | 15 | S11 Ship Chickenz (✱ submit/update) | todo | [stages/S11-ship-chickenz.md](stages/S11-ship-chickenz.md) |
 | 16 | S12 Pool sim | todo | [stages/S12-pool-sim.md](stages/S12-pool-sim.md) |

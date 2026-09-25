@@ -1,38 +1,51 @@
-# HANDOFF (updated 2026-09-25 by session 2)
+# HANDOFF (updated 2026-09-25 by session 3)
 
-**Stage:** S06 is done. S10a is done apart from the simulator e2e. **Course correction (user, 2026-09-25): every game must be PLAYABLE first** (vs bots, with friends, plus a watch mode) at full reference fidelity, before any casino add-on. Chickenz is now playable vs bots. Next: rooms with friends (S05/S08). See `docs/assets/chickenz-parity.md` §5 for the order.
+**Stage:** S09 Chickenz feel is active. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
 
-**About ✱E:** the early submission waits until a *finished* slice exists: the hub, Chickenz, and the Back Your Chicken wager. A site of debug panels would be rejected as half-finished. After S03, S06 and S10a, check whether a finished slice exists, and submit it if it does.
+**Last completed (session 3):**
+- Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
+  - Key rebinding: 5 actions × 2 slots, capture phase, mouse buttons, duplicates cleared, Reset.
+  - A Dynamic Camera toggle and a "Your bird" choice.
+  - Replay tutorial.
+  - A fullscreen button.
+  - The game module has a `Settings` slot in the hub sheet.
+- World-space nameplates: slot-coloured names and Chickenz HP bars. The stomp "SHAKE HIM OFF!" prompt and bar now sit under the stomped bird.
+- Quick-chat emotes:
+  - Keys 1–6 or the chat button; they draw as pixel speech bubbles.
+  - The server validates them and rate-limits at 900 ms.
+  - Labelled practice bots react.
+- **Server fix:** `onAuth` rejected mid-match joins, so invite links failed during a match. Deployed and verified on production.
+- `pnpm -F @arena/browser-checks back-bird` is the S10a e2e.
+- Judge pass:
+  - The hub opens on Chickenz's live attract (ADR-007).
+  - Portrait hub layout.
+  - A rotate hint for upright phones.
+  - Firefox is OK.
+- `docs/CREDITS.md` now lists every ElevenLabs asset. The parity ledger was audited: 110 have, 20 partial, 14 missing (non-blocked).
 
-**Last completed (session 2):**
-- **S03 engine shell:** a persistent WebGPU canvas behind the hub.
-- **S06 Rust Chickenz sim:** 4-player FFA with deterministic bots, compiled to wasm.
-- **S10a seed bank and the Back a Bird wager flow.**
-- **Chickenz, playable:**
-  - You vs 3 labelled bots, with Chickenz controls and touch sticks.
-  - Wipe, countdown and first-to-3 rounds; HUD, results and rematch.
-  - A follow camera and kill-cam.
-  - Ragdoll deaths, dust, explosions and pickup effects.
-  - 22 ElevenLabs gameplay SFX plus 2 battle tracks and a lobby loop.
-  - The 8-step tutorial, first-run prompt and guest username.
-- `docs/assets/chickenz-parity.md` holds the reference parity ledger. Keep its status columns current.
-
-**NEXT ACTION:** Chickenz online rooms are **done and deployed**. The web is live, and the server is on Coolify at HEAD. Next, in order:
-1. The Chickenz settings parity items: key rebinding, the dynamic-camera toggle, a "my hero" choice.
-2. The nameplates and emote bar.
-3. The Back a Bird simulator e2e (S10a).
-4. ✱E: check the live site as a judge would (desktop, mobile, Firefox), then ask the user about submitting.
-5. Pool, Soccer and Runner, each with the same play-first fidelity: a parity ledger per reference, then a playable game vs bots, then rooms, then the wager.
-
-After that:
-- The Chickenz settings items: rebinding, the dynamic-camera toggle, a hero choice.
-- The simulator e2e for Back a Bird.
-- Deploy the server.
-- Then Pool, Soccer and Runner with the same play-first fidelity.
+**NEXT ACTION:**
+1. ✱E: ask the user whether to submit the current live build now (the slice is finished: hub, playable Chickenz vs bots and friends, Back a Bird). Don't submit without their yes.
+2. Then S09 feel gaps, in this order (from the ledger audit):
+   1. The weapon/ammo HUD (`PISTOL 15`, bottom centre; `P.ammo`).
+   2. Muzzle flash, screen shake and hit-stop (render only).
+   3. Stomp depth layering: the rider sits behind the victim at victim.y − 22.
+   4. Projectiles spawn at gun height and snap to the muzzle on their first frame.
+   5. SFX for silent events: landing, shake presses, zone damage, empty click, respawn, wipe swoosh.
+   6. The `SUDDEN DEATH IN n` warning.
+   7. A lose sting at match end.
+   8. "DRAW!" plus pips in the round banner.
+   9. Render smoothing of online corrections.
+   10. Mobile: viewport meta, shoot-button position, 16 px gutter.
+   11. Music focus fade.
+   12. The round-start camera snap.
+   13. A kill feed.
+   14. A music on/off toggle.
+   15. Suppress the canvas context menu.
+3. Then Pool (S12–S16), Soccer and Runner, each play-first: a parity ledger per reference → playable vs bots → rooms → wager.
 
 **Uncommitted work:** none.
 
-**Blocked on the user:** nothing. Server deploys need the user's Coolify tunnel open on localhost:8001.
+**Blocked on the user:** only ✱E (submission yes/no).
 
 **Environment state:**
 - The simulator runs from `casino-sdk` with `npm start` (:3300, chain :8545). Log: `/tmp/ruckus-sim.log`. The local RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` (changes on restart; re-run `pnpm -F @arena/contracts sync`).
@@ -42,12 +55,19 @@ After that:
 - Branch `main` tracks origin. CI is green. This repo's git author email is `abubakrjimoh16488@gmail.com`, which Vercel needs.
 - Toolchain: node 25.9 (the repo pins 24.21.0), pnpm 10.34.5, forge 1.7.1, rustc 1.98.1 with the wasm32 target, nixpacks 1.41, docker (OrbStack), and the elevenlabs, 21st, vercel, coolify and convex CLIs. **wasm-pack is not installed** (S06 needs it).
 
-**Last green verification:**
+**Last green verification (session 3):**
+- `pnpm verify` passes. `back-bird` e2e PASS (10 VRF rounds, all 4 classes, flawless 6× on round 7). `firefox` probe OK. Production late-join is verified with a two-client script against wss://ruckus-play.84.46.247.92.sslip.io.
+
+**Older verification:**
 - `pnpm verify` passes, and `pnpm -F @arena/web build && pnpm -F @arena/web budgets` passes (shell 143.7 KB gz).
 - `forge test` passes.
 - `prod-frame` also boots the real hub framed. Browser checks pass: `casino` (simulator), `prod-frame`, and `connectivity` against both local and **production**.
 
 **Gotchas learned (the rest are in the stage notes):**
+- The ChickenzDriver keeps stepping after `match_over` (the taunt window). Compare fights with `driver.overHash`, which is taken on the exact end tick, never `sim.hash()` later.
+- Plates and bubbles over birds render with `depthTest: false` plus `renderOrder`. Thin layers 0.001 apart z-fight at play-camera distance, which made the HP bars black.
+- Playwright's Chromium can vanish from the cache. Fix it with `pnpm exec playwright-core install chromium` in tooling/browser-checks.
+- ElevenLabs can still return near-silent takes: check `volumedetect` before using one.
 - **Colyseus "seat reservation expired" (4002) on every join** means two peer variants of `@colyseus/core` are installed. The matchmaker and the WS transport then keep separate room registries. apps/server pins `@colyseus/core`, `ws-transport` and `auth` directly to keep them unified. Check `ls node_modules/.pnpm | grep @colyseus+core`.
 - A local "couldn't reach the game server" is usually the local `node apps/server/dist/index.js` being down or stale. Rebuild it and restart it.
 - Firefox and Zen render through WebGL2 (`engine/renderer.ts`). `pnpm -F @arena/browser-checks firefox` probes them (the Playwright Firefox build must match playwright-core).
