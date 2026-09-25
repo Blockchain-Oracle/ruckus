@@ -47,35 +47,38 @@ function Rows() {
   );
 }
 
-/** First visit: How to play stands between Play and the kickoff. */
+/**
+ * First visit: How to play stands between Play and the kickoff. It must fit any screen: capped at
+ * the viewport height with only the rules scrolling, and the two choices always visible below.
+ */
 export function IntroCard({ onGo, onLearn }: { onGo: () => void; onLearn: () => void }) {
+  const choose = (then: () => void) => () => {
+    markControlsSeen();
+    then();
+  };
   return (
-    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/55 px-4">
-      <div className="w-full max-w-md rounded-2xl border-2 border-teal bg-ink-2 p-5 text-sm shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
-        <div className="mb-3 font-display text-2xl text-teal">HOW TO PLAY</div>
-        <Rows />
-        <div className="mt-4 flex gap-3">
+    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/55 p-3">
+      <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md min-w-0 flex-col rounded-2xl border-2 border-teal bg-ink-2 p-4 text-xs shadow-[0_20px_60px_rgb(0_0_0/0.6)] sm:p-5 sm:text-sm">
+        <div className="mb-2 shrink-0 font-display text-xl text-teal sm:mb-3 sm:text-2xl">
+          HOW TO PLAY
+        </div>
+        <div className="min-h-0 overflow-y-auto overscroll-contain pr-1 [@media(max-height:500px)]:pb-4 [@media(max-height:500px)]:[mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
+          <Rows />
+        </div>
+        <div className="mt-3 grid shrink-0 grid-cols-2 gap-2 sm:mt-4 sm:gap-3">
           <Button
             variant="teal"
-            size="lg"
             sound="ui.confirm"
-            className="flex-1"
-            onClick={() => {
-              markControlsSeen();
-              onLearn();
-            }}
+            className="w-full min-w-0 px-2 text-sm sm:text-base"
+            onClick={choose(onLearn)}
           >
-            Try it (1 min)
+            Quick lesson
           </Button>
           <Button
             variant="tomato"
-            size="lg"
             sound="ui.confirm"
-            className="flex-1"
-            onClick={() => {
-              markControlsSeen();
-              onGo();
-            }}
+            className="w-full min-w-0 px-2 text-sm sm:text-base"
+            onClick={choose(onGo)}
           >
             Kick off
           </Button>
@@ -100,7 +103,7 @@ export function ControlsButton() {
       </button>
     );
   return (
-    <div className="pointer-events-auto absolute top-0 left-0 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-2 border-teal bg-ink/95 p-4 text-sm shadow-[0_12px_40px_rgb(0_0_0/0.5)]">
+    <div className="pointer-events-auto absolute top-0 left-0 max-h-[calc(100dvh-6rem)] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border-2 border-teal bg-ink/95 p-4 text-sm shadow-[0_12px_40px_rgb(0_0_0/0.5)]">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-display text-teal">HOW TO PLAY</span>
         <button

@@ -21,7 +21,7 @@ export function LessonCard() {
           <p className="text-cream">
             Move, jump high, shoot, head it and grab power-ups. Most goals in 90 seconds wins.
           </p>
-          <Button variant="tomato" size="lg" sound="ui.confirm" onClick={startMatch}>
+          <Button variant="tomato" sound="ui.confirm" className="w-full" onClick={startMatch}>
             Kick off a match
           </Button>
         </div>

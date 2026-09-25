@@ -62,7 +62,7 @@ try {
     .getByRole('button', { name: /^play$/i })
     .first()
     .click({ timeout: 20_000 });
-  await page.getByRole('button', { name: /Try it/ }).click({ timeout: 15_000 });
+  await page.getByRole('button', { name: 'Quick lesson' }).click({ timeout: 15_000 });
   await page.waitForFunction('globalThis.__ruckusSoccerTutorial?.getState().lesson === 0');
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/lesson-0.png` });
 
