@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "@fontsource/bungee/400.css";
+@import "@fontsource/rubik/500.css";
+@import "@fontsource/rubik/700.css";
+@import "@fontsource/silkscreen/400.css";
+@import "./tokens.css";
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-tomato: var(--tomato);
+  --color-tomato-deep: var(--tomato-deep);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-win: var(--win);
+  --color-loss: var(--loss);
+  --color-warn: var(--warn);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-pixel: var(--font-pixel);
+  --radius-card: var(--radius-card);
+  --radius-button: var(--radius-button);
+
+  /* shadcn semantic names, bound to the brand so vendored primitives theme themselves. */
+  --color-background: var(--ink-2);
+  --color-foreground: var(--cream);
+  --color-muted: var(--ink-3);
+  --color-muted-foreground: var(--cream-dim);
+  --color-primary: var(--tomato);
+  --color-primary-foreground: var(--cream);
+  --color-secondary: var(--ink-3);
+  --color-accent: var(--ink-3);
+  --color-input: var(--line);
+  --color-border: var(--line);
+  --color-ring: var(--teal);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-weight: 500;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  :focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label-caps {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}

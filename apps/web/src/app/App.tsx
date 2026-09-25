@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import { CASINO_GAME_ID } from '@arena/shared';
+import { Hub } from './Hub.tsx';
 
 const CasinoDebugPanel = lazy(() =>
   import('@/features/casino-debug/CasinoDebugPanel.tsx').then((m) => ({
@@ -32,5 +32,5 @@ export function App() {
       </Suspense>
     );
   }
-  return <main data-game-id={CASINO_GAME_ID}>RUCKUS</main>;
+  return <Hub />;
 }

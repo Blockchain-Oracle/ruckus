@@ -1,0 +1,39 @@
+/* Brand tokens — the single source for colour, type and depth (docs/assets/ART-BIBLE.md). */
+:root {
+  color-scheme: dark;
+
+  --ink: #1b1024;
+  --ink-2: #24163a;
+  --ink-3: #2a1838;
+  --line: #4a2d5e;
+  --cream: #fff1d6;
+  --cream-dim: #cdbfa8;
+  --tomato: #ff5a36;
+  --tomato-deep: #7a1f10;
+  --teal: #2ec4b6;
+  --teal-deep: #178075;
+  /* Gold is reserved for money: balances, stakes, payouts and the Quick Play hero button. */
+  --gold: #ffc23a;
+  --gold-deep: #b8780e;
+
+  /* Semantic states never reuse tomato or gold, so "yours" and "money" stay unambiguous. */
+  --win: #7ee081;
+  --loss: #ff8a9a;
+  --warn: #ffb057;
+
+  --player-1: var(--tomato);
+  --player-2: var(--teal);
+  --player-3: #8c6bff;
+  --player-4: #9be15d;
+
+  --font-display: "Bungee", system-ui, sans-serif;
+  --font-body: "Rubik", system-ui, sans-serif;
+  --font-pixel: "Silkscreen", ui-monospace, monospace;
+
+  --radius-card: 10px;
+  --radius-button: 14px;
+  --lip: 6px;
+  --press-ms: 60ms;
+
+  --vignette: radial-gradient(ellipse at center, transparent 45%, rgb(10 5 16 / 0.72) 100%);
+}
