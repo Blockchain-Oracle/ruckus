@@ -41,3 +41,41 @@
 
 ## Exit checklist
 ROADMAP · HANDOFF (URLs, Convex deployment name, Coolify app uuid, context) · LOG · commits
+
+## Notes (as built, 2026-09-25)
+
+**Game server on Coolify**
+- Context `agari-new`, a tunnel on localhost:8001 to server 84.46.247.92, which the user opens. Server uuid `7otp4kskhbwzkzybsug3uqgx`.
+- Project `ruckus` (`01shlznvl6fdjtqh6uxou3my`), app `ruckus-server` (`kkeghmfwz9wl40u2l0n11iow`).
+- Nixpacks, base `/`, port 2567, `/health` check, stop grace period 30 s.
+- URL: **https://ruckus-play.84.46.247.92.sslip.io** (wss). HTTPS comes from Traefik and Let's Encrypt on sslip.io, the same pattern as the user's `shijima-web`.
+- Repo access uses a read-only GitHub deploy key: Coolify private key `ruckus-deploy-key` (`otqghgkqecwo4qpcw7mu8lbs`). There's no GitHub App.
+- Env:
+  - `NIXPACKS_CONFIG_FILE=apps/server/nixpacks.toml` (build)
+  - `NIXPACKS_NODE_VERSION=24` (build). Coolify pre-set it to 22, so it was overridden.
+  - `NODE_ENV=production` (runtime only)
+- **No push-to-deploy yet.** The Coolify dashboard isn't publicly reachable (only via the tunnel), so GitHub webhooks can't reach it. To deploy, run `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow` from here with the tunnel open. Watch paths only matter once auto-deploy exists. Follow-up: expose the Coolify instance, or use a CI job that SSHes in.
+- The Nixpacks image works (health inside and outside the container, WS join, SIGTERM exit 0). It is 2.3 GB because Nixpacks doesn't prune devDependencies; the documented Dockerfile fallback fixes that if it matters.
+- Nixpacks' Node provider sets `NODE_ENV=production` at build time, so `nixpacks.toml` installs with `--prod=false`.
+- The root `prepare` script skips lefthook when there is no `.git`, as inside the Nixpacks build container.
+
+**Convex** (team `blockchain-oracle`, project `ruckus`)
+- dev deployment: `insightful-bass-789`
+- prod deployment: `qualified-armadillo-823`
+- Both have their own `JWT_PRIVATE_KEY` and `JWKS`, generated locally with jose and never committed.
+- `SITE_URL`: dev is `http://127.0.0.1:5173`; prod is `https://ruckus-nine.vercel.app`.
+- Generated types (`convex/src/_generated`) are committed, because Vercel builds can't run codegen.
+
+**Web on Vercel** (project `ruckus`, team `blockchain-oracles-projects`)
+- Prod alias: **https://ruckus-nine.vercel.app**
+- Linked at the repo root with Root Directory `apps/web`, Node 24.x, and `ENABLE_EXPERIMENTAL_COREPACK=1`.
+- `apps/web/vercel.json` runs install and build from the root through turbo.
+- **`turbo.json` build `env: ["VITE_*"]` is required**, because turbo's strict env mode otherwise drops the VITE vars.
+- `.vercelignore` excludes references, casino-sdk and similar.
+- Deploy with `vercel deploy --prod` from the repo root. Git integration isn't connected yet; see the follow-up.
+- Live: the site returns 200, the jam widget tag is in the HTML, and `/game.manifest.json` returns 200.
+
+**Verification**
+- Local: `pnpm -F @arena/browser-checks run connectivity` passes.
+- Prod: `WEB_URL=https://ruckus-nine.vercel.app …` (result in LOG/HANDOFF).
+- Deployed server: `SERVER_URL=wss://ruckus-play.84.46.247.92.sslip.io pnpm -F @arena/browser-checks run check:server` passes.
