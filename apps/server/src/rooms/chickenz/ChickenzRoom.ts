@@ -8,6 +8,7 @@ import {
   ChickenzSeat,
   INPUT_BYTES,
   type MatchEndEvent,
+  NO_SLOT,
   type RoundEndEvent,
   type RoundStartEvent,
   SEAT_KIND,
@@ -58,6 +59,8 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   private frozen = true;
   private roundEnded = false;
   private timers: ReturnType<typeof setTimeout>[] = [];
+  /** The round in progress, replayed to anyone who joins mid-match so they can watch it. */
+  private currentRound: RoundStartEvent | null = null;
 
   override async onCreate(options: ChickenzJoinOptions) {
     ensureChickenzWasm();
@@ -108,11 +111,13 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   }
 
   override onJoin(client: Client, options: ChickenzJoinOptions) {
-    const slot = this.freeSlot();
-    if (slot < 0) throw new ServerError(ROOM_FULL, 'Room is full.');
+    const midMatch = this.state.phase !== CHICKENZ_PHASE.lobby;
+    const slot = midMatch ? NO_SLOT : this.freeSlot();
+    if (slot < 0) throw new ServerError(ROOM_FULL, 'That room is full.');
     const seat = new ChickenzSeat();
     seat.slot = slot;
-    seat.kind = SEAT_KIND.human;
+    // Joining mid-match: watch this one live, play the next (never turned away at the door).
+    seat.kind = midMatch ? SEAT_KIND.waiting : SEAT_KIND.human;
     seat.sessionId = client.sessionId;
     seat.name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
     const wanted =
@@ -122,6 +127,8 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     seat.hero = wanted ?? this.freeHero();
     this.state.seats.push(seat);
     if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    void this.lockIfFull();
+    if (midMatch && this.currentRound) client.send(CHICKENZ_MSG.roundStart, this.currentRound);
   }
 
   override async onDrop(client: Client) {
@@ -196,16 +203,19 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     }
   }
 
+  /** Only a genuinely full room is locked; a match in progress still welcomes watchers. */
   private async lockIfFull() {
     if (this.state.seats.length >= MAX_SEATS) await this.lock();
+    else await this.unlock();
   }
 
   /** A player who leaves mid-match becomes a labelled bot; in the lobby their seat frees up. */
   private release(client: Client) {
     const seat = this.seatOf(client);
     if (!seat) return;
-    if (this.state.phase === CHICKENZ_PHASE.lobby) {
+    if (this.state.phase === CHICKENZ_PHASE.lobby || seat.kind === SEAT_KIND.waiting) {
       this.state.seats.splice(this.state.seats.indexOf(seat), 1);
+      void this.lockIfFull();
     } else {
       seat.kind = SEAT_KIND.bot;
       seat.sessionId = '';
@@ -240,19 +250,20 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
 
   private startMatch() {
     // Seats must be contiguous from slot 0 for the sim; renumber in join order.
-    const seats = [...this.state.seats].sort((a, b) => a.slot - b.slot);
+    const seats = [...this.state.seats]
+      .filter((s) => s.kind !== SEAT_KIND.waiting)
+      .sort((a, b) => a.slot - b.slot);
     if (seats.length < MIN_PLAYERS_TO_START) return;
     seats.forEach((s, i) => {
       s.slot = i;
       s.wins = 0;
     });
-    void this.lock();
     this.state.round = 0;
     this.nextRound();
   }
 
   private nextRound() {
-    const players = this.state.seats.length;
+    const players = this.state.seats.filter((s) => s.kind !== SEAT_KIND.waiting).length;
     this.seed = Math.imul(this.seed ^ (this.state.round + 1), 2654435761) >>> 0 || 1;
     const mapId = MAPS[this.state.round % MAPS.length] ?? 0;
     this.sim?.free();
@@ -283,7 +294,10 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     const winner = this.view[H.winner] ?? -1;
     const seat = this.state.seats.find((s) => s.slot === winner);
     if (seat) seat.wins += 1;
-    const wins = [...this.state.seats].sort((a, b) => a.slot - b.slot).map((s) => s.wins);
+    const wins = [...this.state.seats]
+      .filter((s) => s.kind !== SEAT_KIND.waiting)
+      .sort((a, b) => a.slot - b.slot)
+      .map((s) => s.wins);
     const roundEnd: RoundEndEvent = { round: this.state.round, winner, wins };
     this.broadcast(CHICKENZ_MSG.roundEnd, roundEnd);
     this.state.phase = CHICKENZ_PHASE.roundOver;
@@ -303,9 +317,16 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
   private backToLobby() {
     this.sim?.free();
     this.sim = null;
+    this.currentRound = null;
     this.state.phase = CHICKENZ_PHASE.lobby;
+    // Watchers take the free seats for the next match.
+    for (const s of this.state.seats) {
+      if (s.kind !== SEAT_KIND.waiting) continue;
+      s.kind = SEAT_KIND.human;
+      s.slot = this.freeSlot();
+    }
     for (const s of this.state.seats) s.ready = s.kind === SEAT_KIND.bot;
-    void this.unlock();
+    void this.lockIfFull();
   }
 
   // ── sim ───────────────────────────────────────────────────────────────

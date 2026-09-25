@@ -41,7 +41,10 @@ export const CHICKENZ_PHASE = {
 } as const;
 export type ChickenzPhase = (typeof CHICKENZ_PHASE)[keyof typeof CHICKENZ_PHASE];
 
-export const SEAT_KIND = { human: 'human', bot: 'bot' } as const;
+/** `waiting`: joined mid-match; watches live and takes a seat when the room returns to its lobby. */
+export const SEAT_KIND = { human: 'human', bot: 'bot', waiting: 'waiting' } as const;
+/** Slot value for seats that are not in the running sim (spectators). */
+export const NO_SLOT = 255;
 
 /** Message names. Byte messages carry the sim; JSON ones carry lobby commands and round events. */
 export const CHICKENZ_MSG = {

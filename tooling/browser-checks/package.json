@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit -p .",
     "check:server": "tsx src/server-hello.ts",
     "connectivity": "tsx src/connectivity.ts",
-    "chickenz-room": "tsx src/chickenz-room.ts"
+    "chickenz-room": "tsx src/chickenz-room.ts",
+    "firefox": "tsx src/firefox-probe.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

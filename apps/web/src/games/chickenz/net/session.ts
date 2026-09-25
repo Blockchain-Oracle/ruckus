@@ -90,6 +90,17 @@ function attach(r: Room) {
   });
 }
 
+/** Server and matchmaker errors, in the words a player needs. */
+function friendlyError(cause: unknown): string {
+  const raw = cause instanceof Error ? cause.message : String(cause);
+  if (/locked|full/i.test(raw))
+    return 'That room is full (4 players). Ask the host for a new room.';
+  if (/not found|invalid|no rooms/i.test(raw))
+    return 'No room with that code. Check the code or ask for a fresh link.';
+  if (/protocol/i.test(raw)) return 'The game was updated: reload the page to join.';
+  return "Couldn't reach the game server. Check your connection and try again.";
+}
+
 const joinOptions = (priv: boolean): ChickenzJoinOptions => ({
   protocolVersion: PROTOCOL_VERSION,
   name: useProfile.getState().name,
@@ -104,8 +115,7 @@ async function connect(run: (client: Client) => Promise<Room>) {
   try {
     attach(await run(new Client(env.VITE_SERVER_URL)));
   } catch (cause) {
-    const message = cause instanceof Error ? cause.message : 'Could not reach the game server.';
-    useRoom.getState().set({ status: 'error', error: message });
+    useRoom.getState().set({ status: 'error', error: friendlyError(cause) });
   } finally {
     joining = false;
   }

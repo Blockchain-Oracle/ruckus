@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type SeatView = {
   slot: number;
-  kind: 'human' | 'bot';
+  kind: 'human' | 'bot' | 'waiting';
   sessionId: string;
   name: string;
   hero: string;

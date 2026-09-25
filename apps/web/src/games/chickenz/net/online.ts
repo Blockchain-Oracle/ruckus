@@ -15,7 +15,10 @@ export function installOnline() {
   setOnlineHandlers({
     onRoundStart(e) {
       const room = useRoom.getState();
-      const seats = [...room.seats].sort((a, b) => a.slot - b.slot);
+      // Watchers (joined mid-match) aren't in the sim: they spectate with no local bird.
+      const seats = [...room.seats]
+        .filter((s) => s.kind !== 'waiting')
+        .sort((a, b) => a.slot - b.slot);
       const me = seats.find((s) => s.sessionId === room.mySessionId);
       const heroes = seats.map((s) => (isHero(s.hero) ? s.hero : HEROES[0]));
       // Bots are always labelled; a bot that took over a dropped player keeps their name in brackets.

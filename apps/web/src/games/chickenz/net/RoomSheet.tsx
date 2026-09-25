@@ -189,13 +189,15 @@ function Lobby() {
                   <span className="font-pixel text-[10px] uppercase text-cream-dim">
                     {seat.kind === 'bot'
                       ? 'BOT'
-                      : seat.sessionId === room.mySessionId
-                        ? 'YOU'
-                        : seat.connected
-                          ? seat.ready
-                            ? 'READY'
-                            : 'NOT READY'
-                          : 'RECONNECTING'}
+                      : seat.kind === 'waiting'
+                        ? 'WATCHING · NEXT MATCH'
+                        : seat.sessionId === room.mySessionId
+                          ? 'YOU'
+                          : seat.connected
+                            ? seat.ready
+                              ? 'READY'
+                              : 'NOT READY'
+                            : 'RECONNECTING'}
                   </span>
                 </>
               ) : (
