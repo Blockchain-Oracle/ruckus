@@ -23,32 +23,32 @@
   - Firefox is OK.
 - `docs/CREDITS.md` now lists every ElevenLabs asset. The parity ledger was audited: 110 have, 20 partial, 14 missing (non-blocked).
 
-**Pool progress (session 3, later):**
-- **S12 is done** (`packages/sim-pool`):
-  - A deterministic engine using only + − × ÷ sqrt, enforced by the exact-math lint.
-  - 8-ball rules and a searching bot.
-- **S13 is mostly done** (`apps/web/src/games/pool`):
-  - Visuals: the cinematic table, balls and cue, the aim guide, the HDRI, lighting and shadows.
-  - Controls: the power cue, the spin ball, pocket calling, ball in hand, keys, and a phone layout.
-  - Audio: ElevenLabs SFX and a jazz track.
-  - A bot exhibition behind the hub, practice vs a bot, and visible bot strokes.
-  - It's hidden behind `?preview` until it's complete.
-- A soak test (a full rack through the real HUD code paths via `__ruckusPoolKit`) passes.
+**Pool is feature-complete** (hidden behind `?preview` until the server deploys):
+- **S12, the engine:** exact arithmetic, rules, and a searching bot.
+- **S13, the table:** a cinematic table; controls for keys, touch, spin and calling the 8; audio and music; a phone layout.
+- **S14, rooms:** `PoolRoom` is server-authoritative lockstep.
+  - Raw Float64 tables; aim relay; labelled bots; watchers; a 20 s reconnect.
+  - The generic `features/rooms` kit and lobby sheet.
+  - `pool-room` check: two browsers stay bit-identical.
+- **S15, the wager "Call Your Shot":** four contract tiers at 96%; the realise-your-stroke search; the `pool-wager` simulator e2e passes up to 9.6×.
+- **S16, the tutorial:** five hands-on lessons.
+- The `select()` double-select fix (it remounted scenes and dropped online tables).
+
+**Soccer:** S17's sim is done (`packages/sim-soccer`: Eggy numbers, bots, power-ups, 1v1/2v2, about 5 goals a match).
 
 **NEXT ACTION:**
-1. **Pool S14, rooms with friends (and watchers):**
-   - Build `PoolRoom` on the server. The server runs `@arena/sim-pool` authoritatively.
-   - The shooter sends `{place, shot, calledPocket}`. The server simulates it and broadcasts the shot plus the resulting balls, hash and rack state.
-   - Clients replay the shot in real time, then snap to the server state at rest.
-   - Relay aim at 10 Hz so others watch the cue move.
-   - Labelled bot seats; late joiners watch; a 20 s reconnect.
-   - Mirror the `ChickenzRoom` patterns and the protocol in `packages/protocol/src/pool.ts`.
-2. Pool S16: a hands-on tutorial (aim → power → spin → pot → ball in hand → call the 8).
-3. Pool S15: the wager spike (novelty check against Clatter and Roll Call).
-4. Unhide Pool, then Soccer (S17–S21) and Runner (S22–S26), play-first.
-5. The four-game hub landing (see ADR-007's follow-up).
-6. The Chickenz feel gaps listed in the ledger audit.
-7. ✱E is deferred until all four games exist.
+1. **Soccer S18: render the pitch.**
+   - Code-drawn egg characters: squash and stretch, eyes tracking the ball, team kits.
+   - A night-stadium backdrop with crowd and floodlights; goal nets; a rolling football.
+   - HUD: score bug and clock, power-up chips, READY/GO, and a GOAL! celebration.
+   - Controls: keys and touch buttons.
+   - ElevenLabs SFX: kick, header, bounce, post, whistle, crowd bed and roar. Plus music.
+   - Then S19 (a SoccerRoom with prediction), S21 (the tutorial), S20 (the wager, with a novelty check).
+2. Runner S22–S26, play-first.
+3. **Deploy the server once the Coolify tunnel (localhost:8001) is back:** `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow`. Then unhide Pool (`registry.ts` `hidden: false`), because production PoolRoom needs the deployed server.
+4. The four-game hub landing (ADR-007 follow-up).
+5. The Chickenz feel gaps (ledger audit list).
+6. ✱E is deferred until all four games are done.
 
 **Uncommitted work:** none.
 
