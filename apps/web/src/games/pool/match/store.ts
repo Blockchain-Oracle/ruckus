@@ -27,6 +27,11 @@ type PoolState = {
   mySlot: number;
   /** It's my turn and the table is waiting for me. */
   myTurn: boolean;
+  /** Tutorial lesson index (−1 when not in the tutorial) and a coaching note after a miss. */
+  lesson: number;
+  lessonNote: string | null;
+  /** First visit: offer the lesson before the first match. */
+  offerTutorial: boolean;
   set(patch: Partial<Omit<PoolState, 'set'>>): void;
 };
 
@@ -47,5 +52,8 @@ export const usePool = create<PoolState>()((set) => ({
   potted: [],
   mySlot: -1,
   myTurn: false,
+  lesson: -1,
+  lessonNote: null,
+  offerTutorial: false,
   set: (patch) => set(patch),
 }));

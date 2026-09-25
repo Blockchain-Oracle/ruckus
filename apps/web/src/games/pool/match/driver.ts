@@ -94,6 +94,9 @@ export class PoolDriver {
     this.snap = { after, rack, message };
   }
 
+  /** Tutorial: every shot comes back to the student, whatever the rules would say. */
+  sandbox = false;
+
   /** Load a table mid-rack (joining as a watcher, reconnecting). */
   load(balls: Balls, rack: RackState) {
     this.balls.set(balls);
@@ -148,7 +151,7 @@ export class PoolDriver {
       return true;
     }
     const out = judgeShot(this.rack, this.before, this.balls, events, this.calledPocket);
-    applyOutcome(this.rack, this.balls, out);
+    if (!this.sandbox) applyOutcome(this.rack, this.balls, out);
     this.lastOutcome = out;
     this.phase = this.rack.winner >= 0 ? 'over' : 'aim';
     this.rested = true;

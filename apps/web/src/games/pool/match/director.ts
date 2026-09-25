@@ -13,10 +13,19 @@ import {
 } from '@arena/sim-pool';
 
 import { playStrike } from '../audio/sfx.ts';
+import { LESSONS } from '../tutorial/lessons.ts';
 import { aim } from './aim.ts';
 import { thinkBot } from './bot.ts';
 import { PoolDriver, type Seat } from './driver.ts';
 import { usePool } from './store.ts';
+import {
+  aimLessonPassed,
+  judgeLesson,
+  LESSON_TIMINGS,
+  lessonCount,
+  markTutorialDone,
+  stageLesson,
+} from './tutorial.ts';
 
 /** A bot takes a human-looking beat before it shoots, and a moment after a rack ends. */
 const BOT_THINK_MIN_MS = 700;
@@ -43,7 +52,8 @@ const leftOf = (d: PoolDriver, g: Group | null) => {
  */
 export class PoolDirector {
   driver: PoolDriver;
-  mode: 'exhibition' | 'match' | 'online' = 'exhibition';
+  mode: 'exhibition' | 'match' | 'online' | 'tutorial' = 'exhibition';
+  private lesson = -1;
   /** Dev-only timeline for browser checks (never read in production). */
   log: string[] = [];
   private trace(line: string) {
@@ -64,8 +74,72 @@ export class PoolDirector {
   }
 
   humanTurn() {
+    if (this.mode === 'tutorial') return this.lesson >= 0;
     if (this.mode === 'online') return this.driver.shooter === this.mySlot;
     return this.mode === 'match' && !this.driver.seats[this.driver.shooter].bot;
+  }
+
+  // ── tutorial ───────────────────────────────────────────────────────────
+
+  startTutorial() {
+    this.mode = 'tutorial';
+    this.timers = [];
+    this.stroke = null;
+    this.driver = new PoolDriver(1, [
+      { name: 'You', bot: false, difficulty: 0 },
+      { name: 'Coach', bot: false, difficulty: 0 },
+    ]);
+    this.gotoLesson(0);
+    usePool.getState().set({ status: 'playing', winner: -1, offerTutorial: false });
+  }
+
+  private gotoLesson(index: number) {
+    this.lesson = index;
+    stageLesson(this.driver, index);
+    this.sync(null);
+    usePool.getState().set({ lesson: index });
+    if (index === lessonCount - 1) this.after(LESSON_TIMINGS.finalMs, () => this.finishTutorial());
+  }
+
+  finishTutorial() {
+    markTutorialDone();
+    this.lesson = -1;
+    usePool.getState().set({ lesson: -1, lessonNote: null });
+    this.startMatch(this.playerName);
+  }
+
+  /** The name to seat the human under (set by the scene from the profile). */
+  playerName = 'You';
+
+  private tutorialTick() {
+    const d = this.driver;
+    const id = LESSONS[this.lesson]?.id;
+    // Lesson 1 passes on the aim alone; it moves on to shooting the same table.
+    if (id === 'aim' && d.phase === 'aim' && aimLessonPassed(d)) {
+      this.lesson = -2;
+      this.after(LESSON_TIMINGS.passMs, () => {
+        const keep = { dx: aim.dx, dy: aim.dy };
+        this.gotoLesson(1);
+        aim.dx = keep.dx;
+        aim.dy = keep.dy;
+      });
+    }
+  }
+
+  private tutorialRested() {
+    const index = this.lesson;
+    if (index < 0) return;
+    const verdict = judgeLesson(index, this.driver, this.driver.sim.events);
+    if (verdict === true) {
+      this.lesson = -2;
+      usePool.getState().set({ lessonNote: 'Nice!' });
+      this.after(LESSON_TIMINGS.passMs, () => this.gotoLesson(index + 1));
+    } else {
+      this.after(LESSON_TIMINGS.passMs, () => {
+        this.gotoLesson(index);
+        usePool.getState().set({ lessonNote: verdict });
+      });
+    }
   }
 
   // ── online (server-refereed lockstep) ───────────────────────────────────
@@ -155,6 +229,8 @@ export class PoolDirector {
   startExhibition() {
     this.trace('exhibition');
     this.mode = 'exhibition';
+    this.lesson = -1;
+    usePool.getState().set({ lesson: -1, lessonNote: null, offerTutorial: false });
     this.timers = [];
     this.newRack(EXHIBITION_SEATS);
     usePool.getState().set({ status: 'off' });
@@ -162,6 +238,7 @@ export class PoolDirector {
 
   startMatch(name: string) {
     this.mode = 'match';
+    this.lesson = -1;
     this.timers = [];
     this.newRack([
       { name, bot: false, difficulty: 0 },
@@ -232,6 +309,11 @@ export class PoolDirector {
     this.advanceStroke(dtS);
     const d = this.driver;
     d.update(dtS);
+    if (this.mode === 'tutorial') {
+      if (d.takeRested()) this.tutorialRested();
+      else this.tutorialTick();
+      return;
+    }
     if (d.takeRested()) this.sync(d.lastOutcome?.message ?? null);
     if (this.mode === 'online') this.nextPlayed();
     if (d.phase === 'over') return;
@@ -355,7 +437,7 @@ export class PoolDirector {
       thinking: false,
       potted: Array.from({ length: 15 }, (_, k) => k + 1).filter((n) => !onTable(d.balls, n)),
       status: this.mode === 'exhibition' ? 'off' : r.winner >= 0 ? 'over' : 'playing',
-      mySlot: this.mode === 'online' ? this.mySlot : this.mode === 'match' ? 0 : -1,
+      mySlot: this.mode === 'online' ? this.mySlot : this.mode === 'exhibition' ? -1 : 0,
       myTurn: mine && d.phase === 'aim',
     });
     if (r.winner >= 0 && this.mode === 'exhibition') {

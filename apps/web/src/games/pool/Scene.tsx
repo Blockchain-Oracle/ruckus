@@ -17,6 +17,7 @@ import { resetPoolCamera } from './match/camera.ts';
 import { PoolDirector } from './match/director.ts';
 import { setDirector } from './match/runtime.ts';
 import { usePool } from './match/store.ts';
+import { tutorialDone } from './match/tutorial.ts';
 import { applyPendingRack, poolRooms, relayAim } from './net/online.ts';
 import { AimGuide } from './render/AimGuide.tsx';
 import { Balls } from './render/Balls.tsx';
@@ -52,7 +53,10 @@ export function PoolScene({ phase, generation }: GameSceneProps) {
     setPoolBackdrop(phase === 'attract' || phase === 'leaving');
     // In a room the server starts the rack; never start a local practice match meanwhile.
     if (phase === 'entering' && director.mode === 'exhibition' && !poolRooms.inRoom()) {
-      director.startMatch(useProfile.getState().name);
+      director.playerName = useProfile.getState().name;
+      // First visit: offer the one-minute lesson before the first rack.
+      if (tutorialDone()) director.startMatch(director.playerName);
+      else usePool.getState().set({ offerTutorial: true, status: 'playing' });
       resetPoolCamera();
       playMusic(POOL_TRACK);
     } else if (phase === 'leaving' && director.mode !== 'exhibition') {

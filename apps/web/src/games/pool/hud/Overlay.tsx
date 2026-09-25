@@ -11,6 +11,7 @@ import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 import { getDirector } from '../match/runtime.ts';
 import { usePool } from '../match/store.ts';
 import { poolRooms, watchRoomPhase } from '../net/online.ts';
+import { LessonCard, TutorialOffer } from './Lesson.tsx';
 import { PoolHud } from './PoolHud.tsx';
 import { PoolResults } from './Results.tsx';
 
@@ -54,6 +55,8 @@ export function PoolOverlay() {
   return (
     <>
       <PoolHud onLeave={leave} />
+      <LessonCard />
+      <TutorialOffer />
       <PoolResults online={online} onRematch={() => getDirector()?.rematch()} onLeave={leave} />
       <RoomSheet
         kit={poolRooms}

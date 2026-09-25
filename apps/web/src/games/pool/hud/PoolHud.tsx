@@ -73,6 +73,7 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
     rolling,
     myTurn: mine,
     mySlot,
+    lesson,
   } = usePool();
   if (status === 'off') return null;
   const myTurn = status === 'playing' && mine && !rolling;
@@ -120,7 +121,7 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
           </span>
         </div>
       )}
-      {(message || hint) && (
+      {lesson < 0 && (message || hint) && (
         <div className="absolute inset-x-0 top-28 flex justify-center px-4 sm:top-24">
           <div className="rounded-full border-2 border-line bg-ink/85 px-4 py-1.5 text-center text-sm text-cream shadow-lg">
             {hint ?? message}
