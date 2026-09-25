@@ -24,28 +24,33 @@
 - `docs/CREDITS.md` now lists every ElevenLabs asset. The parity ledger was audited: 110 have, 20 partial, 14 missing (non-blocked).
 
 **NEXT ACTION:**
-1. ✱E: ask the user whether to submit the current live build now (the slice is finished: hub, playable Chickenz vs bots and friends, Back a Bird). Don't submit without their yes.
-2. Then S09 feel gaps, in this order (from the ledger audit):
-   1. The weapon/ammo HUD (`PISTOL 15`, bottom centre; `P.ammo`).
-   2. Muzzle flash, screen shake and hit-stop (render only).
-   3. Stomp depth layering: the rider sits behind the victim at victim.y − 22.
-   4. Projectiles spawn at gun height and snap to the muzzle on their first frame.
-   5. SFX for silent events: landing, shake presses, zone damage, empty click, respawn, wipe swoosh.
-   6. The `SUDDEN DEATH IN n` warning.
-   7. A lose sting at match end.
-   8. "DRAW!" plus pips in the round banner.
-   9. Render smoothing of online corrections.
-   10. Mobile: viewport meta, shoot-button position, 16 px gutter.
+1. **✱E is deferred by the user:** no submission until all four games are playable and the hub presents all of them. Keep the repo private and invite reviewers at submission. See ADR-007's follow-up.
+2. **Pool (S12–S16), play-first:**
+   1. Write the reference parity ledger (`docs/assets/pool-parity.md`).
+   2. Build the sim and a playable game vs bots.
+   3. Then rooms, then the wager.
+   Then Soccer (S17–S21) and Runner (S22–S26) the same way.
+3. **Then rebuild the hub landing** as a four-game arena, with each cabinet showing its game's live attract.
+4. **Chickenz S09 feel gaps**, interleaved as polish. From the ledger audit:
+   1. The weapon/ammo HUD.
+   2. Muzzle flash, shake and hit-stop.
+   3. Stomp layering.
+   4. The projectile muzzle origin.
+   5. SFX for silent events.
+   6. `SUDDEN DEATH IN n`.
+   7. A lose sting.
+   8. "DRAW!" in the round banner.
+   9. Online correction smoothing.
+   10. The shoot-button position and the 16 px gutter.
    11. Music focus fade.
    12. The round-start camera snap.
    13. A kill feed.
-   14. A music on/off toggle.
+   14. A music toggle.
    15. Suppress the canvas context menu.
-3. Then Pool (S12–S16), Soccer and Runner, each play-first: a parity ledger per reference → playable vs bots → rooms → wager.
 
 **Uncommitted work:** none.
 
-**Blocked on the user:** only ✱E (submission yes/no).
+**Blocked on the user:** nothing.
 
 **Environment state:**
 - The simulator runs from `casino-sdk` with `npm start` (:3300, chain :8545). Log: `/tmp/ruckus-sim.log`. The local RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` (changes on restart; re-run `pnpm -F @arena/contracts sync`).
