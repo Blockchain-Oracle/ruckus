@@ -23,6 +23,8 @@ const lookAt = new Vector3();
 /** Follow-cam smoothing (1/s): position snappier than zoom, as Chickenz (0.15 vs 0.05 per frame). */
 const FOLLOW_POS_RATE = 9;
 const FOLLOW_ZOOM_RATE = 3;
+/** World units + zoom: close enough to hand back to the static play pose without a visible cut. */
+const HOME_EPS = 0.01;
 
 /**
  * One camera for the whole hub. Attract orbits the scene; Play dollies the same camera into the
@@ -84,18 +86,24 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     playPos.set(...play.position);
     playTarget.set(...play.target);
     const follow = phase === 'attract' ? null : (rig.follow?.(camera.aspect) ?? null);
-    if (follow) {
+    // Once following, a null follow eases back to the static pose instead of cutting to it.
+    const easingHome = !follow && !Number.isNaN(s.fx) && phase !== 'attract';
+    if (follow || easingHome) {
       if (Number.isNaN(s.fx)) {
         s.fx = play.target[0];
         s.fy = play.target[1];
         s.fz = 1;
       }
-      s.fx = MathUtils.damp(s.fx, follow.x, FOLLOW_POS_RATE, delta);
-      s.fy = MathUtils.damp(s.fy, follow.y, FOLLOW_POS_RATE, delta);
-      s.fz = MathUtils.damp(s.fz, follow.zoom, FOLLOW_ZOOM_RATE, delta);
+      const goal = follow ?? { x: play.target[0], y: play.target[1], zoom: 1 };
+      s.fx = MathUtils.damp(s.fx, goal.x, FOLLOW_POS_RATE, delta);
+      s.fy = MathUtils.damp(s.fy, goal.y, FOLLOW_POS_RATE, delta);
+      s.fz = MathUtils.damp(s.fz, goal.zoom, FOLLOW_ZOOM_RATE, delta);
       const distance = (play.position[2] - play.target[2]) / s.fz;
       playTarget.set(s.fx, s.fy, play.target[2]);
       playPos.set(s.fx, s.fy, play.target[2] + distance);
+      const home =
+        Math.abs(s.fx - goal.x) + Math.abs(s.fy - goal.y) + Math.abs(s.fz - goal.zoom) < HOME_EPS;
+      if (easingHome && home) s.fx = Number.NaN;
     } else {
       s.fx = Number.NaN;
     }

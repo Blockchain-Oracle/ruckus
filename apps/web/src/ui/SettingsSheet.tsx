@@ -1,5 +1,7 @@
 import { useSettings } from '@/app/stores/settings.ts';
 import { useUi } from '@/app/stores/ui.ts';
+import { useGameMachine } from '@/engine/gameMachine.ts';
+import { getLoadedGame } from '@/games/loader.ts';
 import type { MessageKey } from '@/i18n/index.ts';
 import { useT } from '@/i18n/index.ts';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/ui/primitives/sheet.tsx';
@@ -23,6 +25,7 @@ export function SettingsSheet() {
   const open = useUi((s) => s.sheet === 'settings');
   const openSheet = useUi((s) => s.openSheet);
   const settings = useSettings();
+  const GameSettings = getLoadedGame(useGameMachine((s) => s.gameId))?.Settings;
 
   return (
     <Sheet open={open} onOpenChange={(o) => openSheet(o ? 'settings' : null)}>
@@ -32,7 +35,7 @@ export function SettingsSheet() {
             {t('settings.title')}
           </SheetTitle>
         </SheetHeader>
-        <div className="flex flex-col gap-6 px-4">
+        <div className="flex flex-col gap-6 overflow-y-auto px-4 pb-24">
           {VOLUMES.map(([key, label]) => (
             <div key={key} className="flex flex-col gap-2 text-sm">
               <span className="flex justify-between">
@@ -64,6 +67,7 @@ export function SettingsSheet() {
               />
             </label>
           ))}
+          {GameSettings && <GameSettings />}
         </div>
       </SheetContent>
     </Sheet>

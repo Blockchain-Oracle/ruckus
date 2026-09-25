@@ -51,13 +51,13 @@ This ledger compares the reference game with our port, one capability per row. I
 
 | Surface | Reference evidence | Reference behavior | Target status | Class | Notes |
 |---|---|---|---|---|---|
-| Default key bindings | `input/InputManager.ts:15-21` | Left `KeyA`/`ArrowLeft`; Right `KeyD`/`ArrowRight`; Jump `KeyW`/`ArrowUp`; Shoot `Space`/`Mouse0`; Taunt `KeyS`/`ArrowDown`. Two slots per action | missing | Exact | Nothing reads the keyboard. The sim takes it through `Sim.set_input(slot, buttons, aim_x, aim_y)` (`crates/chickenz-sim/src/wasm.rs:45`) |
+| Default key bindings | `input/InputManager.ts:15-21` | Left `KeyA`/`ArrowLeft`; Right `KeyD`/`ArrowRight`; Jump `KeyW`/`ArrowUp`; Shoot `Space`/`Mouse0`; Taunt `KeyS`/`ArrowDown`. Two slots per action | have | Exact | `prefs.ts` DEFAULT_BINDINGS, read by `input/keyboard.ts` |
 | Aim derivation | `InputManager.ts:136-142` | `aimX` = −1 if Left is held, +1 if Right, 0 otherwise. `aimY` is always 0. When touch aim is non-zero it overrides the keyboard | missing | Exact | Aim is horizontal only. There is no mouse aim |
 | Mouse buttons | `InputManager.ts:61-67` | `mousedown`/`mouseup` on the canvas set `Mouse{button}`. The context menu is suppressed on the canvas | missing | Exact | Mouse0 (LMB) is the second Shoot binding |
 | Blur clears keys | `InputManager.ts:68-70` | `window.blur` clears every held key, so nothing gets stuck on alt-tab | missing | Exact | |
 | Held keys and edges | `InputManager.ts:118-143`; sim | Keys are level-sampled every tick. The sim needs a rising edge to jump again (hence the touch pulse below) | missing | Exact | Rust adds `JUMP_BUFFER_T = 6` (`constants.rs:26`), a jump buffer. That is **Additive** |
-| Rebinding | `ui/SettingsPanel.ts:201-305`; `index.html:1715-1751` | Click a key button: it shows `...` and gets the `listening` class. The next key or mouse button (capture phase) binds. Modifier-only keys are ignored. A duplicate binding elsewhere is cleared. "Reset Defaults" restores the table. Saved to `localStorage["chickenz-bindings"]` with old-format migration (`InputManager.ts:145-178`) | missing | Exact | Needs a Controls section in `ui/SettingsSheet.tsx`. Key labels come from `friendlyKeyName` (`InputManager.ts:26-39`): `MOUSE1`, `SPACE`, `LEFT`… |
-| Typing guard | `main.ts:734-740`; `SettingsPanel.ts:195-199` | Text inputs `stopPropagation` on keydown and keyup, so typing doesn't move the bird | missing | Exact | Apply to every hub text field while a match runs |
+| Rebinding | `ui/SettingsPanel.ts:201-305`; `index.html:1715-1751` | Click a key button: it shows `...` and gets the `listening` class. The next key or mouse button (capture phase) binds. Modifier-only keys are ignored. A duplicate binding elsewhere is cleared. "Reset Defaults" restores the table. Saved to `localStorage["chickenz-bindings"]` with old-format migration (`InputManager.ts:145-178`) | have | Exact | `hud/ChickenzSettings.tsx`: capture-phase key/mouse bind, modifiers ignored, duplicates cleared, Esc cancels (Additive), Reset defaults; persisted as `ruckus.chickenz.prefs` (`prefs.ts`) |
+| Typing guard | `main.ts:734-740`; `SettingsPanel.ts:195-199` | Text inputs `stopPropagation` on keydown and keyup, so typing doesn't move the bird | have | Exact | `input/keyboard.ts` ignores keys whose target is an INPUT/TEXTAREA |
 | Touch: joystick | `input/TouchControls.ts:17-19,72-82,193-216`; `index.html:1670-1671` | A fixed-base joystick on a canvas covering the left 55% of the width and the bottom 55% of the height. The base is 110 px from the left and 110 px from the bottom. Radius 65, knob radius 28, dead zone 0.18. `nx > 0.3` → Right, `nx < −0.3` → Left | missing | Exact | Show only on touch devices (`"ontouchstart" in window \|\| maxTouchPoints > 0`, `main.ts:42-43`) and only while playing |
 | Touch: jump by pushing up, with auto-jump pulse | `TouchControls.ts:133-141` | Pushing up (`ny < −0.2`) holds Jump for 47 frames, releases it for 3, and repeats every 50 frames. This produces rising edges while the stick is held up | missing | Exact | Counted in rAF frames. A diagonal-up gives move + jump |
 | Touch: tap to taunt | `TouchControls.ts:218-233` | Knob travel under `65 × 0.18 × 1.5 ≈ 17.6 px` and a release under 250 ms sends Taunt for 150 ms | missing | Exact | |
@@ -121,8 +121,8 @@ This ledger compares the reference game with our port, one capability per row. I
 | Height-locked view | `game.ts:9-25` | Always shows 540 world units vertically; VIEW_W widens on wide screens | have | Exact | `config.ts:13-20` (`PLAY_DISTANCE` is height-locked) |
 | Dynamic framing | `scenes/CameraSystem.ts:84-123` | With both alive, `dist = hypot`: zoom 1.3 when `dist < 250`, 1.0 when `dist > 500`, linear between. Centre on the midpoint. Fit guard: `min(VIEW_W/needW, VIEW_H/needH)` with 80 px padding. Smoothing per 60 fps frame: zoom 0.05, position 0.15 (`smoothLerp`, `constants.ts:118-120`) | missing | Adapted | FFA: frame the bounding box of the living birds (ADR-005 "camera-framing data covers every player"), using the same thresholds applied to the box diagonal. The play pose is currently static (`config.ts:19`) |
 | Kill cam | `CameraSystem.ts:91-117` | During `roundTransition` or `deathLingerTimer > 0`, zoom to 1.5 on the survivor. If both are dead, zoom 1.5 at (480, 270) | missing | Exact | View field `H.deathLinger` |
-| Fixed camera (option off) | `CameraSystem.ts:43-53` | Fit the whole arena with 40 px padding. Zoom smoothing 0.1, position 0.15 | partial | Exact | This is what the play pose does now. It becomes the "Dynamic Camera: off" setting |
-| Warmup and tutorial follow cam | `CameraSystem.ts:60-81` | Follow the local bird at zoom 1.3 (zoom 0.05, position 0.15). When dead, return to (480, 270) | missing | Exact | |
+| Fixed camera (option off) | `CameraSystem.ts:43-53` | Fit the whole arena with 40 px padding. Zoom smoothing 0.1, position 0.15 | have | Exact | Dynamic camera off → static full-arena play pose |
+| Warmup and tutorial follow cam | `CameraSystem.ts:60-81` | Follow the local bird at zoom 1.3 (zoom 0.05, position 0.15). When dead, return to (480, 270) | have | Exact | `match/camera.ts` tutorial branch: follow local bird at 1.3× |
 | Round-start snap | `GameScene.ts:969-989` | At the round midpoint, snap to the players' midpoint and fit zoom (80 px padding, ≤ 1.0) so there's no swoop | missing | Exact | |
 | Pixel snapping | `CameraSystem.ts:20-25` | Round the camera scroll to whole pixels | missing | Adapted | With R3F perspective (30° FOV), snap the camera x/y to 1/16-unit steps in play |
 | Attract orbit | none | None | have | Additive | `engine/CameraDirector.tsx` |
@@ -170,7 +170,7 @@ All sheets are 32×32 at 20 fps (`constants.ts:31-39`). Target: `sprites.ts:23-3
 | Taunt (crouch) | `GameScene.ts:427-433,2031-2045` | On the taunt button's rising edge **while grounded**: play `hit` frames 2-6 at 20 fps once (restart if pressed again) and play the hero's taunt sound (interrupting). Local input is read directly for zero latency | partial | Exact | `Bird.tsx:47` shows the full `hit` animation for as long as Taunt is **held**. Change it to edge-triggered frames 2-6 plus the sound |
 | Countdown idle | `GameScene.ts:2035-2037` | Idle is forced while not playing | missing | Exact | |
 | Facing flip | `GameScene.ts:2068` | `flipX` when facing left | have | Exact | `Bird.tsx:127` |
-| Hero assignment | `main.ts:24-36`; `SettingsPanel.ts:392-417`; `GameScene.ts:531-536` | Home and away hero preferences (stored in `localStorage`); the opponent gets a random different hero | partial | Adapted | FFA: every slot shows a distinct hero (`HEROES`). Add a "your hero" choice |
+| Hero assignment | `main.ts:24-36`; `SettingsPanel.ts:392-417`; `GameScene.ts:531-536` | Home and away hero preferences (stored in `localStorage`); the opponent gets a random different hero | have | Adapted | `prefs.hero` takes slot 0 in practice; bots take the other heroes; rooms honour it when free |
 
 ### 2.7 Audio events
 
@@ -211,13 +211,13 @@ In the reference, **every gameplay SFX is synthesised in Web Audio** (`audio/sfx
 |---|---|---|---|---|---|
 | Opening and closing | `SettingsPanel.ts:125-165`; `main.ts:482-494` | Gear button, ✕ button, click on the backdrop, or Esc | have | Adapted | `ui/SettingsSheet.tsx` |
 | Username | `SettingsPanel.ts:167-199` | 1-7 chars, `[A-Za-z0-9_]`, uppercase display, "Saved!" in `#66bb6a` for 1.5 s | partial | Adapted | Identity lives in S04 guest names |
-| Character home/away | `index.html:1694-1712` | ↑/↓ cycle through the 4 heroes | missing | Adapted | Becomes "my hero" in FFA |
-| Controls | `index.html:1713-1752` | 5 actions × 2 slots plus Reset Defaults | missing | Exact | |
+| Character home/away | `index.html:1694-1712` | ↑/↓ cycle through the 4 heroes | have | Adapted | "Your bird" picker in Chickenz settings (`prefs.hero`); used for practice and sent when joining rooms; picking in a room saves it |
+| Controls | `index.html:1713-1752` | 5 actions × 2 slots plus Reset Defaults | have | Exact | 5 actions × 2 slots + Reset defaults (`hud/ChickenzSettings.tsx`) |
 | Music on/off | `index.html:1755-1761` | Checkbox | partial | Adapted | Global mute only |
 | Music volume | `index.html:1762-1768` | Slider 0-100, default 10 | have | Adapted | `musicVolume`, default 0.6 |
 | SFX volume | `index.html:1769-1775` | Slider 0-100, default 80 | have | Adapted | `sfxVolume` 0.9, plus a UI volume (Additive) |
-| Dynamic Camera | `index.html:1779-1786`; `SettingsPanel.ts:370-374` | Checkbox, default on. Off gives the fixed full-arena view | missing | Exact | |
-| Fullscreen | `SettingsPanel.ts:378-390` | Top-bar toggle, ⛶ or ✖ | missing | Exact | |
+| Dynamic Camera | `index.html:1779-1786`; `SettingsPanel.ts:370-374` | Checkbox, default on. Off gives the fixed full-arena view | have | Exact | Settings switch → `prefs.dynamicCamera`; `match/camera.ts` returns null (fixed pose) when off; CameraDirector eases home instead of cutting |
+| Fullscreen | `SettingsPanel.ts:378-390` | Top-bar toggle, ⛶ or ✖ | have | Exact | `ui/FullscreenButton.tsx` in the hub top bar and the match HUD; hidden where fullscreen is unavailable |
 | Version footer | `main.ts:447-452` | `Version: <hash> \| <date>` | missing | Additive | Optional |
 | Reduced motion, haptics | none | None | have | Additive | `stores/settings.ts:17-18` |
 
@@ -228,7 +228,7 @@ In the reference, **every gameplay SFX is synthesised in Web Audio** (`audio/sfx
 | Surface | Reference evidence | Reference behavior | Target status | Class | Notes |
 |---|---|---|---|---|---|
 | First-run prompt | `main.ts:318-360`; `index.html:1642-1651` | "Looks like you're new here / Learn the basics in a quick tutorial" with [Play Tutorial] and [Skip]. Shown when the done flag is missing | missing | Adapted | Hub onboarding (S04) should offer it the first time Chickenz is chosen |
-| Step 1: move | `Tutorial.ts:34-38,155-158` | "Press A/D to move" (mobile: "Use joystick to move"). Done after 30 ticks with Left or Right held | missing | Exact | Generate the key names from the current bindings |
+| Step 1: move | `Tutorial.ts:34-38,155-158` | "Press A/D to move" (mobile: "Use joystick to move"). Done after 30 ticks with Left or Right held | have | Exact | Step text generated from current bindings (`tutorial/steps.ts`) |
 | Step 2: jump | `Tutorial.ts:39-43,160-163` | "Press W to jump" (mobile: "Push joystick up to jump"). Done on any Jump press | missing | Exact | |
 | Step 3: double jump | `Tutorial.ts:44-48,165-169` | "Press W again mid-air to double jump!\nReach the high platform!" (mobile: "Push joystick up again while airborne!…"). Done when airborne with `jumpsLeft == 0` | missing | Exact | Done doesn't actually require reaching the platform |
 | Step 4: weapon | `Tutorial.ts:49-53,171-174` | "Walk over a weapon to pick it up". Done when armed | missing | Exact | |
@@ -236,7 +236,7 @@ In the reference, **every gameplay SFX is synthesised in Web Audio** (`audio/sfx
 | Step 6: stomp escape | `Tutorial.ts:59-63,181-228` | "You've been stomped!\nMash LEFT and RIGHT to escape!" (mobile: "Spin the joystick to escape!"). Setup puts P2 on P0's head with the stomp state armed; P0's HP is pinned at 100. Done when `stompedBy` clears | missing | Adapted | Needs a sim hook to seed a stomp. The reference uses `export_state`/`import_state` edits; our sim has `snapshot`/`restore` (`wasm.rs:92-97`). A tutorial-only setup function in the crate would be cleaner |
 | Step 7: kill | `Tutorial.ts:64-68,230-281` | "Now take them out!" P2 appears 120 px ahead at 15 HP with stomp cooldown 99,999. Done when P2 dies | missing | Adapted | The same sim hook |
 | Step 8: finish | `Tutorial.ts:69-74,318-324` | "You're ready! Good luck!" Advances automatically after 3,000 ms | missing | Exact | |
-| Skip and replay | `Tutorial.ts:112-115`; `main.ts:757-775` | Replay from ⋯ → Tutorial. The `btn-tutorial-skip-step` handler is bound, but that element doesn't exist in the HTML | missing | Adapted | Give us a visible "Skip tutorial" button |
+| Skip and replay | `Tutorial.ts:112-115`; `main.ts:757-775` | Replay from ⋯ → Tutorial. The `btn-tutorial-skip-step` handler is bound, but that element doesn't exist in the HTML | have | Adapted | "Skip tutorial" button; Settings → Replay tutorial (`flow.ts` replayTutorial) from the hub or mid-practice |
 | Username after tutorial | `main.ts:365-407`; `index.html:1655-1665` | "Choose a Username", 1-7 chars, "LET'S GO!" | missing | Adapted | S04 guest identity |
 | HUD in tutorial | `GameScene.ts:2226-2233`; `GameScene.ts:690-691` | Timer, round, sudden-death and weapon HUD hidden | missing | Exact | |
 

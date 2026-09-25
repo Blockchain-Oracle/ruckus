@@ -10,6 +10,7 @@ import { useT } from '@/i18n/index.ts';
 import { BalancePill } from '@/ui/BalancePill.tsx';
 import { Button } from '@/ui/Button.tsx';
 import { CabinetTile } from '@/ui/CabinetTile.tsx';
+import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { Logo } from '@/ui/Logo.tsx';
 
 import { useShell } from './stores/shell.ts';
@@ -78,6 +79,7 @@ function TopBar({ hidden }: { hidden: boolean }) {
       <Logo className="text-3xl sm:text-4xl" />
       <div className="pointer-events-auto flex items-center gap-3">
         <BalancePill />
+        <FullscreenButton />
         <button
           type="button"
           aria-label="Settings"

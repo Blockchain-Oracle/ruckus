@@ -33,6 +33,8 @@ export type GameModule = {
   preload?: () => Promise<unknown>;
   /** Extra hub buttons next to Play (e.g. a wager entry point). */
   HubActions?: ComponentType;
+  /** The game's own section in the hub settings sheet (controls, camera, character). */
+  Settings?: ComponentType;
   /** Always-mounted DOM layer while this game is selected: sheets, HUDs, result cards. */
   Overlay?: ComponentType;
 };

@@ -14,6 +14,7 @@ import {
   SheetTitle,
 } from '@/ui/primitives/sheet.tsx';
 
+import { useChickenzPrefs } from '../prefs.ts';
 import { HERO_NAMES, HEROES, type Hero } from '../sprites.ts';
 import { HeroPortrait } from '../wager/HeroPortrait.tsx';
 import { isHero } from './heroes.ts';
@@ -230,7 +231,10 @@ function Lobby() {
                   className="sr-only"
                   checked={mine}
                   disabled={disabled}
-                  onChange={() => sendCommand(CHICKENZ_MSG.hero, h)}
+                  onChange={() => {
+                    sendCommand(CHICKENZ_MSG.hero, h);
+                    useChickenzPrefs.getState().set({ hero: h });
+                  }}
                 />
                 <HeroPortrait hero={h} className="w-10" />
               </label>

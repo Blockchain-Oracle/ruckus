@@ -1,13 +1,16 @@
-import { ArrowLeftIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, GearSixIcon } from '@phosphor-icons/react';
 
 import { ALIVE_FLAG, H, MAX_HEALTH_HP, P, playerBase, TICK_HZ } from '@arena/sim-chickenz';
 
+import { useUi } from '@/app/stores/ui.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 
 import { WINS_TO_TAKE_MATCH } from '../match/config.ts';
 import { getDriver } from '../match/runtime.ts';
 import { useMatch } from '../match/store.ts';
+import { primaryKey, useChickenzPrefs } from '../prefs.ts';
 import { HeroPortrait } from '../wager/HeroPortrait.tsx';
 import { useTick } from './useTick.ts';
 
@@ -38,7 +41,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
 
   return (
     <div className="pointer-events-none absolute inset-0 font-pixel">
-      <div className="absolute inset-x-0 top-3 flex justify-center gap-2 pr-4 pl-16 sm:gap-3 [@media(pointer:fine)]:top-4 [@media(pointer:fine)]:px-4">
+      <div className="absolute inset-x-0 top-3 flex justify-center gap-2 px-16 sm:gap-3 [@media(pointer:fine)]:top-4">
         {heroes.map((hero, slot) => {
           const b = playerBase(slot);
           const hp = Math.max(0, v[b + P.health] ?? 0);
@@ -87,7 +90,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         })}
       </div>
 
-      <div className="tabular absolute top-20 right-4 text-lg text-cream sm:top-24 sm:right-8 sm:text-xl">
+      <div className="tabular absolute top-[7.5rem] right-4 text-lg text-cream sm:right-8 sm:text-xl">
         {status === 'playing' || status === 'roundOver' ? `${secondsLeft}s` : ''}
       </div>
 
@@ -125,12 +128,23 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         </div>
       )}
 
-      <div className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream-dim [@media(pointer:fine)]:sm:block sm:left-8">
-        A/D move · W jump · Space shoot · S taunt
+      <div className="absolute bottom-6 left-4 hidden text-[10px] uppercase text-cream [text-shadow:1px_1px_0_#000] [@media(pointer:fine)]:sm:block sm:left-8">
+        <ControlsHint />
       </div>
 
       <div className="pointer-events-auto absolute top-20 left-4 sm:top-4 sm:left-auto sm:right-auto">
         <span className="sr-only">{status}</span>
+      </div>
+      <div className="pointer-events-auto absolute top-3 right-3 flex flex-col gap-2 sm:right-8 [@media(pointer:fine)]:top-4">
+        <button
+          type="button"
+          aria-label="Settings"
+          onClick={() => useUi.getState().openSheet('settings')}
+          className="grid size-10 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream hover:border-cream-dim"
+        >
+          <GearSixIcon weight="bold" className="size-5" />
+        </button>
+        <FullscreenButton className="bg-ink/85" />
       </div>
       <button
         type="button"
@@ -146,6 +160,16 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function ControlsHint() {
+  const b = useChickenzPrefs((s) => s.bindings);
+  return (
+    <>
+      {primaryKey(b, 'left')}/{primaryKey(b, 'right')} move · {primaryKey(b, 'jump')} jump ·{' '}
+      {primaryKey(b, 'shoot')} shoot · {primaryKey(b, 'taunt')} taunt
+    </>
   );
 }
 

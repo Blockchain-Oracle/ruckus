@@ -1,21 +1,16 @@
 import { Button } from '@arena/sim-chickenz';
 
+import { type Action, type Bindings, useChickenzPrefs } from '../prefs.ts';
+
 /**
- * Chickenz's controls (`apps/client/src/input/InputManager.ts`): two bindable codes per action,
- * aim follows the last horizontal direction, shots go where you face.
+ * Chickenz's input manager (`apps/client/src/input/InputManager.ts`): level-sampled keys through
+ * the player's bindings, aim follows the last horizontal direction, shots go where you face.
  */
-export const DEFAULT_BINDINGS = {
-  left: ['KeyA', 'ArrowLeft'],
-  right: ['KeyD', 'ArrowRight'],
-  jump: ['KeyW', 'ArrowUp'],
-  shoot: ['Space', 'Mouse0'],
-  taunt: ['KeyS', 'ArrowDown'],
-} as const satisfies Record<string, readonly [string, string]>;
-
-type Action = keyof typeof DEFAULT_BINDINGS;
-
-/** Keys the game consumes: stop the page scrolling / buttons activating while playing. */
-const CAPTURED = new Set<string>(Object.values(DEFAULT_BINDINGS).flat());
+const captured = (b: Bindings) => new Set<string>(Object.values(b).flat().filter(Boolean));
+let CAPTURED = captured(useChickenzPrefs.getState().bindings);
+useChickenzPrefs.subscribe((s) => {
+  CAPTURED = captured(s.bindings);
+});
 
 export class KeyboardInput {
   private down = new Set<string>();
@@ -65,8 +60,8 @@ export class KeyboardInput {
   }
 
   private pressed(action: Action) {
-    const [a, b] = DEFAULT_BINDINGS[action];
-    return this.down.has(a) || this.down.has(b);
+    const [a, b] = useChickenzPrefs.getState().bindings[action];
+    return (a !== '' && this.down.has(a)) || (b !== '' && this.down.has(b));
   }
 
   read(): { buttons: number; aimX: -1 | 0 | 1 } {

@@ -1,5 +1,6 @@
 import { Button } from '@/ui/Button.tsx';
 
+import { ACTIONS, primaryKey, useChickenzPrefs } from '../prefs.ts';
 import { useTutorial } from '../tutorial/director.ts';
 import { STEPS } from '../tutorial/steps.ts';
 import { useCoarsePointer } from './TouchControls.tsx';
@@ -8,6 +9,7 @@ import { useCoarsePointer } from './TouchControls.tsx';
 export function TutorialHud({ onSkip }: { onSkip: () => void }) {
   const step = useTutorial((s) => s.step);
   const coarse = useCoarsePointer();
+  const bindings = useChickenzPrefs((s) => s.bindings);
   const current = STEPS[step];
   if (!current) return null;
   return (
@@ -18,7 +20,14 @@ export function TutorialHud({ onSkip }: { onSkip: () => void }) {
             Step {step + 1} / {STEPS.length}
           </div>
           <div className="mt-1 whitespace-pre-line text-sm text-white">
-            {coarse ? current.touch : current.text}
+            {coarse
+              ? current.touch
+              : current.text(
+                  Object.fromEntries(ACTIONS.map((a) => [a, primaryKey(bindings, a)])) as Record<
+                    (typeof ACTIONS)[number],
+                    string
+                  >,
+                )}
           </div>
         </div>
       </div>

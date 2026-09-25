@@ -5,6 +5,7 @@ import type { GameModule } from '@/engine/types.ts';
 
 import { loadChickenzSfx } from './audio/sfx.ts';
 import { rig } from './config.ts';
+import { ChickenzSettings } from './hud/ChickenzSettings.tsx';
 import { ChickenzScene } from './Scene.tsx';
 import { loadSprites } from './sprites.ts';
 import { ChickenzHubActions } from './wager/HubActions.tsx';
@@ -16,4 +17,5 @@ export const chickenz: GameModule = {
   preload: () => Promise.all([loadSprites(), loadChickenz(wasmUrl), loadChickenzSfx()]),
   HubActions: ChickenzHubActions,
   Overlay: ChickenzOverlay,
+  Settings: ChickenzSettings,
 };

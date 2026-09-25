@@ -16,7 +16,7 @@ import { useProfile } from '@/app/stores/profile.ts';
 import { writeUrlState } from '@/app/urlState.ts';
 import { env } from '@/config/env.ts';
 
-import { useWager } from '../wager/store.ts';
+import { useChickenzPrefs } from '../prefs.ts';
 import { type SeatView, useRoom } from './roomStore.ts';
 
 type Handlers = {
@@ -104,7 +104,7 @@ function friendlyError(cause: unknown): string {
 const joinOptions = (priv: boolean): ChickenzJoinOptions => ({
   protocolVersion: PROTOCOL_VERSION,
   name: useProfile.getState().name,
-  hero: useWager.getState().hero,
+  hero: useChickenzPrefs.getState().hero,
   private: priv,
 });
 
