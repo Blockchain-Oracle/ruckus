@@ -1,6 +1,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useState } from 'react';
 
+import { backBirdClass, runBotRound } from '@arena/sim-chickenz';
+
 import { useProfile } from '@/app/stores/profile.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
 import type { GameSceneProps } from '@/engine/types.ts';
@@ -124,8 +126,10 @@ export function ChickenzScene({ generation }: GameSceneProps) {
 
   useEffect(() => {
     driver.onRoundEnd = () => {
-      if (driver.kind === 'fight') useWager.getState().set({ fightDone: true, phase: 'result' });
-      else if (useMatch.getState().status === 'playing') matchDirector.handleRoundEnd();
+      if (driver.kind === 'fight') {
+        if (import.meta.env.DEV) recordFight(driver);
+        useWager.getState().set({ fightDone: true, phase: 'result' });
+      } else if (useMatch.getState().status === 'playing') matchDirector.handleRoundEnd();
     };
   }, [driver, matchDirector]);
 
@@ -188,4 +192,26 @@ export function ChickenzScene({ generation }: GameSceneProps) {
       <Zone driver={driver} />
     </>
   );
+}
+
+/**
+ * Dev-only evidence for the simulator e2e: the presented fight's final state hash next to the
+ * canonical headless run of the same bank seed, and that run's class.
+ */
+function recordFight(driver: ChickenzDriver) {
+  const fight = useWager.getState().fight;
+  if (!fight) return;
+  const difficulties = Array.from({ length: PRESENTATION.players }, () => PRESENTATION.difficulty);
+  const canonical = runBotRound(fight.seed, fight.mapId, difficulties);
+  Object.assign(globalThis, {
+    __ruckusFight: {
+      sessionId: fight.sessionId,
+      settledClass: fight.outcomeClass,
+      presentedClass: backBirdClass(fight.seed, fight.mapId, difficulties),
+      liveHash: String(driver.overHash),
+      canonicalHash: canonical.hash.toString(),
+      payout: fight.payout.toString(),
+      wager: fight.wager.toString(),
+    },
+  });
 }

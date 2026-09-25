@@ -1,4 +1,5 @@
 import init, {
+  back_bird_class,
   type InitInput,
   initSync,
   run_bot_round,
@@ -57,3 +58,7 @@ export function runBotRound(
     hash: (hi << 32n) | lo,
   };
 }
+
+/** Back-a-Bird class of slot 0 for a bank exhibition (0 flawless, 1 win, 2 runner-up, 3 lose). */
+export const backBirdClass = (seed: number, mapId: number, difficulties: readonly number[]) =>
+  back_bird_class(seed >>> 0, mapId, Int32Array.from(difficulties));

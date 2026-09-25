@@ -48,6 +48,16 @@ export class ChickenzDriver {
   alpha = 0;
   /** Bumped whenever the sim is replaced (map may change, per-round visuals reset). */
   round = 0;
+  /**
+   * State hash on the exact tick the round ended. Rounds may keep stepping afterwards (the taunt
+   * window), so this is what matches a headless `run_bot_round` of the same seed.
+   */
+  overHash: bigint | null = null;
+
+  private noteOver(sim: Sim) {
+    if (this.overHash === null && sim.match_over()) this.overHash = sim.hash();
+  }
+
   /** While frozen (countdowns) the world holds still but keeps rendering. */
   frozen = false;
   private accumulator = 0;
@@ -125,6 +135,7 @@ export class ChickenzDriver {
       }
     }
     this.ended = false;
+    this.overHash = null;
     this.overFor = 0;
     this.accumulator = 0;
     this.pending = [];
@@ -171,6 +182,7 @@ export class ChickenzDriver {
       this.prev.set(this.curr);
       sim.step();
       sim.view(this.curr);
+      this.noteOver(sim);
       this.onStep?.(this.prev, this.curr);
       this.accumulator -= TICK_S;
     }
@@ -233,6 +245,7 @@ export class ChickenzDriver {
     const sim = this.current;
     if (!sim || this.mode.kind !== 'fight') return;
     for (let i = 0; i < SKIP_LIMIT_TICKS && !sim.match_over(); i++) sim.step();
+    this.noteOver(sim);
     sim.view(this.curr);
     this.prev.set(this.curr);
   }

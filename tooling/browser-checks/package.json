@@ -11,7 +11,8 @@
     "check:server": "tsx src/server-hello.ts",
     "connectivity": "tsx src/connectivity.ts",
     "chickenz-room": "tsx src/chickenz-room.ts",
-    "firefox": "tsx src/firefox-probe.ts"
+    "firefox": "tsx src/firefox-probe.ts",
+    "back-bird": "tsx src/back-bird-e2e.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

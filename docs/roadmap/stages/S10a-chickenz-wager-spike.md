@@ -53,8 +53,10 @@
 - [x] Miner (Rust example) and bank v1
 - [x] `@arena/casino-math` presentation: `presentationIndex`, `presentationSeed`, `bankHash`
 - [x] CI validation of every bank entry
-- [ ] The Back a Bird flow in the hub (hero pick, stake, bridge `openSession`, suspense, reveal, live fight, payout tier), in demo mode and in the simulator
-- [ ] Simulator e2e: bet → WAITING_RANDOMNESS → reveal → the presented fight's class equals the settled class
+- [x] The Back a Bird flow in the hub (hero pick, stake, bridge `openSession`, suspense, reveal, live fight, payout tier), in demo mode and in the simulator
+- [x] Simulator e2e: bet → WAITING_RANDOMNESS → reveal → the presented fight's class equals the settled class
+  - `pnpm -F @arena/browser-checks back-bird` drives the real hub UI in the simulator frame and loops until the 6× class lands. Every round checks: presented class = settled class, the live fight's hash at match over = the headless `run_bot_round` hash for the bank seed, and payout = stake × class multiplier.
+  - 2026-09-25 run: 10 rounds, all 4 classes seen (flawless 6× on round 7), PASS.
 
 ## Acceptance
 - The wager design passes the novelty check.
