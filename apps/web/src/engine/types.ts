@@ -21,6 +21,12 @@ export type CameraRig = {
    * distance). Return null to hold the static play pose. `aspect` lets games clamp to their bounds.
    */
   follow?: (aspect: number) => { x: number; y: number; zoom: number } | null;
+  /**
+   * Optional full camera control during play (an orbiting aim camera, a replay cut): where the
+   * camera sits and what it looks at, already smoothed by the game. Wins over `follow`; the entry
+   * dolly still blends into it. Return null to fall back to `play`/`follow`.
+   */
+  pose?: (aspect: number) => { position: Vec3; target: Vec3 } | null;
 };
 
 export type GameSceneProps = { phase: Phase; generation: number };

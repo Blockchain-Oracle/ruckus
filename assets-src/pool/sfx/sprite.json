@@ -1,0 +1,15 @@
+{
+  "loudnessLufs": -18,
+  "sounds": {
+    "pool.cue.soft": { "src": "cue_soft.mp3" },
+    "pool.cue.hard": { "src": "cue_hard.mp3" },
+    "pool.clack~1": { "src": "clack_a.mp3" },
+    "pool.clack~2": { "src": "clack_b.mp3" },
+    "pool.clack~3": { "src": "clack_c.mp3" },
+    "pool.cushion~1": { "src": "cushion.mp3" },
+    "pool.cushion~2": { "src": "cushion_b.mp3" },
+    "pool.pocket": { "src": "pocket.mp3" },
+    "pool.gully": { "src": "gully.mp3" },
+    "pool.chalk": { "src": "chalk.mp3" }
+  }
+}

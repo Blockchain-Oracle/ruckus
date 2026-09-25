@@ -1,12 +1,12 @@
 import type { GameModule } from '@/engine/types.ts';
 
-export type GameId = 'chickenz';
+export type GameId = 'chickenz' | 'pool';
 
 type GameEntry = {
   id: GameId;
   title: string;
   /** i18n key for the one-line pitch on the cabinet tile. */
-  taglineKey: 'games.chickenz.tagline';
+  taglineKey: 'games.chickenz.tagline' | 'games.pool.tagline';
   players: string;
   /** Hidden games are never shown as "coming soon" (PLAN §1 decision 7). */
   hidden: boolean;
@@ -22,6 +22,15 @@ export const GAMES = [
     players: '2–4',
     hidden: false,
     load: () => import('./chickenz/index.ts').then((m) => m.chickenz),
+  },
+  {
+    id: 'pool',
+    title: '8-Ball',
+    taglineKey: 'games.pool.tagline',
+    players: '1–2',
+    // Shown once it is fully playable (play-first rule); `?preview` shows it meanwhile.
+    hidden: true,
+    load: () => import('./pool/index.ts').then((m) => m.pool),
   },
 ] as const satisfies readonly GameEntry[];
 

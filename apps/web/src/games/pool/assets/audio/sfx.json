@@ -1,0 +1,42 @@
+{
+  "pool.cue.soft": {
+    "start": 0,
+    "duration": 0.48
+  },
+  "pool.cue.hard": {
+    "start": 0.58,
+    "duration": 0.2052
+  },
+  "pool.clack~1": {
+    "start": 0.8852,
+    "duration": 0.102
+  },
+  "pool.clack~2": {
+    "start": 1.0872,
+    "duration": 0.0598
+  },
+  "pool.clack~3": {
+    "start": 1.247,
+    "duration": 0.0542
+  },
+  "pool.cushion~1": {
+    "start": 1.4012,
+    "duration": 0.5987
+  },
+  "pool.cushion~2": {
+    "start": 2.0999,
+    "duration": 0.0881
+  },
+  "pool.pocket": {
+    "start": 2.288,
+    "duration": 0.254
+  },
+  "pool.gully": {
+    "start": 2.642,
+    "duration": 1.1685
+  },
+  "pool.chalk": {
+    "start": 3.9106,
+    "duration": 0.582
+  }
+}

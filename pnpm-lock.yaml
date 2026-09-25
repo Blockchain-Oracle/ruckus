@@ -123,6 +123,9 @@ importers:
       '@arena/sim-chickenz':
         specifier: workspace:*
         version: link:../../packages/sim-chickenz
+      '@arena/sim-pool':
+        specifier: workspace:*
+        version: link:../../packages/sim-pool
       '@chain/casino-sdk':
         specifier: workspace:*
         version: link:../../packages/chain-casino-sdk

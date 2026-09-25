@@ -19,6 +19,7 @@ export const en = {
   'settings.reducedMotion': 'Reduce motion',
   'settings.haptics': 'Vibration',
   'games.chickenz.tagline': 'Four birds, one arena. Last chicken standing.',
+  'games.pool.tagline': 'Real cloth, real spin. Sink your group, call the 8.',
 } as const;
 
 export type MessageKey = keyof typeof en;

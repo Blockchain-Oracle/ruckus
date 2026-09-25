@@ -95,9 +95,14 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     );
     playPos.set(...play.position);
     playTarget.set(...play.target);
-    const follow = phase === 'attract' ? null : (rig.follow?.(camera.aspect) ?? null);
+    const pose = phase === 'attract' ? null : (rig.pose?.(camera.aspect) ?? null);
+    if (pose) {
+      playPos.set(...pose.position);
+      playTarget.set(...pose.target);
+    }
+    const follow = phase === 'attract' || pose ? null : (rig.follow?.(camera.aspect) ?? null);
     // Once following, a null follow eases back to the static pose instead of cutting to it.
-    const easingHome = !follow && !Number.isNaN(s.fx) && phase !== 'attract';
+    const easingHome = !follow && !pose && !Number.isNaN(s.fx) && phase !== 'attract';
     if (follow || easingHome) {
       if (Number.isNaN(s.fx)) {
         s.fx = play.target[0];
