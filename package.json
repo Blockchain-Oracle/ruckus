@@ -1,7 +1,7 @@
 {
   "name": "ruckus",
   "private": true,
-  "description": "RUCKUS — multiplayer party arena with VRF casino wagers (Chain Jam Vol. 1)",
+  "description": "RUCKUS \u2014 multiplayer party arena with VRF casino wagers (Chain Jam Vol. 1)",
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "engines": {
@@ -14,7 +14,8 @@
     "test": "turbo run test",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "verify": "pnpm check && pnpm typecheck && pnpm test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",

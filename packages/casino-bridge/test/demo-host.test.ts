@@ -106,7 +106,7 @@ describe('DemoHost', () => {
 describe('reveal guard', () => {
   it('reveals exactly once — by presentation, watchdog or dispose', () => {
     vi.useFakeTimers();
-    const reveal = vi.fn(async () => {});
+    const reveal = vi.fn(async (_sessionId: string) => {});
     const guard = createRevealGuard(reveal, 1_000);
     guard.arm('a');
     guard.arm('b');
