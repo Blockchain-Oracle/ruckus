@@ -1,5 +1,6 @@
 import {
   DT,
+  gauntletWorld,
   IDLE,
   type Input,
   newWorld,
@@ -9,7 +10,9 @@ import {
   type SimEvent,
   tick,
   unpackWorld,
+  WIPEOUTS,
   type World,
+  wipeoutOf,
 } from '@arena/sim-runner';
 
 import { EXHIBITION_RESTART_S, EXHIBITION_SKILLS } from '../config.ts';
@@ -18,7 +21,9 @@ export type RunnerMode =
   | { kind: 'exhibition' }
   | { kind: 'race'; bot: number; humanSlot: number }
   /** A room race: `humanSlot` is −1 for watchers. */
-  | { kind: 'online'; humanSlot: number };
+  | { kind: 'online'; humanSlot: number }
+  /** Call the Wipeout: a bank seed's gauntlet, watched (no human runner). */
+  | { kind: 'wager'; seed: number };
 
 /** Longest frame we'll catch up on; beyond this the race just slows rather than spiralling. */
 const MAX_STEPS_PER_FRAME = 8;
@@ -51,6 +56,10 @@ export class RunnerDriver {
   private frames: number[] = [];
   /** Recorded runs racing as ghosts, by sim slot (a challenger's run). */
   private replays = new Map<number, Recording>();
+  /** Holds the race still (a wager's lineup before the call, its last frame after). */
+  paused = false;
+  /** Names a gauntlet's ending as it happens (wager mode only), once. */
+  onEnding: ((ending: number) => void) | null = null;
   readInput: () => Input = () => IDLE;
   sendInput: ((seq: number, input: Input) => void) | null = null;
 
@@ -93,6 +102,35 @@ export class RunnerDriver {
     return { seed: this.world.seed, frames: Uint8Array.from(this.frames) };
   }
 
+  /** A bank seed's gauntlet; `paused` shows its start line until the round is settled. */
+  startGauntlet(seed: number, paused: boolean) {
+    this.mode = { kind: 'wager', seed };
+    this.world = gauntletWorld(seed);
+    this.reset();
+    this.paused = paused;
+  }
+
+  /** Tap to skip: run the gauntlet straight to its ending. */
+  skipToEnd() {
+    if (this.mode.kind !== 'wager') return;
+    const w = this.world;
+    for (let i = 0; i < 6_000 && this.onEnding; i++) {
+      tick(w);
+      for (const e of w.events) this.queue.push(e);
+      this.checkEnding(w.events);
+    }
+    this.snapshot();
+  }
+
+  private checkEnding(events: readonly SimEvent[]) {
+    if (!this.onEnding) return;
+    const ending = wipeoutOf(this.world, events);
+    if (!ending) return;
+    const done = this.onEnding;
+    this.onEnding = null;
+    done(WIPEOUTS.indexOf(ending));
+  }
+
   startOnline(seed: number, bots: readonly number[], humanSlot: number) {
     this.mode = { kind: 'online', humanSlot };
     this.world = newWorld(seed, bots);
@@ -107,6 +145,8 @@ export class RunnerDriver {
     this.seqNo = 0;
     this.frames = [];
     this.replays = new Map();
+    this.paused = false;
+    this.onEnding = null;
     this.smooth = this.world.runners.map(() => ({ s: 0, y: 0 }));
     this.snapshot();
   }
@@ -142,6 +182,7 @@ export class RunnerDriver {
       s.s *= k;
       s.y *= k;
     }
+    if (this.paused) return;
     if (w.phase === 'over') {
       if (this.mode.kind === 'exhibition') {
         if (this.restartIn < 0) this.restartIn = EXHIBITION_RESTART_S;
@@ -176,6 +217,7 @@ export class RunnerDriver {
       // Frame i is the input applied going into tick i + 1, exactly how a replay feeds it back.
       if (human) this.frames[at] = packInput(human.input);
       for (const e of w.events) this.queue.push(e);
+      this.checkEnding(w.events);
     }
     if (steps === MAX_STEPS_PER_FRAME) this.acc = 0;
     this.alpha = this.acc / DT;

@@ -11,9 +11,13 @@ import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 import { SLOTS } from '../config.ts';
 import { useRunner } from '../match/store.ts';
 import { applyPendingRace, runnerRooms, watchRoomPhase } from '../net/online.ts';
+import { closeCallTheWipeout, useWipeoutController } from '../wager/controller.ts';
+import { useWipeoutBet } from '../wager/store.ts';
+import { WipeoutHud } from '../wager/WipeoutHud.tsx';
 import { RunnerHud } from './RunnerHud.tsx';
 
 const leave = () => {
+  if (useWipeoutBet.getState().phase !== 'off') closeCallTheWipeout();
   // Leaving the road online leaves the room too (a labelled bot takes the runner).
   if (runnerRooms.inRoom()) void runnerRooms.leaveRoom();
   useGameMachine.getState().send('leaving');
@@ -35,7 +39,9 @@ const seatBadge = (seat: SeatView) => {
 
 /** The Runner's DOM layer: the race HUD owns the screen while a race (or its intro) is up. */
 export function RunnerOverlay() {
-  const busy = useRunner((s) => s.status !== 'off');
+  const betting = useWipeoutBet((s) => s.phase !== 'off');
+  const busy = useRunner((s) => s.status !== 'off') || betting;
+  useWipeoutController();
   const setGameOwnsHud = useShell((s) => s.setGameOwnsHud);
   const setImmersive = useShell((s) => s.setImmersive);
   useEffect(() => watchRoomPhase(), []);
@@ -60,6 +66,7 @@ export function RunnerOverlay() {
   return (
     <>
       <RunnerHud onLeave={leave} />
+      <WipeoutHud onLeave={leave} />
       <RoomSheet
         kit={runnerRooms}
         gameId="runner"

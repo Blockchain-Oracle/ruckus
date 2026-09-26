@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, Color, type InstancedMesh, type Mesh, Object3D } from 'three/webgpu';
 
-import { COURSE_M, LANE_WIDTH_M, LANES } from '@arena/sim-runner';
+import { LANE_WIDTH_M, LANES } from '@arena/sim-runner';
 
 import { COLORS, VIEW_AHEAD_M, VIEW_BEHIND_M, zAt } from '../config.ts';
 import { finishTexture, roadTexture } from './textures.ts';
@@ -22,7 +22,7 @@ const TEAL = new Color(COLORS.laneLeft);
 const PURPLE = new Color(COLORS.laneRight);
 
 /** The neon road: grid asphalt, glowing lane dividers, edge rails and pulsing edge lights. */
-export function Road({ focusS }: { focusS: () => number }) {
+export function Road({ focusS, finishM }: { focusS: () => number; finishM: () => number }) {
   const road = useRef<Mesh>(null);
   const lights = useRef<InstancedMesh>(null);
   const finish = useRef<Mesh>(null);
@@ -64,7 +64,7 @@ export function Road({ focusS }: { focusS: () => number }) {
     }
     const f = finish.current;
     if (f) {
-      const z = zAt(COURSE_M, s);
+      const z = zAt(finishM(), s);
       f.visible = z > -VIEW_AHEAD_M && z < VIEW_BEHIND_M;
       f.position.z = z;
     }

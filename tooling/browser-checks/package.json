@@ -19,7 +19,8 @@
     "soccer-tutorial": "tsx src/soccer-tutorial.ts",
     "soccer-finish": "tsx src/soccer-finish-e2e.ts",
     "runner-room": "tsx src/runner-room.ts",
-    "runner-challenge": "tsx src/runner-challenge.ts"
+    "runner-challenge": "tsx src/runner-challenge.ts",
+    "runner-wipeout": "tsx src/runner-wipeout-e2e.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

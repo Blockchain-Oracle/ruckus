@@ -116,7 +116,8 @@ export function Runners({
       body.play(...pickClip(w.phase, r, b, speed, coast));
       body.update(delta);
       // Flicker while invulnerable after a hit (the classic "you're safe for a second" read).
-      body.root.visible = !(r.invulnerable > 0 && Math.floor(t.current * HIT_BLINK_HZ) % 2 === 0);
+      body.root.visible =
+        r.out || !(r.invulnerable > 0 && Math.floor(t.current * HIT_BLINK_HZ) % 2 === 0);
       const ring = rings.current[i];
       if (ring) {
         ring.position.y = (r.platform >= 0 ? pose.y : 0) - pose.y + 0.02;

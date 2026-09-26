@@ -25,6 +25,8 @@ import { Road } from './render/Road.tsx';
 import { Runners } from './render/Runners.tsx';
 import { Sparks } from './render/Sparks.tsx';
 import { SpeedLines } from './render/SpeedLines.tsx';
+import { closeCallTheWipeout } from './wager/controller.ts';
+import { useWipeoutBet } from './wager/store.ts';
 
 const ATTRACT_SEED = 0xda5;
 /** DAG Dasher's fog (30 → 150 m); the Fog debuff pulls it in to 5 → 35 m. */
@@ -77,13 +79,21 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
   // exhibition under the hub menu.
   useEffect(() => {
     if (phase === 'attract') setWindBed('backdrop');
-    if (phase === 'entering' && useRunner.getState().status === 'off' && !runnerRooms.inRoom()) {
+    // In a room the server starts the race, and a wager has its own gauntlet: no practice then.
+    const betting = useWipeoutBet.getState().phase !== 'off';
+    if (
+      phase === 'entering' &&
+      useRunner.getState().status === 'off' &&
+      !runnerRooms.inRoom() &&
+      !betting
+    ) {
       fx.clear();
       const challenge = consumeChallenge();
       if (challenge) startChallenge(challenge);
       else if (controlsSeen()) startRace();
       else useRunner.getState().set({ status: 'intro' });
     } else if (phase === 'leaving') {
+      if (betting) closeCallTheWipeout();
       stopRace();
       fx.clear();
       setWindBed('backdrop');
@@ -128,7 +138,7 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
       <pointLight position={[-5, 5, -10]} color="#9945ff" intensity={30} distance={50} />
       <pointLight position={[0, 3, 5]} color="#00d9ff" intensity={12} distance={30} />
       <City focusS={focusS} />
-      <Road focusS={focusS} />
+      <Road focusS={focusS} finishM={() => driver.world.finishM} />
       <Barriers world={world} focus={focus} focusS={focusS} />
       <Collectibles world={world} focus={focus} focusS={focusS} />
       <Runners driver={() => driver} events={() => events.current} />

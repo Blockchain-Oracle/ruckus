@@ -1,4 +1,4 @@
-import { FlagCheckeredIcon, GlobeIcon } from '@phosphor-icons/react';
+import { FlagCheckeredIcon, GlobeIcon, LightningIcon } from '@phosphor-icons/react';
 
 import { useGameMachine } from '@/engine/gameMachine.ts';
 import { Button } from '@/ui/Button.tsx';
@@ -6,10 +6,11 @@ import { Button } from '@/ui/Button.tsx';
 import { queueChallenge } from '../match/flow.ts';
 import { clearChallenge, raceClock, readChallenge } from '../net/challenge.ts';
 import { runnerRooms } from '../net/online.ts';
+import { openCallTheWipeout } from '../wager/controller.ts';
 
 /**
- * The Runner's extra hub buttons: race online (friends, bots, watchers), and when this page came
- * from a "beat my run" link, race that run's ghost.
+ * The Runner's extra hub buttons: race online (friends, bots, watchers), Call the Wipeout (the
+ * wager), and when this page came from a "beat my run" link, race that run's ghost.
  */
 export function RunnerHubActions() {
   const challenge = readChallenge();
@@ -38,6 +39,9 @@ export function RunnerHubActions() {
         onClick={() => runnerRooms.useRoom.getState().set({ sheetOpen: true })}
       >
         <GlobeIcon weight="bold" /> Online
+      </Button>
+      <Button variant="gold" size="lg" sound="ui.coin" onClick={openCallTheWipeout}>
+        <LightningIcon weight="bold" /> Call the Wipeout
       </Button>
     </>
   );
