@@ -13,6 +13,7 @@ import { CabinetTile } from '@/ui/CabinetTile.tsx';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { Logo } from '@/ui/Logo.tsx';
 
+import { ArenaLanding } from './ArenaLanding.tsx';
 import { useShell } from './stores/shell.ts';
 import { useUi } from './stores/ui.ts';
 
@@ -73,7 +74,7 @@ function TopBar({ hidden }: { hidden: boolean }) {
   return (
     <header
       aria-hidden={hidden}
-      className="relative flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] transition-opacity duration-300 sm:px-8"
+      className="relative z-20 flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] transition-opacity duration-300 sm:px-8"
       style={{ opacity: hidden ? 0 : 1, visibility: hidden ? 'hidden' : 'visible' }}
     >
       <Logo className="text-3xl sm:text-4xl" />
@@ -106,6 +107,9 @@ function HubMenu() {
     writeUrlState({ game: id });
     void select(id);
   };
+
+  // No game chosen: the arena landing, every cabinet with its footage.
+  if (!game && games.length > 1) return <ArenaLanding onChoose={choose} />;
 
   return (
     <m.main

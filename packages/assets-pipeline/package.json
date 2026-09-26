@@ -8,6 +8,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
+    "previews": "node src/encode-previews.ts ../../assets-src/hub/previews/raw ../../apps/web/src/assets/previews",
     "audio:hub": "node src/audio-sprite.ts ../../assets-src/hub/ui/sprite.json ../../apps/web/src/assets/audio/hub-ui"
   },
   "devDependencies": {

@@ -12,6 +12,11 @@ import type { CameraRig } from './types.ts';
 
 const TAU = Math.PI * 2;
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+/**
+ * Dev-only `?capture`: the attract frames its subject dead centre (no room left for a menu), for
+ * recording the hub landing's cabinet previews (tooling/browser-checks/src/capture-previews.ts).
+ */
+const CAPTURE = import.meta.env.DEV && new URLSearchParams(window.location.search).has('capture');
 /** Wrap into (-π, π] so unwinding takes the short way home. */
 const wrapAngle = (a: number) => a - TAU * Math.round(a / TAU);
 
@@ -129,7 +134,7 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     camera.lookAt(lookAt);
     // The side shift makes room for a left-hand menu; stacked (tall) layouts put it below instead.
     const wide = MathUtils.clamp((camera.aspect - 1) / (PORTRAIT_REF_ASPECT - 1), 0, 1);
-    const shift = (attract.lensShift ?? 0) * wide * (1 - t);
+    const shift = CAPTURE ? 0 : (attract.lensShift ?? 0) * wide * (1 - t);
     if (camera.filmOffset !== shift) {
       camera.filmOffset = shift;
       camera.updateProjectionMatrix();

@@ -21,10 +21,11 @@ type Manifest = Record<string, Chunk>;
 const KB = 1024;
 const MB = KB * KB;
 /**
- * The shell carries every cabinet's metadata; 155 KB leaves room for the fourth game's tile.
- * The growth from 143.7 KB during Pool (S12–S16) is a known follow-up to audit.
+ * The shell carries every cabinet's metadata and, since session 5, the arena landing (the first
+ * thing a visitor sees): 157 KB with it, so 160 KB. The growth from 143.7 KB during Pool
+ * (S12–S16) is a known follow-up to audit. Preview clips are lazy media, not first-paint bytes.
  */
-const BUDGETS = { shellGz: 155 * KB, attractGz: 1.5 * MB, game: 8 * MB } as const;
+const BUDGETS = { shellGz: 160 * KB, attractGz: 1.5 * MB, game: 8 * MB } as const;
 const ENGINE_KEY = 'src/engine/GameShell.tsx';
 const GAME_KEY = /^src\/games\/([^/]+)\/index\.ts$/;
 
@@ -81,13 +82,16 @@ if (!entryKey) throw new Error('No entry chunk in manifest');
 const shell = files(closure(entryKey));
 check('shell (gz)', sumGz(shell), BUDGETS.shellGz);
 
+const shellWithAssets = files(closure(entryKey), true);
 const engine = minus(files(closure(ENGINE_KEY)), shell);
 for (const key of Object.keys(manifest)) {
   const id = GAME_KEY.exec(key)?.[1];
   if (!id) continue;
   const game = minus(files(closure(key)), shell);
   check(`${id} attract (gz)`, sumGz(new Set([...engine, ...game])), BUDGETS.attractGz);
-  const withAssets = minus(files(closure(key), true), shell);
+  // Minus everything the shell already ships, assets included (the landing's preview clips come
+  // with the registry, which game chunks share).
+  const withAssets = minus(files(closure(key), true), shellWithAssets);
   // Browsers fetch one audio format; the AAC twins of Opus files are a fallback, not extra weight.
   const fetched = [...withAssets].filter((f) => !f.endsWith('.m4a'));
   const raw = fetched.reduce((n, f) => n + statSync(join(dist, f)).size, 0);

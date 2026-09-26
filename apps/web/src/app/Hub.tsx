@@ -26,8 +26,10 @@ export function Hub() {
     const startMusic = () => playMusic(LOBBY_TRACK);
     window.addEventListener('pointerdown', startMusic, { once: true });
     window.addEventListener('keydown', startMusic, { once: true });
-    // No deep link: open on the featured game's live attract rather than an empty room.
-    const opening = findGame(readUrlState().game) ?? visibleGames()[0];
+    // A deep link opens that game's live attract; otherwise the arena landing shows every game.
+    // (With only one game shipped there is no landing: open on it, ADR-007.)
+    const games = visibleGames();
+    const opening = findGame(readUrlState().game) ?? (games.length > 1 ? null : games[0]);
     if (opening) void useGameMachine.getState().select(opening.id);
   }, []);
 

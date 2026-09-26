@@ -168,8 +168,13 @@ export class RunnerBody {
     this.mixer.update(dt);
   }
 
+  /**
+   * Stops the clips and frees GPU memory. StrictMode remounts reuse the same memoized body, so it
+   * must come back to life: forgetting the current clip makes the next `play` start it again.
+   */
   dispose() {
     this.mixer.stopAllAction();
+    this.current = null;
     this.main.dispose();
     this.joints.dispose();
   }

@@ -7,6 +7,10 @@ export const en = {
   'hub.welcome.title': 'Play with friends',
   'hub.welcome.body': 'Party games you can drop into in seconds. No sign-up, no wallet to play.',
   'hub.pickGame': 'Pick a cabinet',
+  'hub.arena.title': 'Four games. One arena.',
+  'hub.arena.body':
+    'Play friends, strangers or bots for free and climb the ranks. Every game also has a VRF round you can call.',
+  'hub.arena.online': 'Online',
   'hub.players': 'players',
   'balance.demo': 'DEMO',
   'balance.demoNote': 'Demo credits, no value',

@@ -51,3 +51,6 @@ test-results/
 
 # CC0 packs fetched by assets-src/runner/fetch-packs.sh (large; rebuilt locally)
 assets-src/runner/packs/
+
+# Raw attract recordings for the landing previews (re-captured with capture-previews)
+assets-src/hub/previews/
