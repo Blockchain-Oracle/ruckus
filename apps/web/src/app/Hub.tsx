@@ -5,6 +5,8 @@ import { Scrim } from '@/engine/Scrim.tsx';
 import { findGame, visibleGames } from '@/games/registry.ts';
 import { getAudio } from '@/lib/audio/index.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
+import { ErrorBoundary } from '@/ui/ErrorBoundary.tsx';
+import { GraphicsNotice } from '@/ui/GraphicsNotice.tsx';
 
 import { AppShell } from './AppShell.tsx';
 import { useShell } from './stores/shell.ts';
@@ -55,12 +57,18 @@ export function Hub() {
         className="fixed inset-0"
         style={{ opacity: canvasReady ? 1 : 0, transition: `opacity ${CANVAS_FADE_MS}ms ease-out` }}
       >
-        <Suspense fallback={null}>
-          <GameShell onReady={() => setCanvasReady(true)} />
-        </Suspense>
+        <ErrorBoundary
+          fallback={null}
+          onError={() => useShell.setState({ graphicsFailed: true, booting: false })}
+        >
+          <Suspense fallback={null}>
+            <GameShell onReady={() => setCanvasReady(true)} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
       <Scrim />
       <AppShell />
+      <GraphicsNotice />
       <Suspense fallback={null}>
         <Toaster position="top-center" />
       </Suspense>

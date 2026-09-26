@@ -12,6 +12,10 @@ export const en = {
     'Play friends, strangers or bots for free, online or right here. Every game also has a VRF round you can call.',
   'hub.arena.online': 'Online',
   'hub.players': 'players',
+  'graphics.title': 'Your browser has 3D switched off',
+  'graphics.body':
+    'The games need hardware graphics. In Chrome or Edge, open Settings → System, turn on "Use graphics acceleration when available", relaunch, then reload. Or try another browser.',
+  'graphics.reload': 'Reload',
   'balance.demo': 'DEMO',
   'balance.demoNote': 'Demo credits, no value',
   'balance.connecting': 'Connecting…',
