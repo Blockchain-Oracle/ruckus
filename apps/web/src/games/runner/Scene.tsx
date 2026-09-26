@@ -13,7 +13,15 @@ import { COLORS } from './config.ts';
 import { controlsSeen } from './hud/controlsSeen.ts';
 import { attachKeys, readInput } from './input/keys.ts';
 import { RunnerDriver } from './match/driver.ts';
-import { consumeChallenge, presenter, startChallenge, startRace, stopRace } from './match/flow.ts';
+import {
+  consumeChallenge,
+  consumeLessonsNext,
+  presenter,
+  startChallenge,
+  startLessons,
+  startRace,
+  stopRace,
+} from './match/flow.ts';
 import { focusView, setDriver } from './match/runtime.ts';
 import { useRunner } from './match/store.ts';
 import { applyPendingRace, runnerRooms } from './net/online.ts';
@@ -25,6 +33,7 @@ import { Road } from './render/Road.tsx';
 import { Runners } from './render/Runners.tsx';
 import { Sparks } from './render/Sparks.tsx';
 import { SpeedLines } from './render/SpeedLines.tsx';
+import { tutorial, useTutorial } from './tutorial/director.ts';
 import { closeCallTheWipeout } from './wager/controller.ts';
 import { useWipeoutBet } from './wager/store.ts';
 
@@ -65,7 +74,8 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
   useEffect(() => {
     setDriver(driver);
     driver.readInput = readInput;
-    if (import.meta.env.DEV) Object.assign(globalThis, { __ruckusRunner: driver });
+    if (import.meta.env.DEV)
+      Object.assign(globalThis, { __ruckusRunner: driver, __ruckusRunnerTutorial: useTutorial });
     const detach = attachKeys();
     // A room race that arrived before this scene mounted (invite links) takes over now.
     applyPendingRace();
@@ -90,6 +100,7 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
       fx.clear();
       const challenge = consumeChallenge();
       if (challenge) startChallenge(challenge);
+      else if (consumeLessonsNext()) startLessons();
       else if (controlsSeen()) startRace();
       else useRunner.getState().set({ status: 'intro' });
     } else if (phase === 'leaving') {
@@ -110,6 +121,7 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
     const focus = driver.focus;
     const w = driver.world;
     const racing = driver.mode.kind !== 'exhibition';
+    if (driver.mode.kind === 'tutorial') tutorial.update(w, evs, dt);
     fx.ingest(evs, w, focus, () => focusView.x);
     playRunnerEvents(evs, focus, clock.current);
     presenter.update(w, evs, driver.humanSlot, dt, racing);

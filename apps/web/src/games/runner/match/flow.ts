@@ -9,6 +9,7 @@ import { playCue, setWindBed } from '../audio/sfx.ts';
 import { BOT_LEVELS, SLOTS } from '../config.ts';
 import type { Challenge } from '../net/challenge.ts';
 import { useRunnerPrefs } from '../prefs.ts';
+import { tutorial } from '../tutorial/director.ts';
 import { getDriver } from './runtime.ts';
 import { useRunner } from './store.ts';
 
@@ -18,6 +19,16 @@ const GO_HOLD_S = 0.7;
 const END_HOLD_S = 2;
 
 let races = 0;
+/** Settings → Replay tutorial from the hub: the next Play goes straight into the lessons. */
+let lessonsNext = false;
+export const queueLessons = () => {
+  lessonsNext = true;
+};
+export const consumeLessonsNext = () => {
+  const next = lessonsNext;
+  lessonsNext = false;
+  return next;
+};
 /** A "beat my run" challenge to start on the next Play (from the hub's challenge button). */
 let challengeNext: Challenge | null = null;
 export const queueChallenge = (c: Challenge) => {
@@ -41,6 +52,7 @@ export function startRace() {
   if (!d) return;
   const { level } = useRunnerPrefs.getState();
   const seed = (Date.now() ^ Math.imul(races + 1, 0x9e3779b1)) >>> 0;
+  tutorial.stop();
   d.startRace(seed, BOT_LEVELS[level]);
   racing = null;
   const you = useProfile.getState().name || 'You';
@@ -80,7 +92,20 @@ export function startOnlineRace(e: RunnerRaceStart, slot: number) {
   playMusic(CHASE_TRACK);
 }
 
+/** The hands-on lessons (first visit, or Settings → Replay tutorial). */
+export function startLessons() {
+  if (!getDriver()) return;
+  tutorial.start();
+  racing = null;
+  presenter.reset();
+  const you = useProfile.getState().name || 'You';
+  useRunner.getState().set({ status: 'tutorial', names: [you], announce: null, online: false });
+  setWindBed('race');
+  playMusic(CHASE_TRACK);
+}
+
 export function stopRace() {
+  tutorial.stop();
   getDriver()?.exhibit();
   presenter.reset();
   useRunner.getState().set({ status: 'off', announce: null, online: false });

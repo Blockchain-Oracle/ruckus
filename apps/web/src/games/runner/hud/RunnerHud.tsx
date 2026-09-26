@@ -5,13 +5,14 @@ import { COUNTDOWN_S, TICK_HZ } from '@arena/sim-runner';
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 
-import { currentChallenge, startChallenge, startRace } from '../match/flow.ts';
+import { currentChallenge, startChallenge, startLessons, startRace } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
 import { useRunner } from '../match/store.ts';
 import { raceClock, shareChallenge } from '../net/challenge.ts';
 import { Announce, Flash } from './Announce.tsx';
 import { ControlsButton, IntroCard } from './Controls.tsx';
 import { CoinsAndSpeed, PowerChip, ProgressRail, Standings } from './Gauges.tsx';
+import { LessonCard } from './Lesson.tsx';
 import { Results } from './Results.tsx';
 import { useCoarse } from './useCoarse.ts';
 import { useTick } from './useTick.ts';
@@ -44,25 +45,33 @@ export function RunnerHud({ onLeave }: { onLeave: () => void }) {
   const coarse = useCoarse();
   const d = getDriver();
   if (status === 'off' || !d) return null;
-  if (status === 'intro') return <IntroCard onGo={startRace} />;
+  if (status === 'intro') return <IntroCard onGo={startRace} onLearn={startLessons} />;
+  const lessons = status === 'tutorial';
   const w = d.world;
   // Watchers follow whoever the camera rides with.
   const you = d.humanSlot >= 0 ? d.humanSlot : d.focus;
+  // Lessons carry their own instruction card; the key reminder is for races.
   const hint = status === 'playing' && w.tick < HINT_TICKS;
 
   return (
     <div className="pointer-events-none absolute inset-0">
       <Flash />
-      <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 [@media(pointer:fine)]:top-4">
-        <ProgressRail w={w} you={you} />
-        <PowerChip w={w} you={you} />
-      </div>
-      <div className="absolute top-28 left-3 sm:left-8 [@media(max-height:500px)]:top-16 [@media(max-height:500px)]:left-16">
-        <CoinsAndSpeed w={w} you={you} />
-      </div>
-      <div className="absolute top-28 right-3 sm:right-8 [@media(max-height:500px)]:top-16 [@media(max-height:500px)]:right-16">
-        <Standings w={w} you={you} names={names} />
-      </div>
+      {lessons ? (
+        <LessonCard />
+      ) : (
+        <>
+          <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 [@media(pointer:fine)]:top-4">
+            <ProgressRail w={w} you={you} />
+            <PowerChip w={w} you={you} />
+          </div>
+          <div className="absolute top-28 left-3 sm:left-8 [@media(max-height:500px)]:top-16 [@media(max-height:500px)]:left-16">
+            <CoinsAndSpeed w={w} you={you} />
+          </div>
+          <div className="absolute top-28 right-3 sm:right-8 [@media(max-height:500px)]:top-16 [@media(max-height:500px)]:right-16">
+            <Standings w={w} you={you} names={names} />
+          </div>
+        </>
+      )}
       <Announce />
 
       <div

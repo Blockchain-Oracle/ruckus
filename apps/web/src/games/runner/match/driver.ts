@@ -22,6 +22,8 @@ export type RunnerMode =
   | { kind: 'race'; bot: number; humanSlot: number }
   /** A room race: `humanSlot` is −1 for watchers. */
   | { kind: 'online'; humanSlot: number }
+  /** Lessons: you alone on roads the tutorial director lays. */
+  | { kind: 'tutorial'; humanSlot: number }
   /** Call the Wipeout: a bank seed's gauntlet, watched (no human runner). */
   | { kind: 'wager'; seed: number };
 
@@ -100,6 +102,18 @@ export class RunnerDriver {
   /** The race so far as a recording (your inputs on this seed). */
   recording(): Recording {
     return { seed: this.world.seed, frames: Uint8Array.from(this.frames) };
+  }
+
+  startTutorial() {
+    this.mode = { kind: 'tutorial', humanSlot: 0 };
+    this.world = newWorld(1, [-1]);
+    this.reset();
+  }
+
+  /** Pieces were moved by hand (a lesson's staging): draw them there, no tween. */
+  resync() {
+    this.snapshot();
+    for (const s of this.smooth) s.s = s.y = 0;
   }
 
   /** A bank seed's gauntlet; `paused` shows its start line until the round is settled. */

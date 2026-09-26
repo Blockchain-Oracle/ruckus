@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type RunnerStatus = 'off' | 'intro' | 'playing' | 'over';
+export type RunnerStatus = 'off' | 'intro' | 'tutorial' | 'playing' | 'over';
 
 type RunnerState = {
   status: RunnerStatus;

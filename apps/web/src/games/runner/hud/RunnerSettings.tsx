@@ -1,6 +1,11 @@
+import { useUi } from '@/app/stores/ui.ts';
+import { useGameMachine } from '@/engine/gameMachine.ts';
 import { cn } from '@/lib/utils.ts';
+import { Button } from '@/ui/Button.tsx';
 
 import type { BotLevel } from '../config.ts';
+import { queueLessons, startLessons } from '../match/flow.ts';
+import { runnerRooms } from '../net/online.ts';
 import { useRunnerPrefs } from '../prefs.ts';
 
 const LEVELS = [
@@ -78,6 +83,20 @@ export function RunnerSettings() {
           progress rail.
         </span>
       </div>
+      <Button size="md" sound="ui.confirm" disabled={runnerRooms.inRoom()} onClick={replayTutorial}>
+        Replay tutorial
+      </Button>
     </section>
   );
+}
+
+/** From the hub it queues the lessons and enters; mid-race it switches straight to them. */
+function replayTutorial() {
+  useUi.getState().openSheet(null);
+  const machine = useGameMachine.getState();
+  if (machine.phase === 'play') startLessons();
+  else if (machine.phase === 'attract') {
+    queueLessons();
+    machine.send('entering');
+  }
 }

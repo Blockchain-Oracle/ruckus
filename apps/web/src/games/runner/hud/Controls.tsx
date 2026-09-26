@@ -77,7 +77,11 @@ function Rows() {
  * First visit: How to play stands between Play and the start. Capped at the viewport height with
  * only the rules scrolling, and the start button always visible below.
  */
-export function IntroCard({ onGo }: { onGo: () => void }) {
+export function IntroCard({ onGo, onLearn }: { onGo: () => void; onLearn: () => void }) {
+  const choose = (then: () => void) => () => {
+    markControlsSeen();
+    then();
+  };
   return (
     <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/55 p-3">
       <div
@@ -90,17 +94,24 @@ export function IntroCard({ onGo }: { onGo: () => void }) {
         <div className="min-h-0 overflow-y-auto overscroll-contain pr-1 [@media(max-height:500px)]:pb-4 [@media(max-height:500px)]:[mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
           <Rows />
         </div>
-        <Button
-          variant="tomato"
-          sound="ui.confirm"
-          className="mt-3 w-full shrink-0 sm:mt-4"
-          onClick={() => {
-            markControlsSeen();
-            onGo();
-          }}
-        >
-          Start the race
-        </Button>
+        <div className="mt-3 grid shrink-0 grid-cols-2 gap-2 sm:mt-4 sm:gap-3">
+          <Button
+            variant="teal"
+            sound="ui.confirm"
+            className="w-full min-w-0 px-2 text-sm sm:text-base"
+            onClick={choose(onLearn)}
+          >
+            Quick lesson
+          </Button>
+          <Button
+            variant="tomato"
+            sound="ui.confirm"
+            className="w-full min-w-0 px-2 text-sm sm:text-base"
+            onClick={choose(onGo)}
+          >
+            Start the race
+          </Button>
+        </div>
       </div>
     </div>
   );
