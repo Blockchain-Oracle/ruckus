@@ -6,6 +6,8 @@ import { WIPEOUT_CALLS } from '@arena/casino-math';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { RoundBanner } from '@/ui/RoundBanner.tsx';
+import { StakeField } from '@/ui/StakeField.tsx';
 
 import { Announce } from '../hud/Announce.tsx';
 import { useTick } from '../hud/useTick.ts';
@@ -16,7 +18,6 @@ import { useWipeoutBet } from './store.ts';
 
 const FALLBACK_DECIMALS = 18;
 const HUD_HZ = 10;
-const STAKES = ['0.5', '1', '5', '10'] as const;
 const fmt = (v: number) =>
   v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -32,7 +33,7 @@ export function WipeoutHud({ onLeave }: { onLeave: () => void }) {
   const call = callAt(picked);
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <button
         type="button"
         aria-label="Leave"
@@ -42,9 +43,7 @@ export function WipeoutHud({ onLeave }: { onLeave: () => void }) {
         <ArrowLeftIcon weight="bold" className="size-5" />
       </button>
       <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 sm:top-4">
-        <div className="rounded-full border-2 border-gold-deep bg-ink/85 px-4 py-1.5 text-center font-display text-xs text-gold sm:text-sm">
-          CALL THE WIPEOUT · {mode === 'demo' ? 'DEMO CREDITS, NO VALUE' : 'RTP 96% ON EVERY CALL'}
-        </div>
+        <RoundBanner title="CALL THE WIPEOUT" demo={mode === 'demo'} />
         {(phase === 'run' || phase === 'result') && (
           <div className="rounded-full border border-line bg-ink/85 px-3 py-1 text-xs text-cream">
             Your call:{' '}
@@ -96,28 +95,10 @@ export function WipeoutHud({ onLeave }: { onLeave: () => void }) {
                 );
               })}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <label
-                className="flex items-center gap-2 text-sm text-cream-dim"
-                htmlFor="wipeout-stake"
-              >
-                Stake
-                <input
-                  id="wipeout-stake"
-                  value={stake}
-                  inputMode="decimal"
-                  onChange={(e) => set({ stake: e.target.value.replace(/[^0-9.]/g, '') })}
-                  className="tabular h-9 w-20 rounded-md border-2 border-line bg-ink px-2 text-cream outline-none focus:border-teal"
-                />
-              </label>
-              {STAKES.map((v) => (
-                <Button key={v} size="sm" className="px-3" onClick={() => set({ stake: v })}>
-                  {v}
-                </Button>
-              ))}
-            </div>
           </div>
+          {/* Pinned with the call: on a small phone the scrolling grid used to hide the stake. */}
           <div className="flex shrink-0 flex-col gap-2 border-t border-line/60 p-3 pt-2 sm:p-4 sm:pt-2">
+            <StakeField id="wipeout-stake" value={stake} onChange={(v) => set({ stake: v })} />
             <div className="flex items-baseline justify-between gap-2 text-sm">
               <span className="min-w-0 truncate font-display text-teal">{call.name}</span>
               <span className="tabular shrink-0 text-cream">

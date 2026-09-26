@@ -4,6 +4,8 @@ import { formatUnits } from 'viem';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { RoundBanner } from '@/ui/RoundBanner.tsx';
+import { StakeField } from '@/ui/StakeField.tsx';
 
 import { KITS } from '../config.ts';
 import { Announce } from '../hud/Announce.tsx';
@@ -16,7 +18,6 @@ import { useFinishBet } from './store.ts';
 
 const FALLBACK_DECIMALS = 18;
 const HUD_HZ = 10;
-const STAKES = ['0.5', '1', '5', '10'] as const;
 const TEAMS = [
   { v: 'tomato', label: 'Tomato', color: KITS[0].body },
   { v: 'either', label: 'Either', color: '#fff1d6' },
@@ -50,7 +51,7 @@ export function FinishHud({ onLeave }: { onLeave: () => void }) {
   const w = getDriver()?.world;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <button
         type="button"
         aria-label="Leave"
@@ -63,9 +64,7 @@ export function FinishHud({ onLeave }: { onLeave: () => void }) {
         {phase === 'match' && w ? (
           <ScoreBug w={w} names={['Tomato', 'Violet', 'Tomato', 'Violet']} you={-1} />
         ) : (
-          <div className="rounded-full border-2 border-gold-deep bg-ink/85 px-4 py-1.5 text-center font-display text-xs text-gold sm:text-sm">
-            CALL THE FINISH · {mode === 'demo' ? 'DEMO CREDITS, NO VALUE' : 'RTP 96% ON EVERY CALL'}
-          </div>
+          <RoundBanner title="CALL THE FINISH" demo={mode === 'demo'} />
         )}
         {(phase === 'match' || phase === 'result') && (
           <div className="rounded-full border border-line bg-ink/85 px-3 py-1 text-xs text-cream">
@@ -120,26 +119,7 @@ export function FinishHud({ onLeave }: { onLeave: () => void }) {
               {call.chance} · pays <span className="font-display text-gold">{call.pays}×</span>
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              className="flex items-center gap-2 text-sm text-cream-dim"
-              htmlFor="finish-stake"
-            >
-              Stake
-              <input
-                id="finish-stake"
-                value={stake}
-                inputMode="decimal"
-                onChange={(e) => set({ stake: e.target.value.replace(/[^0-9.]/g, '') })}
-                className="tabular h-10 w-20 rounded-md border-2 border-line bg-ink px-2 text-cream outline-none focus:border-teal"
-              />
-            </label>
-            {STAKES.map((v) => (
-              <Button key={v} size="sm" className="px-3" onClick={() => set({ stake: v })}>
-                {v}
-              </Button>
-            ))}
-          </div>
+          <StakeField id="finish-stake" value={stake} onChange={(v) => set({ stake: v })} />
           <Button
             variant="gold"
             sound="ui.confirm"

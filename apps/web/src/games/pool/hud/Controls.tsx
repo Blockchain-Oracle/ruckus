@@ -1,6 +1,8 @@
 import { QuestionIcon, XIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 
+import { isCompact } from '@/lib/platform.ts';
+
 import { useCoarse } from './useCoarse.ts';
 
 const MOUSE = [
@@ -28,6 +30,8 @@ const WAGER_STEPS = [
 export function ControlsCard({ wager = false }: { wager?: boolean }) {
   const coarse = useCoarse();
   const [open, setOpen] = useState(() => {
+    // On a phone the wager panel already says all this; the card would only bury the table.
+    if (wager && isCompact()) return false;
     try {
       return window.localStorage.getItem('ruckus.pool.controlsSeen') !== '1';
     } catch {
@@ -56,7 +60,7 @@ export function ControlsCard({ wager = false }: { wager?: boolean }) {
   }
   const rows = coarse ? TOUCH : MOUSE;
   return (
-    <div className="pointer-events-auto absolute top-16 left-3 w-[min(22rem,calc(100%-7rem))] rounded-2xl border-2 border-teal bg-ink/92 p-4 text-sm shadow-[0_12px_40px_rgb(0_0_0/0.5)] sm:top-[4.5rem] sm:left-8">
+    <div className="pointer-events-auto absolute top-16 left-3 max-h-[calc(100%-5rem)] w-[min(22rem,calc(100%-7rem))] overflow-y-auto overscroll-contain rounded-2xl border-2 border-teal bg-ink/92 p-4 text-sm shadow-[0_12px_40px_rgb(0_0_0/0.5)] sm:top-[4.5rem] sm:left-8">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-display text-teal">{wager ? 'CALL YOUR SHOT' : 'HOW TO PLAY'}</span>
         <button

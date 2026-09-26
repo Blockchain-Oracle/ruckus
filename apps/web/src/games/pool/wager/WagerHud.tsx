@@ -6,6 +6,8 @@ import { TIERS } from '@arena/sim-pool';
 
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { Button } from '@/ui/Button.tsx';
+import { RoundBanner } from '@/ui/RoundBanner.tsx';
+import { StakeField } from '@/ui/StakeField.tsx';
 
 import { BallChip } from '../hud/BallChip.tsx';
 import { ControlsCard } from '../hud/Controls.tsx';
@@ -37,7 +39,6 @@ const POCKET_NAMES = [
   'bottom side',
   'top side',
 ] as const;
-const STAKES = ['0.5', '1', '5', '10'] as const;
 const fmt = (v: number) =>
   v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -63,7 +64,7 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
   const odds = call ? tierOdds(call.tier) : null;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <button
         type="button"
         aria-label="Leave"
@@ -73,9 +74,7 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
         <ArrowLeftIcon weight="bold" className="size-5" />
       </button>
       <div className="absolute inset-x-0 top-3 flex justify-center px-16 sm:top-4">
-        <div className="rounded-full border-2 border-gold-deep bg-ink/85 px-4 py-1.5 font-display text-sm text-gold">
-          CALL YOUR SHOT · {mode === 'demo' ? 'DEMO CREDITS, NO VALUE' : 'RTP 96% ON EVERY CALL'}
-        </div>
+        <RoundBanner title="CALL YOUR SHOT" demo={mode === 'demo'} />
       </div>
 
       {setup && <PowerCue enabled />}
@@ -83,7 +82,8 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
       {setup && <ControlsCard wager />}
 
       {(setup || phase === 'checking') && (
-        <div className="pointer-events-auto absolute inset-x-0 bottom-4 mx-auto flex w-[min(640px,calc(100%-2rem))] flex-col gap-3 rounded-2xl border-2 border-line bg-ink-2/95 p-4 shadow-[0_20px_60px_rgb(0_0_0/0.55)] sm:bottom-6">
+        <div className="pointer-events-auto absolute inset-x-0 bottom-4 mx-auto flex max-h-[calc(100%-5.5rem)] w-[min(640px,calc(100%-2rem))] flex-col gap-3 overflow-y-auto overscroll-contain rounded-2xl border-2 border-line bg-ink-2/95 p-4 shadow-[0_20px_60px_rgb(0_0_0/0.55)] max-sm:gap-2.5 max-sm:p-3 sm:bottom-6 [@media(max-height:480px)]:right-auto [@media(max-height:480px)]:bottom-3 [@media(max-height:480px)]:left-3 [@media(max-height:480px)]:mx-0 [@media(max-height:480px)]:w-[min(19rem,42%)] [@media(max-height:480px)]:gap-2 [@media(max-height:480px)]:p-3">
+          {/* Short landscape phones: docked left, so the table stays in view to aim at. */}
           <div className="flex min-h-10 items-center gap-3">
             {call && odds ? (
               <>
@@ -97,32 +97,18 @@ export function CallShotHud({ onLeave }: { onLeave: () => void }) {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-cream-dim">
+              <p className="text-sm text-cream-dim compact:text-xs">
                 Click or drag on the table to aim at a ball and a pocket (your aim stays put).
                 Harder shots pay more; every call returns 96%.
               </p>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="flex items-center gap-2 text-sm text-cream-dim" htmlFor="shot-stake">
-              Stake
-              <input
-                id="shot-stake"
-                value={stake}
-                inputMode="decimal"
-                onChange={(e) => set({ stake: e.target.value.replace(/[^0-9.]/g, '') })}
-                className="tabular h-10 w-24 rounded-md border-2 border-line bg-ink px-2 text-cream outline-none focus:border-teal"
-              />
-            </label>
-            {STAKES.map((v) => (
-              <Button key={v} size="sm" onClick={() => set({ stake: v })}>
-                {v}
-              </Button>
-            ))}
+          <StakeField id="shot-stake" value={stake} onChange={(v) => set({ stake: v })} />
+          <div className="flex">
             <Button
               variant="gold"
               sound="ui.confirm"
-              className="ml-auto"
+              className="w-full min-w-0"
               disabled={!ready || !call || !setup}
               onClick={() => void placeCallShot(api, decimals)}
             >

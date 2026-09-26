@@ -40,13 +40,13 @@ export function ChickenzSettings() {
 
       <fieldset className="flex flex-col gap-2 text-sm">
         <legend className="mb-2">Your bird</legend>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-4 gap-1.5">
           {HEROES.map((h) => (
             <label
               key={h}
               title={HERO_NAMES[h]}
               className={cn(
-                'flex cursor-pointer flex-col items-center gap-1 rounded-md border-2 p-1.5 has-focus-visible:outline-2 has-focus-visible:outline-cream',
+                'flex min-w-0 cursor-pointer flex-col items-center gap-1 rounded-md border-2 p-1.5 has-focus-visible:outline-2 has-focus-visible:outline-cream',
                 hero === h ? 'border-tomato bg-ink-3' : 'border-transparent hover:border-line',
               )}
             >
@@ -58,7 +58,7 @@ export function ChickenzSettings() {
                 onChange={() => set({ hero: h })}
               />
               <HeroPortrait hero={h} className="w-10" />
-              <span className="font-pixel text-[9px] uppercase text-cream-dim">
+              <span className="font-pixel text-center text-[9px] leading-tight uppercase text-cream-dim">
                 {HERO_NAMES[h]}
               </span>
             </label>
@@ -81,7 +81,8 @@ export function ChickenzSettings() {
         />
       </label>
 
-      <div className="flex flex-col gap-2 text-sm">
+      {/* Key rebinding means nothing on a touchscreen; phones get the on-screen sticks. */}
+      <div className="flex flex-col gap-2 text-sm [@media(pointer:coarse)]:hidden">
         <div className="flex items-center justify-between">
           <span>Controls</span>
           <button

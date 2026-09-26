@@ -12,12 +12,13 @@ export function TutorialOffer() {
   if (!offer) return null;
   return (
     <div className="pointer-events-auto absolute inset-0 z-30 grid place-items-center bg-ink/60 px-4">
-      <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl border-2 border-line bg-ink-2 p-6 text-center shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
-        <div className="font-display text-3xl text-cream">New to the table?</div>
+      <div className="flex w-full min-w-0 max-w-sm flex-col items-center gap-4 rounded-2xl border-2 border-line bg-ink-2 p-5 text-center sm:p-6 shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
+        <div className="font-display text-2xl text-cream sm:text-3xl">New to the table?</div>
         <p className="text-cream-dim">
           A one-minute lesson: aim, power, spin, ball in hand, calling the 8.
         </p>
-        <div className="flex gap-3">
+        {/* Equal halves that may shrink: two nowrap labels used to push the card off a phone. */}
+        <div className="grid w-full grid-cols-2 gap-3 *:h-auto *:min-h-12 *:min-w-0 *:px-3 *:py-2 *:leading-tight *:whitespace-normal">
           <Button
             variant="tomato"
             sound="ui.confirm"

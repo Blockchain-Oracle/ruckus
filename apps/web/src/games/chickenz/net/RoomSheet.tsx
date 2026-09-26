@@ -59,7 +59,7 @@ export function RoomSheet() {
         className="mx-auto max-w-2xl rounded-t-2xl border-line bg-ink-2 text-cream"
       >
         <SheetHeader>
-          <SheetTitle className="font-display text-3xl text-cream">
+          <SheetTitle className="font-display text-2xl text-cream sm:text-3xl">
             {inLobby ? `Room ${room.code}` : 'Play online'}
           </SheetTitle>
           <SheetDescription className="text-cream-dim">
@@ -119,9 +119,14 @@ function Entry() {
           }
           placeholder="ROOM CODE"
           aria-label="Room code"
-          className="font-pixel h-12 flex-1 rounded-[var(--radius-button)] border-2 border-line bg-ink px-4 text-lg tracking-[0.3em] text-cream outline-none focus:border-teal"
+          className="font-pixel h-12 w-full min-w-0 flex-1 rounded-[var(--radius-button)] border-2 border-line bg-ink px-3 text-lg tracking-[0.2em] text-cream outline-none focus:border-teal sm:px-4 sm:tracking-[0.3em]"
         />
-        <Button type="submit" size="md" disabled={busy || code.length !== CODE_LENGTH}>
+        <Button
+          type="submit"
+          size="md"
+          className="shrink-0"
+          disabled={busy || code.length !== CODE_LENGTH}
+        >
           Join
         </Button>
       </form>

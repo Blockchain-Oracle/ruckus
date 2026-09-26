@@ -30,7 +30,7 @@ export function GameSwitcherSheet({ onChoose }: { onChoose: (id: GameId) => void
     <Sheet open={open} onOpenChange={(o) => openSheet(o ? 'games' : null)}>
       <SheetContent
         side="bottom"
-        className="max-h-[85dvh] overflow-y-auto rounded-t-[var(--radius-card)] border-line bg-ink-2 pb-[max(5rem,env(safe-area-inset-bottom))] text-cream"
+        className="rounded-t-[var(--radius-card)] border-line bg-ink-2 pb-[max(1rem,env(safe-area-inset-bottom))] text-cream"
       >
         {/* "All games" lives up here: the jam's corner badge covers the bottom of the sheet. */}
         <SheetHeader className="flex-row items-center gap-3 pr-12 pb-0">
