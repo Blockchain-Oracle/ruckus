@@ -1,5 +1,5 @@
 /** Bump when the client↔server message or schema contract changes; checked on room join. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /** Contract name is `RuckusGame`; the host derives this id via `canonicalCasinoGameId`. */
 export const CASINO_GAME_ID = 'ruckus';
