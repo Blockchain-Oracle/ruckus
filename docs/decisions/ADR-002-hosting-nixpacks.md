@@ -2,7 +2,7 @@
 
 - Status: accepted (2026-09-25)
 - Context:
-  - The user runs their own Coolify instance and wants Nixpacks with pnpm.
+  - The owner runs their own Coolify instance and wants Nixpacks with pnpm.
   - The Colyseus server holds long-lived WebSockets.
   - The web app is static.
 
@@ -35,7 +35,7 @@
   - **No `X-Frame-Options` or `frame-ancestors`**, since the jam gallery embeds entries in hover iframes.
   - Git LFS is enabled for binary assets.
 - **Convex:** `npx convex deploy`.
-- **Coolify context:** chosen with the user at checkpoint ✱S02.
+- **Coolify context:** chosen by the owner.
   - Contexts found: `agari-new` (default, localhost:8001, the only one responding on 2026-09-25), `agari`, `zkf`, `localhost`, `cloud`.
 
 ## Alternatives

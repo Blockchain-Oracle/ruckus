@@ -53,8 +53,8 @@ export const CHICKENZ_FIGHTERS = 4;
 
 /**
  * Egg Soccer "Call the Finish". A 2v2 bot match plays 20 s of golden goal and ends one of seven
- * ways; the declared table is in twentieths (close to what the bots actually do: see
- * docs/roadmap/stages/S20-soccer-wager.md). Each call covers some finishes and is its own
+ * ways; the declared table is in twentieths (close to what the bots actually
+ * do, measured over the seed bank). Each call covers some finishes and is its own
  * make/miss table at 96%, mirroring `_finishCover` in Solidity.
  */
 export const FINISH_CLASSES = [
@@ -112,7 +112,7 @@ function finishTables() {
 /**
  * Neon Dash "Call the Wipeout". A lone bot runs a short all-barrier gauntlet with no coins, so
  * its first hit ends the run; it ends one of five ways, in twentieths (close to what the gauntlet
- * bot actually does: docs/roadmap/stages/S25-runner-wager.md). Mirrors `_wipeoutCover`.
+ * bot actually does, measured over the seed bank). Mirrors `_wipeoutCover`.
  * `verb` names the barrier colour that stopped the runner (sim-runner `WIPEOUTS` order).
  */
 export const WIPEOUT_CLASSES = [

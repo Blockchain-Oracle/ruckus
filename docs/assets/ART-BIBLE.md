@@ -1,6 +1,6 @@
 # RUCKUS Art Bible (direction A · Arcade Cabinet)
 
-Decided on 2026-09-25 (✱N). The comparison of all three directions is at https://claude.ai/artifact/5N3ouNtD9vLWUNiBaZwGiJ; the source is `docs/assets/brand-directions.html`. It borrows friendly copy from direction B and live tickers from direction C.
+Decided on 2026-09-25. The three directions compared are in `docs/assets/brand-directions.html`. It borrows friendly copy from direction B and live tickers from direction C.
 
 **Idea.** RUCKUS is an arcade. Each game is a cabinet with its own native look: pixel Chickenz, cinematic 3D pool, cartoon egg soccer, low-poly runner. The hub is the dark room they stand in. The dark ground lets the live game behind the menu and the gold of money carry every screen.
 

@@ -54,3 +54,22 @@ assets-src/runner/packs/
 
 # Raw attract recordings for the landing previews (re-captured with capture-previews)
 assets-src/hub/previews/
+
+# AI-agent working files: instructions, session handoffs, scraped inputs and scratch notes.
+# They stay on the maintainer's disk; the repo carries only the project and its real docs.
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.claude/
+.agents/
+.cursor/
+.codex/
+.windsurf/
+.mcp.json
+docs/roadmap/
+docs/raw/
+docs/marketing/
+docs/requirements.md
+docs/research/0*.md
+docs/assets/elevenlabs-request.md

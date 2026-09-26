@@ -4,7 +4,7 @@
 - Context:
   - Chickenz's proven sim is `references/chickenz/services/prover/core/src/fp.rs`. It is MIT-licensed, uses i32 fixed-point maths with 8 fractional bits, and runs a pure `step_mut(&mut State, &[Input;2], &Map)`.
   - It is compiled to WASM with wasm-bindgen and runs the same code in the browser and on the server.
-  - The tech-stack research recommended pure TypeScript sims. The user chose full Chickenz fidelity and **4-player FFA**.
+  - The tech-stack research recommended pure TypeScript sims. The owner chose full Chickenz fidelity and **4-player FFA**.
 
 ## Decision
 - **Extract `crates/chickenz-sim` from `fp.rs` only**, with MIT attribution in `NOTICE` and `docs/CREDITS.md`.
@@ -30,4 +30,4 @@
 
 ## Why Rust over a TypeScript port
 - The existing sim is proven, tuned and already deterministic in fixed-point.
-- Porting it would risk losing the game feel, which is what the user values most.
+- Porting it would risk losing the game feel, which is what we value most.

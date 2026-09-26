@@ -2,7 +2,7 @@
 
 - Status: accepted (2026-09-25)
 
-## Art direction (the user's choice)
+## Art direction (the owner's choice)
 - **One shared brand** wraps everything: the hub and the casino layer share one palette, a display font plus a body font, chunky press buttons, Phosphor icons, transitions, sound language and payout celebrations.
 - **Each game keeps its native style:**
   - Chickenz: pixel art
@@ -10,7 +10,7 @@
   - Soccer: cartoon drawn in code
   - Runner: stylized low-poly 3D
 - Gold is reserved for money. No emoji icons, no spinners, no Inter-everywhere.
-- The brand is decided at checkpoint ✱N (S03) using the 21st-ui-explore skill, and written into `docs/assets/ART-BIBLE.md`.
+- The brand was chosen from three explored directions and written into `docs/assets/ART-BIBLE.md`.
 
 ## Source policy
 - **Allowed:** licences that permit commercial use in real-money gambling products. That means CC0, royalty-free with no gambling exclusion, or work we own.
@@ -20,7 +20,7 @@
   - Jestan's weapons pack.
   - Udio.
   - Stock-music plans that gate game use behind enterprise terms (Epidemic, Artlist), and Uppbeat.
-- **ElevenLabs is the primary source for SFX and music** (the user decided this on 2026-09-25, on their paid Starter plan).
+- **ElevenLabs is the primary source for SFX and music** (we decided this on 2026-09-25, on their paid Starter plan).
   - Tools: the `sound-effects` and `music` skills, or the `elevenlabs` CLI 1.4.0 (`elevenlabs text-to-sound-effects convert --json '{...}' -o <file>`).
   - Budget: 39,855 credits per month (a 1 s SFX costs 40 credits; music costs 900 per minute).
   - Keep every take in `assets-src/<game>/{sfx,music}/`, and log the prompt, model and date in `docs/assets/<game>.md`.
@@ -41,4 +41,4 @@
 - **Size budgets:** attract mode ≤1.5 MB per game; a full game chunk ≤8 MB. CI enforces both.
 
 ## Inventory
-See `docs/roadmap/PLAN.md` §6b for the per-game table. Each game's manifest (`docs/assets/<game>.md`) is written at the start of that game's rendering stage.
+Each game's asset manifest (`docs/assets/<game>.md`) is written at the start of that game's rendering stage.
