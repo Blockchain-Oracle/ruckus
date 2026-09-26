@@ -102,14 +102,16 @@ function HubMenu() {
   const games = visibleGames();
   const game = findGame(gameId);
   const HubActions = getLoadedGame(gameId)?.HubActions;
+  const booting = useShell((s) => s.booting);
 
   const choose = (id: typeof gameId) => {
     writeUrlState({ game: id });
     void select(id);
   };
 
-  // No game chosen: the arena landing, every cabinet with its footage.
-  if (!game && games.length > 1) return <ArenaLanding onChoose={choose} />;
+  // No game chosen: the arena landing, every cabinet with its footage (not while a deep link's
+  // game is still loading: that would flash the landing before the game it asked for).
+  if (!game && games.length > 1) return booting ? null : <ArenaLanding onChoose={choose} />;
 
   return (
     <m.main

@@ -7,6 +7,7 @@ import { getAudio } from '@/lib/audio/index.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
 import { AppShell } from './AppShell.tsx';
+import { useShell } from './stores/shell.ts';
 import { readUrlState } from './urlState.ts';
 
 /** three.js + R3F are the heaviest thing on the page; they load after the DOM hub has painted. */
@@ -15,6 +16,17 @@ const Toaster = lazy(() =>
   import('@/ui/primitives/sonner.tsx').then((m) => ({ default: m.Toaster })),
 );
 const CANVAS_FADE_MS = 600;
+
+// A deep link hides the landing from the very first paint until its game has landed (effects run
+// twice under StrictMode, so this can't hang on a select() promise).
+if (findGame(readUrlState().game)) {
+  useShell.setState({ booting: true });
+  const unsubscribe = useGameMachine.subscribe((s) => {
+    if (!s.gameId) return;
+    useShell.setState({ booting: false });
+    unsubscribe();
+  });
+}
 
 export function Hub() {
   const [canvasReady, setCanvasReady] = useState(false);
@@ -30,7 +42,11 @@ export function Hub() {
     // (With only one game shipped there is no landing: open on it, ADR-007.)
     const games = visibleGames();
     const opening = findGame(readUrlState().game) ?? (games.length > 1 ? null : games[0]);
-    if (opening) void useGameMachine.getState().select(opening.id);
+    if (opening)
+      void useGameMachine
+        .getState()
+        .select(opening.id)
+        .catch(() => useShell.setState({ booting: false }));
   }, []);
 
   return (
