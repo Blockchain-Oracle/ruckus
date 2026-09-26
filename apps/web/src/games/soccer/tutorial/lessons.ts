@@ -29,7 +29,7 @@ export const LESSONS: readonly Lesson[] = [
   {
     title: 'Move',
     mouse: 'Run right with D or → and stand in the glowing ring.',
-    touch: 'Hold ▶ and stand in the glowing ring.',
+    touch: 'Slide the stick right and stand in the glowing ring.',
     goal: 'reach',
     stage: { you: { x: -380 }, ball: { x: -560, y: 22 }, target: { x: 260, y: 44 } },
     done: 'Nice moves!',

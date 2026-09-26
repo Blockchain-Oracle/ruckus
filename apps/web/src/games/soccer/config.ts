@@ -69,3 +69,16 @@ export const EXHIBITION_RESTART_S = 3;
 export const BOT_LEVELS = { rookie: 30, pro: 65, legend: 100 } as const;
 export type BotLevel = keyof typeof BOT_LEVELS;
 export const EXHIBITION_SKILL = 70;
+
+/**
+ * Phone thumbstick (px): it floats to wherever the left thumb lands. Sideways past the dead zone
+ * runs, up past the jump line jumps and keeps jumping while held (hold = higher), like Chickenz.
+ */
+export const STICK = {
+  radius: 56,
+  knob: 26,
+  deadZone: 0.28,
+  jumpLine: 0.5,
+  /** Where the idle stick waits, from the bottom-left corner: a hint of where the thumb goes. */
+  restInset: 92,
+} as const;

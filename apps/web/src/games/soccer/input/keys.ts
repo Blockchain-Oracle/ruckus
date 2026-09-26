@@ -9,8 +9,11 @@ export const KEYS = {
 const CAPTURED = new Set<string>(Object.values(KEYS).flat());
 
 const down = new Set<string>();
-/** On-screen buttons OR in here (see hud/TouchPad.tsx). */
-export const pad = { left: false, right: false, jump: false };
+/**
+ * On-screen controls OR in here (see hud/TouchPad.tsx). The stick and the JUMP button keep their
+ * own jump flags, so letting go of one never cancels a jump the other is still holding.
+ */
+export const pad = { left: false, right: false, jump: false, stickJump: false };
 
 const any = (codes: readonly string[]) => codes.some((c) => down.has(c));
 
@@ -20,7 +23,7 @@ export function readInput(): Input {
   const left = any(KEYS.left) || pad.left;
   const right = any(KEYS.right) || pad.right;
   const h: -1 | 0 | 1 = left && right ? lastH : left ? -1 : right ? 1 : 0;
-  return { h, jump: any(KEYS.jump) || pad.jump };
+  return { h, jump: any(KEYS.jump) || pad.jump || pad.stickJump };
 }
 
 export function attachKeys() {

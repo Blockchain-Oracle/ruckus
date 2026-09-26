@@ -17,7 +17,7 @@ const MOUSE = [
   ],
 ] as const;
 const TOUCH = [
-  ['Move', 'Hold ◀ or ▶ bottom left.'],
+  ['Move', 'Thumb anywhere on the left half and slide. Flick up to jump.'],
   ['Jump', 'The big JUMP button. Tap for a hop, hold to jump higher.'],
   ['Kick', 'Just run into the ball. Your whole egg is the boot.'],
   ['Header', 'Jump into a dropping ball to head it.'],
