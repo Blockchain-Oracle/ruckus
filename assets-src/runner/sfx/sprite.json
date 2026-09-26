@@ -1,0 +1,57 @@
+{
+  "loudnessLufs": -18,
+  "sounds": {
+    "runner.coin~1": {
+      "src": "coin_a.mp3"
+    },
+    "runner.coin~2": {
+      "src": "coin_b.mp3"
+    },
+    "runner.jump": {
+      "src": "jump.mp3"
+    },
+    "runner.land": {
+      "src": "land.mp3"
+    },
+    "runner.slide": {
+      "src": "slide.mp3"
+    },
+    "runner.slam": {
+      "src": "slam.mp3"
+    },
+    "runner.lane": {
+      "src": "lane.mp3"
+    },
+    "runner.hit": {
+      "src": "hit.mp3"
+    },
+    "runner.wipeout": {
+      "src": "wipeout.mp3"
+    },
+    "runner.shield": {
+      "src": "shield.mp3"
+    },
+    "runner.buff": {
+      "src": "buff.mp3"
+    },
+    "runner.debuff": {
+      "src": "debuff.mp3"
+    },
+    "runner.boost": {
+      "src": "boost.mp3"
+    },
+    "runner.count": {
+      "src": "count.mp3"
+    },
+    "runner.go": {
+      "src": "go.mp3"
+    },
+    "runner.finish": {
+      "src": "finish.mp3"
+    },
+    "runner.wind": {
+      "src": "wind.mp3",
+      "loop": true
+    }
+  }
+}

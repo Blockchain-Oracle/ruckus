@@ -1,0 +1,17 @@
+coin_a	Bright arcade coin pickup, crisp sparkly two-note chime, short, video game, isolated, no music	0.65	0.5
+coin_b	Shiny gold coin collect sound, quick glittering bell ping, short, arcade, isolated, no music	0.65	0.5
+jump	Athlete jumps off pavement, quick sneaker scuff and airy whoosh upward, short, video game, isolated, no music	0.6	0.6
+land	Runner lands hard on a concrete rooftop after a jump, punchy sneaker thud impact, short, video game, isolated, no musicte after a jump, soft dull thud with a scuff, short, close microphone, isolated, no music	0.6	0.5
+slide	Runner sliding low on smooth pavement, sneaker skid and fabric swish, short, isolated, no music	0.6	0.8
+slam	Fast downward whoosh ending in a heavy ground impact thump, short, video game, isolated, no music	0.6	0.7
+lane	Very short quick air whoosh swipe, fast sideways dodge, subtle, video game, isolated, no music	0.7	0.5
+hit	Runner crashes into a plastic neon barrier, hollow plastic bonk with a short electric buzz zap, video game, isolated, no music	0.6	0.8
+wipeout	Big cartoon tumble and crash, body hits the ground, electric sparks fizzle and power down whine, video game, isolated, no music	0.55	1.8
+shield	Energy force field shield deflecting a hit, glassy resonant ping with a shimmering zap, sci-fi, isolated, no music	0.6	0.8
+buff	Futuristic power up collected, bright rising synth arpeggio chime, positive, video game, isolated, no music	0.6	0.9
+debuff	Glitchy descending synth power down, negative wobbly bleep, video game debuff, isolated, no music	0.6	0.9
+boost	Turbo speed boost, rising jet whoosh with a synth swell, fast, video game, isolated, no music	0.6	1.2
+count	Single short synth countdown beep, clean electronic tone, race start light, isolated, no music	0.7	0.5
+go	Race start, bright rising synth horn blast, energetic, arcade, isolated, no music	0.6	1.0
+finish	Crossing the finish line, crowd cheering with an air horn blast, celebratory, no music	0.55	2.5
+wind	Rushing wind at high speed, steady whooshing airflow past the ears, running fast through a city at night, seamless loop, no music	0.4	5

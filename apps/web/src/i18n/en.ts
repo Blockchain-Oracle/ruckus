@@ -21,6 +21,8 @@ export const en = {
   'games.chickenz.tagline': 'Four birds, one arena. Last chicken standing.',
   'games.pool.tagline': 'Real cloth, real spin. Sink your group, call the 8.',
   'games.soccer.tagline': 'Big heads, no mercy. Head it, bounce it, bury it in 90 seconds.',
+  'games.runner.tagline':
+    'Three lanes, one neon city, four racers. The colour tells you what to do.',
 } as const;
 
 export type MessageKey = keyof typeof en;

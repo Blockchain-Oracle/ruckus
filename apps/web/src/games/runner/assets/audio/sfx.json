@@ -1,0 +1,71 @@
+{
+  "runner.coin~1": {
+    "start": 0,
+    "duration": 0.4799
+  },
+  "runner.coin~2": {
+    "start": 0.5799,
+    "duration": 0.4799
+  },
+  "runner.jump": {
+    "start": 1.1598,
+    "duration": 0.3131
+  },
+  "runner.land": {
+    "start": 1.5729,
+    "duration": 0.5999
+  },
+  "runner.slide": {
+    "start": 2.2729,
+    "duration": 0.5818
+  },
+  "runner.slam": {
+    "start": 2.9547,
+    "duration": 0.5977
+  },
+  "runner.lane": {
+    "start": 3.6524,
+    "duration": 0.48
+  },
+  "runner.hit": {
+    "start": 4.2324,
+    "duration": 0.8
+  },
+  "runner.wipeout": {
+    "start": 5.1324,
+    "duration": 1.0611
+  },
+  "runner.shield": {
+    "start": 6.2934,
+    "duration": 0.8
+  },
+  "runner.buff": {
+    "start": 7.1934,
+    "duration": 0.88
+  },
+  "runner.debuff": {
+    "start": 8.1734,
+    "duration": 0.88
+  },
+  "runner.boost": {
+    "start": 9.1534,
+    "duration": 0.8775
+  },
+  "runner.count": {
+    "start": 10.1309,
+    "duration": 0.48
+  },
+  "runner.go": {
+    "start": 10.7109,
+    "duration": 1
+  },
+  "runner.finish": {
+    "start": 11.8109,
+    "duration": 2.48
+  },
+  "runner.wind": {
+    "start": 14.3909,
+    "duration": 5,
+    "loop": true
+  }
+}

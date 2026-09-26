@@ -1,12 +1,16 @@
 import type { GameModule } from '@/engine/types.ts';
 
-export type GameId = 'chickenz' | 'pool' | 'soccer';
+export type GameId = 'chickenz' | 'pool' | 'soccer' | 'runner';
 
 type GameEntry = {
   id: GameId;
   title: string;
   /** i18n key for the one-line pitch on the cabinet tile. */
-  taglineKey: 'games.chickenz.tagline' | 'games.pool.tagline' | 'games.soccer.tagline';
+  taglineKey:
+    | 'games.chickenz.tagline'
+    | 'games.pool.tagline'
+    | 'games.soccer.tagline'
+    | 'games.runner.tagline';
   players: string;
   /** Hidden games are never shown as "coming soon" (PLAN §1 decision 7). */
   hidden: boolean;
@@ -38,6 +42,14 @@ export const GAMES = [
     players: '1–4',
     hidden: false,
     load: () => import('./soccer/index.ts').then((m) => m.soccer),
+  },
+  {
+    id: 'runner',
+    title: 'Neon Dash',
+    taglineKey: 'games.runner.tagline',
+    players: '1–4',
+    hidden: false,
+    load: () => import('./runner/index.ts').then((m) => m.runner),
   },
 ] as const satisfies readonly GameEntry[];
 
