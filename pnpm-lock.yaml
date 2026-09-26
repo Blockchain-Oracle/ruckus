@@ -444,6 +444,9 @@ importers:
 
   packages/sim-runner:
     devDependencies:
+      '@arena/casino-math':
+        specifier: workspace:*
+        version: link:../casino-math
       '@arena/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

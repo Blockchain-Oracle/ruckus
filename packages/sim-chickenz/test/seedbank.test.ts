@@ -44,6 +44,9 @@ describe('Back a Bird seed bank v1', () => {
     const a = presentationSeed(bank, word, 1);
     expect(presentationSeed(bank, word, 1)).toBe(a);
     expect(bank.classes[1]).toContain(a);
-    expect(bankHash(bankJson)).toMatch(/^0x[0-9a-f]{64}$/);
+    // The published hash (canonical form): anyone can check the committed bank against it.
+    expect(bankHash(bankJson)).toBe(
+      '0xed9673a8378ddf604e5602f5489a5e06b28072502ba728713fd2707a5e363f26',
+    );
   });
 });

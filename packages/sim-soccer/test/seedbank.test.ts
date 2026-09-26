@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
+  bankHash,
   FINISH_CALLS,
   FINISH_CLASSES,
   finishPresentation,
@@ -13,10 +14,17 @@ import {
 import { finishOf } from '../src/index.ts';
 
 const BANK = new URL('../../casino-math/seedbanks/soccer-finish.v1.json', import.meta.url);
-const bank = JSON.parse(readFileSync(fileURLToPath(BANK), 'utf8')) as SeedBank;
+const raw = readFileSync(fileURLToPath(BANK), 'utf8');
+const bank = JSON.parse(raw) as SeedBank;
+/** The published hash (stage doc): anyone can check the committed bank against it. */
+const PUBLISHED_KECCAK = '0x729244ed17e8dfef4a05b577a667c570df3341803124e9a8f12c7617ad0b7eac';
 const weights = FINISH_CLASSES.map((c) => c.weight);
 
 describe('Call the Finish seed bank v1', () => {
+  it('is the published bank', () => {
+    expect(bankHash(raw)).toBe(PUBLISHED_KECCAK);
+  });
+
   it('has K seeds for every finish class', () => {
     expect(bank.classes).toHaveLength(FINISH_CLASSES.length);
     for (const seeds of bank.classes) expect(seeds).toHaveLength(bank.perClass);

@@ -61,7 +61,7 @@
 - [x] Contract: bet types 5–17 via `_finishCover`, `_makeMiss` at 96%, empty-params validation. Foundry: exact RTP for every call, top/bottom multipliers, fuzzed cap and reserve, bad params, unknown type. The parity vectors cover all 13 calls.
 - [x] `@arena/casino-math`: `FINISH_CLASSES`, `FINISH_CALLS`, tables, vectors, `finishPresentation`.
 - [x] `sim-soccer/golden.ts`: `goldenWorld`, `FinishTracker`, `finishOf`.
-  - Bank miner (`pnpm -F @arena/sim-soccer mine-bank`): v1 scanned 5,444 matches, keccak `0x6f0a5a9e4a353a86940be518ca687d5825caef047ad4a3be61d98116a1ea1c53`.
+  - Bank miner (`pnpm -F @arena/sim-soccer mine-bank`): v1 scanned 5,444 matches. Canonical keccak `0x729244ed17e8dfef4a05b577a667c570df3341803124e9a8f12c7617ad0b7eac` (session 5 made `bankHash` hash the compact JSON, because the first published hash was taken before Biome reformatted the file; the tests pin it).
   - CI test: every bank entry replays to its finish; a made call always shows a covered finish, and a missed call never does.
 - [x] Client: store, calls, controller (settle → presentation → golden goal → result → reveal guard), FinishHud (fits every screen), hub button, skip, dev evidence `__ruckusFinish`.
 - [x] Demo-mode run at 1280×720, 844×390 and 390×844: the call button is on screen, the played finish equals the promised one, and there are no errors.

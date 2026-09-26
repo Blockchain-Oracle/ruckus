@@ -5,17 +5,9 @@ export * from './serialize.ts';
 export { coastSpeed, momentum, runnerHeight, speedOf, step } from './step.ts';
 export * from './world.ts';
 
-import { thinkBot } from './bot.ts';
-import { step } from './step.ts';
 import type { Runner, World } from './world.ts';
 
-/** Bots decide, then the world steps: the one call a race loop needs per tick. */
-export function tick(w: World) {
-  w.runners.forEach((r, i) => {
-    if (r.bot >= 0) r.input = thinkBot(w, i);
-  });
-  step(w);
-}
+export { tick } from './tick.ts';
 
 /** A dead heat's last resort: a per-race draw from the seed, so no seat (the host) always wins it. */
 const draw = (w: World, slot: number) =>
@@ -47,4 +39,6 @@ export function hashWorld(w: World): string {
   for (const b of bytes) h = Math.imul(h ^ b, 0x01000193) >>> 0;
   return h.toString(16);
 }
+
+export * from './gauntlet.ts';
 export * from './recording.ts';

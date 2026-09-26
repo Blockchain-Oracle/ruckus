@@ -7,7 +7,7 @@ import { type Input, type Phase, type Runner, takenWords, type World } from './w
  * rebuilt from the seed in the header. Events are per-tick output and don't travel either.
  */
 const PHASES = ['countdown', 'run', 'over'] as const satisfies readonly Phase[];
-const HEADER = 7;
+const HEADER = 8;
 const PER_RUNNER = 31;
 
 const perRunner = (w: World) => PER_RUNNER + takenWords(w.course);
@@ -17,7 +17,10 @@ const bit = (b: boolean) => (b ? 1 : 0);
 const inputOut = (i: Input) => [i.h, bit(i.jump), bit(i.duck)];
 
 export function packWorld(w: World, out = new Float64Array(packedLength(w))) {
-  out.set([w.seed, w.tick, PHASES.indexOf(w.phase), w.phaseTicks, w.grace, w.finishers, w.rng], 0);
+  out.set(
+    [w.seed, w.tick, PHASES.indexOf(w.phase), w.phaseTicks, w.grace, w.finishers, w.rng, w.finishM],
+    0,
+  );
   const stride = perRunner(w);
   w.runners.forEach((r, i) => {
     const at = HEADER + i * stride;
@@ -82,6 +85,7 @@ export function unpackWorld(w: World, a: Float64Array): boolean {
   w.grace = at(4);
   w.finishers = at(5);
   w.rng = at(6) >>> 0;
+  w.finishM = at(7);
   w.events.length = 0;
   w.runners.forEach((r: Runner, i) => {
     const b = HEADER + i * stride;

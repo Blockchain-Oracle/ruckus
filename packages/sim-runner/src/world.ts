@@ -1,4 +1,4 @@
-import { COUNTDOWN_S, START_COINS, START_LANE, TICK_HZ } from './constants.ts';
+import { COUNTDOWN_S, COURSE_M, START_COINS, START_LANE, TICK_HZ } from './constants.ts';
 import { buildCourse, type Entity, type PickupId } from './course.ts';
 
 /**
@@ -62,7 +62,7 @@ export type SimEvent =
   | { kind: 'slam'; runner: number }
   | { kind: 'coin'; runner: number; value: number; entity: number }
   | { kind: 'hit'; runner: number; shielded: boolean; entity: number }
-  | { kind: 'wipeout'; runner: number }
+  | { kind: 'wipeout'; runner: number; entity: number }
   | { kind: 'pickup'; runner: number; pickup: PickupId; entity: number }
   | { kind: 'expire'; runner: number; pickup: PickupId }
   | { kind: 'finish'; runner: number; place: number }
@@ -71,6 +71,8 @@ export type SimEvent =
 export type World = {
   seed: number;
   course: readonly Entity[];
+  /** Where the finish line is (the race's COURSE_M; a wager gauntlet's is shorter). */
+  finishM: number;
   tick: number;
   phase: Phase;
   /** Countdown ticks left. */
@@ -131,6 +133,7 @@ export function newWorld(seed: number, bots: readonly number[]): World {
   return {
     seed: seed >>> 0,
     course,
+    finishM: COURSE_M,
     tick: 0,
     phase: 'countdown',
     phaseTicks: COUNTDOWN_S * TICK_HZ,

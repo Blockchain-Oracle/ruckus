@@ -86,7 +86,7 @@ export function step(w: World) {
 
 /** Past the line: ease to a stop on the road (no more collisions), ready to celebrate. */
 export const coastSpeed = (w: World, r: Runner) =>
-  baseSpeedAt(COURSE_M) * Math.max(0, 1 - (w.tick - r.finished) / (COAST_S * TICK_HZ));
+  baseSpeedAt(w.finishM) * Math.max(0, 1 - (w.tick - r.finished) / (COAST_S * TICK_HZ));
 
 function coast(w: World, r: Runner) {
   r.s += coastSpeed(w, r) * DT;
@@ -113,9 +113,9 @@ function run(w: World, r: Runner, i: number) {
   }
   contacts(w, r, i);
   timers(w, r, i);
-  if (r.s < COURSE_M || r.out) return false;
+  if (r.s < w.finishM || r.out) return false;
   // The exact moment within the tick the line was crossed (ticks, fractional): photo finishes.
-  r.finished = w.tick - 1 + (COURSE_M - from) / (r.s - from);
+  r.finished = w.tick - 1 + (w.finishM - from) / (r.s - from);
   return true;
 }
 
@@ -264,7 +264,7 @@ function hit(w: World, r: Runner, i: number, entity: number) {
   }
   if (r.coins < HIT_COST) {
     r.out = true;
-    w.events.push({ kind: 'wipeout', runner: i });
+    w.events.push({ kind: 'wipeout', runner: i, entity });
     return;
   }
   r.coins -= HIT_COST;
