@@ -1,6 +1,76 @@
-# HANDOFF (updated 2026-09-25 by session 4)
+# HANDOFF (updated 2026-09-26 by session 5)
 
-**Stage:** Soccer is complete: S17–S21 done in session 4, with Call the Finish (S20) as its wager. **Runner S22 is next.** S09 Chickenz feel is still open. S10a is **done**: the Back a Bird simulator e2e passes, 6× class included. The play-first rule still holds (user, 2026-09-25): every game must be playable vs bots, with friends and as a watcher, at full reference fidelity, before its wager.
+**Stage:** All four games are complete and live, and the hub opens on the **arena landing**.
+- Chickenz, 8-Ball, Egg Soccer and Neon Dash are each playable vs bots, online with friends and watchers, and with lessons, and each has its VRF wager.
+- **Runner S22–S26 done this session.**
+- The user's precondition for submission (all 4 games + a multi-game hub) is now met, so **✱E submission is next and needs the user.**
+- S09 Chickenz feel gaps are still open.
+
+**Last completed (session 5): Neon Dash, the runner (after KaspaKinesis/DAG Dasher):**
+- **S22 sim** (`packages/sim-runner`):
+  - a same-seed ghost race: the course is `f(seed)`, coins and orbs are taken per runner
+  - KK numbers and barrier grammar
+  - coins are life (two free hits), coin momentum (+1% per coin, max 10), air slam, photo finishes
+  - skill bots with misses; Float64 snapshots
+- **S23 render:**
+  - neon road/city (procedural, floating origin)
+  - verb-silhouette barriers
+  - Quaternius CC0 mannequin with 14 clips (`packages/assets-pipeline/src/runner-character.ts`; `assets-src/runner/fetch-packs.sh` pulls the packs from itch)
+  - hologram ghosts that fade near you
+  - sparks, shake, speed lines
+  - HUD: rail, coins, km/h, standings, results
+  - keys and mid-gesture swipes
+  - ElevenLabs SFX + synthwave chase theme
+- **S24 online:**
+  - RunnerRoom plus lobby, watchers and walkout → bot
+  - **"beat my run" links**: seed + RLE inputs in the URL, the time recomputed by replay; the hub shows "Beat NAME · m:ss.cc"
+  - dead heats fall to a seeded draw, not slot 0
+- **S25 wager "Call the Wipeout":**
+  - bet types **18–23**: any wipeout 1.2×, jump 3.84×, duck 3.2×, clean 4.8×, dodge 6.4×, strict 9.6×; all 96%
+  - gauntlet + `runner-wipeout.v1` bank
+  - simulator e2e PASS (18 rounds, 9.6× paid exactly)
+- **S26:** six hands-on lessons.
+- **Arena landing** (ADR-007 resolved): no deep link → "Four games. One arena.", cabinet cards with **real recorded attract loops**.
+  - `pnpm -F @arena/browser-checks capture-previews` then `pnpm -F @arena/assets-pipeline previews`
+  - A deep link never flashes the landing.
+- **Cross-cutting fixes:**
+  - `bankHash` is canonical, and the bank tests pin their hashes. The Soccer doc hash is updated.
+  - Protocol **2**: the runner snapshot gained `finishM`.
+  - Budgets no longer count shell assets into game chunks; the shell budget is now 160 KB (157.0 used).
+  - The casino-bridge test used a now-real bet type as "unknown".
+  - A StrictMode remount stopped the runner's animations (T-pose).
+
+**NEXT ACTION:**
+1. **✱E submission. This needs the user**; ask, don't do.
+   - The form wants the Discord, X and Telegram handles, source access (repo reviewers invited) and the go-ahead.
+   - Prepared: title RUCKUS, URL https://ruckus-nine.vercel.app, declared RTP 96%, pitch in the session 5 summary.
+   - Production is checked: widget tag, og:image 1200×630, manifest, no frame-blocking headers.
+   - The contract now has bet types 0–23. They are final unless a new wager is added (the one-contract rule).
+2. S27 tournaments / daily seeded cups (a fixed daily seed per game; runner PB ghosts per daily course).
+3. S28 mobile/a11y/perf re-audit. The shell is 157 KB gz, so auditing the growth from 143.7 KB is still open.
+4. Chickenz feel gaps (ledger audit list).
+
+**Uncommitted work:** none.
+
+**Blocked on the user:** ✱E submission (handles, reviewers, go-ahead).
+
+**Environment state:**
+- Simulator: `cd casino-sdk && npm start` (:3300, chain :8545). RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` with bet types 0–23 (re-sync with `pnpm -F @arena/contracts sync`, then restart).
+- Web dev server: :5173. Local game server: `node apps/server/dist/index.js` on :2567 (rebuild after protocol changes: it runs protocol 2).
+- **Coolify deploys:** open the tunnel yourself with `ssh -N -L 8001:127.0.0.1:8000 agari-box` (the key is in ~/.ssh/config), then `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow`. Production server: protocol 2, commit 424f9c0+.
+- Vercel production: https://ruckus-nine.vercel.app, which deploys on push to main.
+- Dev handles (DEV builds only): `__ruckusRunner`, `__ruckusRunnerTutorial`, `__ruckusWipeout`.
+- `?capture` (DEV) centres attract framing for recording previews.
+
+**Last green verification (session 5):**
+- `pnpm verify`, Foundry (25 tests), web build + budgets.
+- Browser checks (web dev server; Runner scripts):
+  - `runner-room` PASS: 238/238 samples, worst 0.7 m
+  - `runner-challenge` PASS: the ghost finished on the exact recorded tick
+  - `runner-tutorial` PASS
+  - `runner-wipeout` PASS: simulator, 18 rounds
+- Production SDK probe: a runner room race gave 100 snapshots at 20.6 Hz, all unpacked by the current client.
+- Screens at 1280×720, 1440×900, 844×390 and 390×844 (landing, race, results, call sheet, lessons).
 
 **Last completed (session 3):**
 - Chickenz settings (`games/chickenz/prefs.ts`, `hud/ChickenzSettings.tsx`):
