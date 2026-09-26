@@ -19,11 +19,11 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 13 | S09 Chickenz feel, HUD, tutorial, touch, sound | active (gaps: parity ledger §2) | [stages/S09-chickenz-feel.md](stages/S09-chickenz-feel.md) |
 | 14 | S10b Chickenz wagers (full) | todo | [stages/S10b-chickenz-wagers.md](stages/S10b-chickenz-wagers.md) |
 | 15 | S11 Ship Chickenz (✱ submit/update) | todo | [stages/S11-ship-chickenz.md](stages/S11-ship-chickenz.md) |
-| 16 | S12 Pool sim | todo | [stages/S12-pool-sim.md](stages/S12-pool-sim.md) |
-| 17 | S13 Pool rendering and assets | todo | [stages/S13-pool-rendering.md](stages/S13-pool-rendering.md) |
-| 18 | S14 Pool room and bot | todo | [stages/S14-pool-room.md](stages/S14-pool-room.md) |
-| 19 | S15 Pool wager | todo | [stages/S15-pool-wager.md](stages/S15-pool-wager.md) |
-| 20 | S16 Pool tutorial, polish, ship | todo | [stages/S16-pool-tutorial.md](stages/S16-pool-tutorial.md) |
+| 16 | S12 Pool sim | done | [stages/S12-pool-sim.md](stages/S12-pool-sim.md) |
+| 17 | S13 Pool rendering and assets | done | [stages/S13-pool-rendering.md](stages/S13-pool-rendering.md) |
+| 18 | S14 Pool room and bot | done | [stages/S14-pool-room.md](stages/S14-pool-room.md) |
+| 19 | S15 Pool wager | done | [stages/S15-pool-wager.md](stages/S15-pool-wager.md) |
+| 20 | S16 Pool tutorial, polish, ship | done | [stages/S16-pool-tutorial.md](stages/S16-pool-tutorial.md) |
 | 21 | S17 Soccer sim | done | [stages/S17-soccer-sim.md](stages/S17-soccer-sim.md) |
 | 22 | S18 Soccer rendering and assets | done | [stages/S18-soccer-rendering.md](stages/S18-soccer-rendering.md) |
 | 23 | S19 Soccer room and bot | done | [stages/S19-soccer-room.md](stages/S19-soccer-room.md) |

@@ -9,7 +9,7 @@ export const en = {
   'hub.pickGame': 'Pick a cabinet',
   'hub.arena.title': 'Four games. One arena.',
   'hub.arena.body':
-    'Play friends, strangers or bots for free and climb the ranks. Every game also has a VRF round you can call.',
+    'Play friends, strangers or bots for free, online or right here. Every game also has a VRF round you can call.',
   'hub.arena.online': 'Online',
   'hub.players': 'players',
   'balance.demo': 'DEMO',
