@@ -1,4 +1,4 @@
-/** Visual tuning for the persistent shell. Timings follow the xray.games teardown (docs/research/deep/xray-games.md). */
+/** Visual tuning for the persistent shell. Timings follow the xray.games hub. */
 
 /** Game switch: dark scrim fades in, the scene swaps at full black, then it fades out. */
 export const SCRIM_HALF_MS = 200;

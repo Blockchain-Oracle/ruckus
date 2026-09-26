@@ -1,6 +1,6 @@
 import { noise1 } from './noise.ts';
 
-/** Eiserloh trauma model (docs/research/deep/game-feel-audio-ux.md §1.2). */
+/** Eiserloh trauma model (GDC 2016, "Math for Game Programmers: Juicing Your Cameras"). */
 export const TRAUMA = {
   small: 0.15,
   shot: 0.3,

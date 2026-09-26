@@ -67,9 +67,8 @@ GEMINI.md
 .codex/
 .windsurf/
 .mcp.json
-docs/roadmap/
-docs/raw/
-docs/marketing/
-docs/requirements.md
-docs/research/0*.md
-docs/assets/elevenlabs-request.md
+# Working docs (decisions, research, parity notes, credits ledger) stay local; only the README art ships.
+docs/*
+!docs/assets/
+docs/assets/*
+!docs/assets/readme/

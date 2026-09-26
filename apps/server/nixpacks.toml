@@ -1,4 +1,4 @@
-# Coolify build for the Colyseus game server (ADR-002, docs/research/deep/coolify-nixpacks.md).
+# Coolify build for the Colyseus game server.
 # Coolify: Base Directory "/", build variables NIXPACKS_CONFIG_FILE=apps/server/nixpacks.toml
 # and NIXPACKS_NODE_VERSION=24. Never set NODE_ENV=production as a *build* variable.
 

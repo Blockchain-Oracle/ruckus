@@ -1,5 +1,5 @@
 /**
- * 3-lane runner rules and numbers, from DAG Dasher (docs/research/deep/kaspakinesis.md §0.1).
+ * 3-lane runner rules and numbers, from DAG Dasher (KaspaKinesis).
  * Units are world units ("metres") and seconds. `s` is distance along the course (forward),
  * `y` is height above the track, lanes are 0 (left) · 1 · 2 (right).
  */

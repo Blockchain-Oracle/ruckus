@@ -1,4 +1,4 @@
-/** Mix and dynamics tuning (docs/research/deep/game-feel-audio-ux.md §2.5). */
+/** Mix and dynamics tuning. */
 
 export const BUSES = ['music', 'sfx', 'ui'] as const;
 export type Bus = (typeof BUSES)[number];

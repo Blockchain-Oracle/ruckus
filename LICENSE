@@ -20,6 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Third-party code and assets keep their own licences; see docs/CREDITS.md. The
+Third-party code and assets keep their own licences (see the NOTICE files). The
 vendored Chain casino SDK (packages/chain-casino-sdk, casino-sdk/) is provided
 by Chain.wtf under its own terms and is not covered by this licence.

@@ -16,7 +16,7 @@ import {
 
 /**
  * Chickenz's particle and one-shot effects, triggered by diffing sim views (all in px, y down).
- * Numbers from `GameScene.ts:447-491, 1584-1690, 2122-2143` via docs/assets/chickenz-parity.md.
+ * Numbers from `GameScene.ts:447-491, 1584-1690, 2122-2143`.
  */
 const DEG = Math.PI / 180;
 const DUST_CAPACITY = 256;

@@ -1,5 +1,5 @@
 /**
- * Head-soccer rules and numbers, measured from Eggy League (docs/research/deep/eggy-league.md).
+ * Head-soccer rules and numbers, measured from Eggy League.
  * Units are the game's pixels and seconds; y points up, the floor is y = 0, x = 0 is the centre.
  */
 

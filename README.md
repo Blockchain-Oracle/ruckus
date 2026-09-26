@@ -48,8 +48,8 @@ The demo video is being cut from a real game night. Until it's up, the thumbnail
 [![How RUCKUS fits together: the browser, the game server, Convex, the shared sims and the wager path](docs/assets/readme/architecture.png)](docs/assets/readme/architecture.png)
 
 - **Browser** ([apps/web](apps/web)): React 19 and React Three Fiber on WebGPU. One hub holds all four games; starting a match is a camera move, not a page change.
-- **Game server** ([apps/server](apps/server)): Colyseus 0.18. Each game has a room type that runs the authoritative sim, fills empty seats with bots and lets friends watch. It deploys with Nixpacks on Coolify ([ADR-002](docs/decisions/ADR-002-hosting-nixpacks.md)).
-- **Deterministic sims** ([packages/sim-pool](packages/sim-pool), [sim-soccer](packages/sim-soccer), [sim-runner](packages/sim-runner), [crates/chickenz-sim](crates/chickenz-sim)): the same code runs on the server and in the browser. They never read a clock or `Math.random`, and bots draw from the sim's own seeded PRNG. Chickenz is Rust fixed-point compiled to wasm ([ADR-005](docs/decisions/ADR-005-chickenz-rust-ffa.md)).
+- **Game server** ([apps/server](apps/server)): Colyseus 0.18. Each game has a room type that runs the authoritative sim, fills empty seats with bots and lets friends watch. It deploys with Nixpacks on Coolify ([nixpacks.toml](apps/server/nixpacks.toml)).
+- **Deterministic sims** ([packages/sim-pool](packages/sim-pool), [sim-soccer](packages/sim-soccer), [sim-runner](packages/sim-runner), [crates/chickenz-sim](crates/chickenz-sim)): the same code runs on the server and in the browser. They never read a clock or `Math.random`, and bots draw from the sim's own seeded PRNG. Chickenz is Rust fixed-point compiled to wasm.
 - **Convex** ([convex](convex)): anonymous guest accounts, so nobody signs up to play.
 - **Wager path**: the game talks to the host only through the Chain casino SDK bridge ([packages/casino-bridge](packages/casino-bridge)), and one contract settles every call ([contracts/src/RuckusGame.sol](contracts/src/RuckusGame.sol)).
 
@@ -71,7 +71,7 @@ One contract, `RuckusGame`, implements `ICasinoGameV2` with 24 bet types. **Ever
 
 The TypeScript mirror of the tables is [packages/casino-math/src/tables.ts](packages/casino-math/src/tables.ts). Committed parity vectors check that it matches the Solidity payout for every bet type ([contracts/vectors](contracts/vectors), [contracts/test/Parity.t.sol](contracts/test/Parity.t.sol)).
 
-**Why these are new casino games:** each round is built on a real moment from its game. It isn't a dice roll with a skin, and none of them is a classic or a crash, plinko, dice, limbo or mines clone. The novelty check is in [ADR-001](docs/decisions/ADR-001-money-model.md) and [docs/competitors.md](docs/competitors.md).
+**Why these are new casino games:** each round is built on a real moment from its game. It isn't a dice roll with a skin, and none of them is a classic or a crash, plinko, dice, limbo or mines clone. Each one was checked against the originals on Stake, Roobet, BC.Game, Rollbit and Shuffle.
 
 ## Jam requirements, and where each one is met
 
@@ -126,13 +126,11 @@ The tests cover what can quietly go wrong: RTP and payout parity, unbiased class
 | Rooms and matchmaking | [apps/server/src/rooms](apps/server/src/rooms) |
 | The contract and its tests | [contracts](contracts) |
 | Payout tables, VRF draw mirror, seed banks | [packages/casino-math](packages/casino-math) |
-| Why things are the way they are | [docs/decisions](docs/decisions) (ADR-001 to ADR-007) |
-| Where the game-feel numbers come from | [docs/research/deep](docs/research/deep) |
-| Art direction | [docs/assets/ART-BIBLE.md](docs/assets/ART-BIBLE.md) |
+| Brand colours and type | [apps/web/src/styles/tokens.css](apps/web/src/styles/tokens.css) |
 | A plain-text index for automated readers | [llms.txt](llms.txt) |
 
 ## Credits
 
-RUCKUS stands on open work: the original [Chickenz](https://github.com/AshFrancis/chickenz) (MIT), [pooltool](https://github.com/ekiefl/pooltool)'s physics models (Apache-2.0), [KaspaKinesis](https://github.com/peavey2787/KaspaKinesis)' runner rules (MIT), Pixel Frog and Quaternius art (CC0), and sound and music made with ElevenLabs. Every asset, with its licence, is listed in [docs/CREDITS.md](docs/CREDITS.md).
+RUCKUS stands on open work: the original [Chickenz](https://github.com/AshFrancis/chickenz) (MIT), [pooltool](https://github.com/ekiefl/pooltool)'s physics models (Apache-2.0), [KaspaKinesis](https://github.com/peavey2787/KaspaKinesis)' runner rules (MIT), Pixel Frog and Quaternius art (CC0), and sound and music made with ElevenLabs. Their notices ship with the code that uses them ([crates/chickenz-sim/NOTICE](crates/chickenz-sim/NOTICE), [packages/sim-pool/NOTICE](packages/sim-pool/NOTICE)).
 
-Made by **Abubakr Jimoh**. [MIT licensed](LICENSE); third-party material keeps its own terms, as listed in the credits.
+Made by **Abubakr Jimoh**. [MIT licensed](LICENSE); third-party material keeps its own terms.

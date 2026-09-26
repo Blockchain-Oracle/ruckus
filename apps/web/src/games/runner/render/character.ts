@@ -42,7 +42,7 @@ type Loaded = { scene: Object3D; clips: AnimationClip[]; scale: number };
 let loading: Promise<Loaded> | null = null;
 let loaded: Loaded | null = null;
 
-/** Quaternius's CC0 mannequin (docs/CREDITS.md), loaded once and cloned per runner. */
+/** Quaternius's CC0 mannequin, loaded once and cloned per runner. */
 export function loadRunnerCharacter() {
   loading ??= new GLTFLoader()
     .setMeshoptDecoder(MeshoptDecoder)

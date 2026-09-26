@@ -14,15 +14,9 @@
 - [Seed banks](packages/casino-math/seedbanks): per-class seeds the client replays to present a VRF outcome; each sim's test replays every entry.
 - [Casino bridge](packages/casino-bridge/src/bridge.ts): SDK-only host communication; standalone DemoHost ("Demo credits, no value") when there is no parent frame or no handshake within 3 s.
 - [Manifest](apps/web/public/game.manifest.json): gameId "ruckus", served same-origin.
-- [Money model and novelty check](docs/decisions/ADR-001-money-model.md), [competitor originals checked against](docs/competitors.md).
 
 ## Games
 - [Web app](apps/web/src): hub and the four games (apps/web/src/games/<game>; games never import each other).
 - [Chickenz sim](crates/chickenz-sim): Rust fixed-point, 4-player FFA, wasm build in packages/sim-chickenz.
 - [Pool sim](packages/sim-pool), [Soccer sim](packages/sim-soccer), [Runner sim](packages/sim-runner): deterministic TypeScript, no clocks or Math.random, bots on the sim PRNG.
 - [Game server rooms](apps/server/src/rooms): Colyseus rooms per game, authoritative sims, bots and watchers.
-
-## Decisions and sources
-- [Architecture decision records](docs/decisions): ADR-001 to ADR-007.
-- [Research behind tuning numbers](docs/research/deep): cited from constants files.
-- [Credits and licences](docs/CREDITS.md).
