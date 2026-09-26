@@ -12,7 +12,11 @@
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
+    "@gltf-transform/core": "^4.5.0",
+    "@gltf-transform/extensions": "^4.5.0",
+    "@gltf-transform/functions": "^4.5.0",
     "@types/node": "^24.10.0",
+    "meshoptimizer": "^1.3.0",
     "typescript": "catalog:"
   }
 }

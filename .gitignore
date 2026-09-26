@@ -48,3 +48,6 @@ test-results/
 !.vscode/extensions.json
 .vercel
 .env*
+
+# CC0 packs fetched by assets-src/runner/fetch-packs.sh (large; rebuilt locally)
+assets-src/runner/packs/
