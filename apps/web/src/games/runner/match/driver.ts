@@ -3,6 +3,9 @@ import {
   IDLE,
   type Input,
   newWorld,
+  packInput,
+  type Recording,
+  recordedInput,
   type SimEvent,
   tick,
   unpackWorld,
@@ -44,6 +47,10 @@ export class RunnerDriver {
   private queue: SimEvent[] = [];
   private seqNo = 0;
   private pending: { seq: number; input: Input }[] = [];
+  /** Your held input every tick of this race (a "beat my run" link is this plus the seed). */
+  private frames: number[] = [];
+  /** Recorded runs racing as ghosts, by sim slot (a challenger's run). */
+  private replays = new Map<number, Recording>();
   readInput: () => Input = () => IDLE;
   sendInput: ((seq: number, input: Input) => void) | null = null;
 
@@ -72,6 +79,20 @@ export class RunnerDriver {
     this.reset();
   }
 
+  /** Beat my run: you in slot 0 against a recorded run's ghost on its own course. */
+  startChallenge(run: Recording) {
+    this.seed = run.seed;
+    this.mode = { kind: 'race', bot: -1, humanSlot: 0 };
+    this.world = newWorld(run.seed, [-1, -1]);
+    this.reset();
+    this.replays.set(1, run);
+  }
+
+  /** The race so far as a recording (your inputs on this seed). */
+  recording(): Recording {
+    return { seed: this.world.seed, frames: Uint8Array.from(this.frames) };
+  }
+
   startOnline(seed: number, bots: readonly number[], humanSlot: number) {
     this.mode = { kind: 'online', humanSlot };
     this.world = newWorld(seed, bots);
@@ -84,6 +105,8 @@ export class RunnerDriver {
     this.queue.length = 0;
     this.pending = [];
     this.seqNo = 0;
+    this.frames = [];
+    this.replays = new Map();
     this.smooth = this.world.runners.map(() => ({ s: 0, y: 0 }));
     this.snapshot();
   }
@@ -134,6 +157,10 @@ export class RunnerDriver {
       this.acc -= DT;
       steps += 1;
       this.snapshot();
+      for (const [slot, run] of this.replays) {
+        const r = w.runners[slot];
+        if (r) r.input = recordedInput(run, w.tick);
+      }
       const human = w.runners[this.humanSlot];
       if (human) {
         human.input = this.readInput();
@@ -144,7 +171,10 @@ export class RunnerDriver {
           this.sendInput?.(this.seqNo, human.input);
         }
       }
+      const at = w.tick;
       tick(w);
+      // Frame i is the input applied going into tick i + 1, exactly how a replay feeds it back.
+      if (human) this.frames[at] = packInput(human.input);
       for (const e of w.events) this.queue.push(e);
     }
     if (steps === MAX_STEPS_PER_FRAME) this.acc = 0;

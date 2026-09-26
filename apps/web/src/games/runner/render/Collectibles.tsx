@@ -21,6 +21,8 @@ const MAX_PLATFORMS = 16;
 const COIN_SPIN = 2;
 const PICKUP_SPIN = 1.5;
 const PLATFORM_W = 2.2;
+/** Coins and orbs this far behind you are no longer drawn. */
+const PASSED_M = 1.5;
 
 const dummy = new Object3D();
 const tint = new Color();
@@ -88,6 +90,8 @@ export function Collectibles({ world, focus, focusS }: Props) {
         continue;
       }
       if (me && isTaken(me, k)) continue;
+      // Passed-by coins and orbs would sweep past the camera lens as giant discs: gone once behind.
+      if (e.s < s - PASSED_M) continue;
       if (e.kind === 'coin') {
         if (nc >= MAX_COINS) continue;
         const bob = Math.sin(tt * Math.PI * 8 + e.s) * 0.1;

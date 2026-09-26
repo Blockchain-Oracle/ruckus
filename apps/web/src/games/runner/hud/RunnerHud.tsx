@@ -1,13 +1,14 @@
 import { ArrowLeftIcon, GearSixIcon } from '@phosphor-icons/react';
 
-import { TICK_HZ } from '@arena/sim-runner';
+import { COUNTDOWN_S, TICK_HZ } from '@arena/sim-runner';
 
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 
-import { startRace } from '../match/flow.ts';
+import { currentChallenge, startChallenge, startRace } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
 import { useRunner } from '../match/store.ts';
+import { raceClock, shareChallenge } from '../net/challenge.ts';
 import { Announce, Flash } from './Announce.tsx';
 import { ControlsButton, IntroCard } from './Controls.tsx';
 import { CoinsAndSpeed, PowerChip, ProgressRail, Standings } from './Gauges.tsx';
@@ -16,6 +17,20 @@ import { useCoarse } from './useCoarse.ts';
 import { useTick } from './useTick.ts';
 
 const HUD_HZ = 15;
+
+/** Racing a friend's ghost, "Race again" means that same ghost again. */
+const rematch = () => {
+  const c = currentChallenge();
+  if (c) startChallenge(c);
+  else startRace();
+};
+
+function challengeFriend(name: string) {
+  const d = getDriver();
+  const me = d?.world.runners[d.humanSlot];
+  if (!d || !me || me.finished < 0) return;
+  void shareChallenge(d.recording(), name, raceClock(me.finished - COUNTDOWN_S * TICK_HZ));
+}
 /** The control reminder stays up for the opening seconds of each race. */
 const HINT_TICKS = 18 * TICK_HZ;
 const roundBtn =
@@ -31,7 +46,8 @@ export function RunnerHud({ onLeave }: { onLeave: () => void }) {
   if (status === 'off' || !d) return null;
   if (status === 'intro') return <IntroCard onGo={startRace} />;
   const w = d.world;
-  const you = Math.max(0, d.humanSlot);
+  // Watchers follow whoever the camera rides with.
+  const you = d.humanSlot >= 0 ? d.humanSlot : d.focus;
   const hint = status === 'playing' && w.tick < HINT_TICKS;
 
   return (
@@ -88,8 +104,9 @@ export function RunnerHud({ onLeave }: { onLeave: () => void }) {
           you={d.humanSlot}
           names={names}
           online={online}
-          onRematch={startRace}
+          onRematch={rematch}
           onLeave={onLeave}
+          onChallenge={online ? undefined : () => challengeFriend(names[you] ?? 'A friend')}
         />
       )}
     </div>

@@ -101,7 +101,7 @@ export function CoinsAndSpeed({ w, you }: { w: World; you: number }) {
 export function PowerChip({ w, you }: { w: World; you: number }) {
   const me = w.runners[you];
   const p = me?.power;
-  if (!me || !p) return null;
+  if (!me || !p || me.finished >= 0 || me.out) return null;
   const look = PICKUP_LOOK[p];
   const total = PICKUPS[p].seconds * TICK_HZ;
   return (

@@ -13,9 +13,10 @@ import { COLORS } from './config.ts';
 import { controlsSeen } from './hud/controlsSeen.ts';
 import { attachKeys, readInput } from './input/keys.ts';
 import { RunnerDriver } from './match/driver.ts';
-import { presenter, startRace, stopRace } from './match/flow.ts';
+import { consumeChallenge, presenter, startChallenge, startRace, stopRace } from './match/flow.ts';
 import { focusView, setDriver } from './match/runtime.ts';
 import { useRunner } from './match/store.ts';
+import { applyPendingRace, runnerRooms } from './net/online.ts';
 import { Barriers } from './render/Barriers.tsx';
 import { City } from './render/City.tsx';
 import { Collectibles } from './render/Collectibles.tsx';
@@ -64,6 +65,8 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
     driver.readInput = readInput;
     if (import.meta.env.DEV) Object.assign(globalThis, { __ruckusRunner: driver });
     const detach = attachKeys();
+    // A room race that arrived before this scene mounted (invite links) takes over now.
+    applyPendingRace();
     return () => {
       detach();
       setDriver(null);
@@ -74,9 +77,11 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
   // exhibition under the hub menu.
   useEffect(() => {
     if (phase === 'attract') setWindBed('backdrop');
-    if (phase === 'entering' && useRunner.getState().status === 'off') {
+    if (phase === 'entering' && useRunner.getState().status === 'off' && !runnerRooms.inRoom()) {
       fx.clear();
-      if (controlsSeen()) startRace();
+      const challenge = consumeChallenge();
+      if (challenge) startChallenge(challenge);
+      else if (controlsSeen()) startRace();
       else useRunner.getState().set({ status: 'intro' });
     } else if (phase === 'leaving') {
       stopRace();

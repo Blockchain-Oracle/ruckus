@@ -1,3 +1,4 @@
+import type { RunnerRaceStart } from '@arena/protocol/runner';
 import { COUNTDOWN_S, type SimEvent, TICK_HZ, type World } from '@arena/sim-runner';
 
 import { useProfile } from '@/app/stores/profile.ts';
@@ -6,6 +7,7 @@ import { playMusic } from '@/lib/audio/music.ts';
 import { CHASE_TRACK } from '../audio/music.ts';
 import { playCue, setWindBed } from '../audio/sfx.ts';
 import { BOT_LEVELS, SLOTS } from '../config.ts';
+import type { Challenge } from '../net/challenge.ts';
 import { useRunnerPrefs } from '../prefs.ts';
 import { getDriver } from './runtime.ts';
 import { useRunner } from './store.ts';
@@ -16,6 +18,19 @@ const GO_HOLD_S = 0.7;
 const END_HOLD_S = 2;
 
 let races = 0;
+/** A "beat my run" challenge to start on the next Play (from the hub's challenge button). */
+let challengeNext: Challenge | null = null;
+export const queueChallenge = (c: Challenge) => {
+  challengeNext = c;
+};
+export const consumeChallenge = () => {
+  const c = challengeNext;
+  challengeNext = null;
+  return c;
+};
+/** The challenge being raced right now (for the results board), or null. */
+let racing: Challenge | null = null;
+export const currentChallenge = () => racing;
 
 export const ordinal = (n: number) =>
   `${n}${n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th'}`;
@@ -27,12 +42,40 @@ export function startRace() {
   const { level } = useRunnerPrefs.getState();
   const seed = (Date.now() ^ Math.imul(races + 1, 0x9e3779b1)) >>> 0;
   d.startRace(seed, BOT_LEVELS[level]);
+  racing = null;
   const you = useProfile.getState().name || 'You';
   const pick = (i: number) => BOT_NAMES[(races * 3 + i) % BOT_NAMES.length] ?? 'Bot';
   const names = d.world.runners.map((_, i) => (i === 0 ? you : `Bot · ${pick(i)}`));
   races += 1;
   presenter.reset();
   useRunner.getState().set({ status: 'playing', names, announce: null, online: false });
+  setWindBed('race');
+  playMusic(CHASE_TRACK);
+}
+
+/** Beat my run: you against the recorded ghost of a friend's run, on that run's own course. */
+export function startChallenge(c: Challenge) {
+  const d = getDriver();
+  if (!d) return;
+  d.startChallenge(c.run);
+  racing = c;
+  const you = useProfile.getState().name || 'You';
+  presenter.reset();
+  useRunner
+    .getState()
+    .set({ status: 'playing', names: [you, `${c.by} (ghost)`], announce: null, online: false });
+  setWindBed('race');
+  playMusic(CHASE_TRACK);
+}
+
+/** A room race: names and bots come from the server; my seat is `slot` (−1 watching). */
+export function startOnlineRace(e: RunnerRaceStart, slot: number) {
+  const d = getDriver();
+  if (!d) return;
+  d.startOnline(e.seed, e.bots, slot);
+  racing = null;
+  presenter.reset();
+  useRunner.getState().set({ status: 'playing', names: e.names, announce: null, online: true });
   setWindBed('race');
   playMusic(CHASE_TRACK);
 }

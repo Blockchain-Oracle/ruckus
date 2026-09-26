@@ -1,3 +1,5 @@
+import { ShareNetworkIcon } from '@phosphor-icons/react';
+
 import { COIN_VALUE, COUNTDOWN_S, standings, TICK_HZ, type World } from '@arena/sim-runner';
 
 import { Button } from '@/ui/Button.tsx';
@@ -21,6 +23,7 @@ export function Results({
   online,
   onRematch,
   onLeave,
+  onChallenge,
 }: {
   w: World;
   you: number;
@@ -28,7 +31,10 @@ export function Results({
   online: boolean;
   onRematch: () => void;
   onLeave: () => void;
+  /** Offline races only: share your run as a "beat my run" link. */
+  onChallenge?: (() => void) | undefined;
 }) {
+  const mine = w.runners[you];
   const order = standings(w);
   const place = order.indexOf(you) + 1;
   const title = place === 1 ? 'YOU WIN!' : place > 0 ? `${ordinal(place)} place` : 'RACE OVER';
@@ -73,10 +79,15 @@ export function Results({
         {online && (
           <p className="text-xs text-cream-dim">Back to the room in a moment for the next race.</p>
         )}
-        <div className="flex shrink-0 justify-center gap-3">
+        <div className="flex shrink-0 flex-wrap justify-center gap-3">
           {!online && (
             <Button variant="tomato" sound="ui.confirm" onClick={onRematch}>
               Race again
+            </Button>
+          )}
+          {onChallenge && mine && mine.finished >= 0 && (
+            <Button variant="gold" sound="ui.coin" onClick={onChallenge}>
+              <ShareNetworkIcon weight="bold" /> Challenge a friend
             </Button>
           )}
           <Button sound="ui.back" onClick={onLeave}>

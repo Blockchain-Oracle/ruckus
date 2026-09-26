@@ -17,7 +17,9 @@
     "pool-wager": "tsx src/pool-wager-e2e.ts",
     "soccer-room": "tsx src/soccer-room.ts",
     "soccer-tutorial": "tsx src/soccer-tutorial.ts",
-    "soccer-finish": "tsx src/soccer-finish-e2e.ts"
+    "soccer-finish": "tsx src/soccer-finish-e2e.ts",
+    "runner-room": "tsx src/runner-room.ts",
+    "runner-challenge": "tsx src/runner-challenge.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",

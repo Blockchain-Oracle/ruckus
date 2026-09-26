@@ -29,9 +29,9 @@ Statuses are `todo`, `active` and `done`. ✱ marks a user checkpoint. The table
 | 23 | S19 Soccer room and bot | done | [stages/S19-soccer-room.md](stages/S19-soccer-room.md) |
 | 24 | S20 Soccer wager | done | [stages/S20-soccer-wager.md](stages/S20-soccer-wager.md) |
 | 25 | S21 Soccer tutorial, polish, ship | done | [stages/S21-soccer-tutorial.md](stages/S21-soccer-tutorial.md) |
-| 26 | S22 Runner sim | todo | [stages/S22-runner-sim.md](stages/S22-runner-sim.md) |
-| 27 | S23 Runner rendering and assets | todo | [stages/S23-runner-rendering.md](stages/S23-runner-rendering.md) |
-| 28 | S24 Runner room (ghost race) and bot | todo | [stages/S24-runner-room.md](stages/S24-runner-room.md) |
+| 26 | S22 Runner sim | done | [stages/S22-runner-sim.md](stages/S22-runner-sim.md) |
+| 27 | S23 Runner rendering and assets | done | [stages/S23-runner-rendering.md](stages/S23-runner-rendering.md) |
+| 28 | S24 Runner room (ghost race) and bot | active | [stages/S24-runner-room.md](stages/S24-runner-room.md) |
 | 29 | S25 Runner wager | todo | [stages/S25-runner-wager.md](stages/S25-runner-wager.md) |
 | 30 | S26 Runner tutorial, polish, ship | todo | [stages/S26-runner-tutorial.md](stages/S26-runner-tutorial.md) |
 | 31 | S27 Tournaments and daily seeded cups | todo | [stages/S27-tournaments.md](stages/S27-tournaments.md) |
