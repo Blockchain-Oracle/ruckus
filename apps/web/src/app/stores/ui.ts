@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 
-export type Sheet = 'settings' | null;
+export type Sheet = 'settings' | 'games' | null;
 
 type UiState = {
   sheet: Sheet;
   sheetEverOpened: boolean;
+  switcherEverOpened: boolean;
   openSheet(sheet: Sheet): void;
 };
 
@@ -12,6 +13,11 @@ type UiState = {
 export const useUi = create<UiState>()((set) => ({
   sheet: null,
   sheetEverOpened: false,
+  switcherEverOpened: false,
   openSheet: (sheet) =>
-    set((s) => ({ sheet, sheetEverOpened: s.sheetEverOpened || sheet !== null })),
+    set((s) => ({
+      sheet,
+      sheetEverOpened: s.sheetEverOpened || sheet === 'settings',
+      switcherEverOpened: s.switcherEverOpened || sheet === 'games',
+    })),
 }));

@@ -28,7 +28,7 @@ export function BalancePill() {
   const unit = mode === 'demo' ? t('balance.demo') : (snapshot?.token.symbol ?? '');
   return (
     <span
-      className="tabular inline-flex items-center gap-2 rounded-full border-2 border-gold-deep bg-ink-2 px-4 py-1.5 font-bold text-gold"
+      className="tabular inline-flex items-center gap-2 rounded-full border-2 border-gold-deep bg-ink-2 px-4 py-1.5 font-bold text-gold max-[380px]:gap-1.5 max-[380px]:px-3"
       title={mode === 'demo' ? t('balance.demoNote') : undefined}
     >
       {amount}

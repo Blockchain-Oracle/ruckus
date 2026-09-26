@@ -6,7 +6,6 @@ import { findGame, visibleGames } from '@/games/registry.ts';
 import { getAudio } from '@/lib/audio/index.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 import { ErrorBoundary } from '@/ui/ErrorBoundary.tsx';
-import { GraphicsNotice } from '@/ui/GraphicsNotice.tsx';
 
 import { AppShell } from './AppShell.tsx';
 import { useShell } from './stores/shell.ts';
@@ -16,6 +15,9 @@ import { readUrlState } from './urlState.ts';
 const GameShell = lazy(() => import('@/engine/GameShell.tsx'));
 const Toaster = lazy(() =>
   import('@/ui/primitives/sonner.tsx').then((m) => ({ default: m.Toaster })),
+);
+const GraphicsNotice = lazy(() =>
+  import('@/ui/GraphicsNotice.tsx').then((m) => ({ default: m.GraphicsNotice })),
 );
 const CANVAS_FADE_MS = 600;
 
@@ -32,6 +34,7 @@ if (findGame(readUrlState().game)) {
 
 export function Hub() {
   const [canvasReady, setCanvasReady] = useState(false);
+  const graphicsFailed = useShell((s) => s.graphicsFailed);
 
   useEffect(() => {
     // Build the graph and fetch UI sounds now; the context itself unlocks on the first gesture.
@@ -68,7 +71,11 @@ export function Hub() {
       </div>
       <Scrim />
       <AppShell />
-      <GraphicsNotice />
+      {graphicsFailed && (
+        <Suspense fallback={null}>
+          <GraphicsNotice />
+        </Suspense>
+      )}
       <Suspense fallback={null}>
         <Toaster position="top-center" />
       </Suspense>

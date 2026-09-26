@@ -5,6 +5,16 @@
 @import "@fontsource/silkscreen/400.css";
 @import "./tokens.css";
 
+/* A phone either way up: narrow portrait, or a landscape too short for the desktop hub. */
+@custom-variant compact {
+  @media (max-width: 639.98px) {
+    @slot;
+  }
+  @media (max-height: 480px) {
+    @slot;
+  }
+}
+
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
