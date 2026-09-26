@@ -62,6 +62,9 @@ importers:
       '@arena/sim-pool':
         specifier: workspace:*
         version: link:../../packages/sim-pool
+      '@arena/sim-runner':
+        specifier: workspace:*
+        version: link:../../packages/sim-runner
       '@arena/sim-soccer':
         specifier: workspace:*
         version: link:../../packages/sim-soccer

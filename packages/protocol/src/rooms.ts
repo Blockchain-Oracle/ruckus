@@ -4,5 +4,6 @@ export const ROOM = {
   chickenz: 'chickenz',
   pool: 'pool',
   soccer: 'soccer',
+  runner: 'runner',
 } as const;
 export type RoomName = (typeof ROOM)[keyof typeof ROOM];
