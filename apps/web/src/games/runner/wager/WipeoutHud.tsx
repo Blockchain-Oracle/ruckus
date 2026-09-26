@@ -58,79 +58,85 @@ export function WipeoutHud({ onLeave }: { onLeave: () => void }) {
       <Announce />
 
       {phase === 'setup' && (
-        <div className="pointer-events-auto absolute inset-x-0 bottom-3 mx-auto flex max-h-[calc(100dvh-5rem)] w-[min(640px,calc(100%-1.5rem))] flex-col gap-2.5 overflow-y-auto rounded-2xl border-2 border-line bg-ink-2/95 p-3 shadow-[0_20px_60px_rgb(0_0_0/0.55)] sm:bottom-6 sm:gap-3 sm:p-4">
-          <p className="text-xs text-cream-dim sm:text-sm">
-            A runner takes on a neon gauntlet with no coins, so the first hit ends the run. Call
-            what stops them. Every call returns 96%: the rarer the call, the more it pays.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {WIPEOUT_CALLS.map((_, i) => {
-              const c = callAt(i);
-              return (
-                <button
-                  key={c.betType}
-                  type="button"
-                  onClick={() => set({ call: i })}
-                  className={cn(
-                    'flex min-w-0 items-center gap-2 rounded-xl border-2 px-2.5 py-2 text-left',
-                    picked === i ? 'border-gold bg-ink-3' : 'border-line hover:border-cream-dim',
-                  )}
-                >
-                  <span
-                    className="size-4 shrink-0 rounded"
-                    style={{ background: c.look.color, boxShadow: `0 0 10px ${c.look.color}` }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-display text-sm text-cream">
-                      {c.look.label}
+        // Fits any screen: the tiles scroll, the call and its button stay pinned, and on smaller
+        // screens the sheet sits clear of the jam badge in the bottom-right corner.
+        <div className="pointer-events-auto absolute inset-x-0 bottom-14 mx-auto flex max-h-[calc(100dvh-8.5rem)] w-[min(640px,calc(100%-1.5rem))] flex-col rounded-2xl border-2 border-line bg-ink-2/95 shadow-[0_20px_60px_rgb(0_0_0/0.55)] lg:bottom-6 lg:max-h-[calc(100dvh-6rem)]">
+          <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto overscroll-contain p-3 pb-2 sm:gap-3 sm:p-4 sm:pb-2">
+            <p className="text-xs text-cream-dim sm:text-sm [@media(max-height:420px)]:hidden">
+              A runner takes on a neon gauntlet with no coins, so the first hit ends the run. Call
+              what stops them. Every call returns 96%: the rarer the call, the more it pays.
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {WIPEOUT_CALLS.map((_, i) => {
+                const c = callAt(i);
+                return (
+                  <button
+                    key={c.betType}
+                    type="button"
+                    onClick={() => set({ call: i })}
+                    className={cn(
+                      'flex min-w-0 items-center gap-2 rounded-xl border-2 px-2 py-1.5 text-left sm:px-2.5 sm:py-2',
+                      picked === i ? 'border-gold bg-ink-3' : 'border-line hover:border-cream-dim',
+                    )}
+                  >
+                    <span
+                      className="size-3.5 shrink-0 rounded sm:size-4"
+                      style={{ background: c.look.color, boxShadow: `0 0 10px ${c.look.color}` }}
+                    />
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block font-display text-xs text-cream sm:text-sm">
+                        {c.look.label}
+                      </span>
+                      <span className="block text-[0.68rem] text-cream-dim">{c.look.sub}</span>
                     </span>
-                    <span className="block truncate text-[0.7rem] text-cream-dim">
-                      {c.look.sub}
+                    <span className="tabular shrink-0 font-display text-xs text-gold sm:text-sm">
+                      {c.pays}×
                     </span>
-                  </span>
-                  <span className="tabular shrink-0 font-display text-sm text-gold">{c.pays}×</span>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label
+                className="flex items-center gap-2 text-sm text-cream-dim"
+                htmlFor="wipeout-stake"
+              >
+                Stake
+                <input
+                  id="wipeout-stake"
+                  value={stake}
+                  inputMode="decimal"
+                  onChange={(e) => set({ stake: e.target.value.replace(/[^0-9.]/g, '') })}
+                  className="tabular h-9 w-20 rounded-md border-2 border-line bg-ink px-2 text-cream outline-none focus:border-teal"
+                />
+              </label>
+              {STAKES.map((v) => (
+                <Button key={v} size="sm" className="px-3" onClick={() => set({ stake: v })}>
+                  {v}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="flex items-baseline justify-between gap-2 text-sm">
-            <span className="min-w-0 truncate font-display text-teal">{call.name}</span>
-            <span className="tabular shrink-0 text-cream">
-              {call.chance} · pays <span className="font-display text-gold">{call.pays}×</span>
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              className="flex items-center gap-2 text-sm text-cream-dim"
-              htmlFor="wipeout-stake"
+          <div className="flex shrink-0 flex-col gap-2 border-t border-line/60 p-3 pt-2 sm:p-4 sm:pt-2">
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="min-w-0 truncate font-display text-teal">{call.name}</span>
+              <span className="tabular shrink-0 text-cream">
+                {call.chance} · pays <span className="font-display text-gold">{call.pays}×</span>
+              </span>
+            </div>
+            <Button
+              variant="gold"
+              sound="ui.confirm"
+              className="w-full min-w-0 px-3 text-sm sm:text-base"
+              disabled={!ready}
+              onClick={() => void placeWipeoutCall(api, decimals)}
             >
-              Stake
-              <input
-                id="wipeout-stake"
-                value={stake}
-                inputMode="decimal"
-                onChange={(e) => set({ stake: e.target.value.replace(/[^0-9.]/g, '') })}
-                className="tabular h-10 w-20 rounded-md border-2 border-line bg-ink px-2 text-cream outline-none focus:border-teal"
-              />
-            </label>
-            {STAKES.map((v) => (
-              <Button key={v} size="sm" className="px-3" onClick={() => set({ stake: v })}>
-                {v}
-              </Button>
-            ))}
+              Call it · win {fmt(Number(stake || 0) * call.pays)} {unit}
+            </Button>
+            {!ready && (
+              <p className="text-center text-xs text-cream-dim">Connecting to the casino…</p>
+            )}
           </div>
-          <Button
-            variant="gold"
-            sound="ui.confirm"
-            className="w-full min-w-0 px-3 text-sm sm:text-base"
-            disabled={!ready}
-            onClick={() => void placeWipeoutCall(api, decimals)}
-          >
-            Call it · win {fmt(Number(stake || 0) * call.pays)} {unit}
-          </Button>
-          {!ready && (
-            <p className="text-center text-xs text-cream-dim">Connecting to the casino…</p>
-          )}
         </div>
       )}
 
