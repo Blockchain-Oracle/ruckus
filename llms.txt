@@ -1,0 +1,28 @@
+# RUCKUS
+
+> A browser party arena of four multiplayer games (Chickenz, 8-Ball, Egg Soccer, Neon Dash), built for Chain Jam Vol. 1. Play is free. Each game has one casino round, settled by a single ICasinoGameV2 contract using Chain's VRF, with a declared RTP of 96% on all 24 bet types. Live at https://playruckus.xyz.
+
+## Start here
+- [README](README.md): what it is, how it fits together, the wagers, jam requirements mapped to files, how to run and verify.
+- [Architecture image](docs/assets/readme/architecture.png): browser, Colyseus game server, Convex, shared deterministic sims, wager path.
+
+## Casino (jam eligibility)
+- [RuckusGame.sol](contracts/src/RuckusGame.sol): ICasinoGameV2; drawClass (uint256 rejection sampling); one _payout() for quoteCaps, quoteRiskParams, onSessionStart, onRandomness.
+- [Contract tests](contracts/test): RuckusGame.t.sol, Parity.t.sol (Solidity vs TypeScript payout vectors).
+- [Payout tables, TS mirror](packages/casino-math/src/tables.ts): bet types 0-23, DECLARED_RTP_BPS = 9600.
+- [Casino math tests](packages/casino-math/test): RTP per bet type, unbiased draw, parity vectors.
+- [Seed banks](packages/casino-math/seedbanks): per-class seeds the client replays to present a VRF outcome; each sim's test replays every entry.
+- [Casino bridge](packages/casino-bridge/src/bridge.ts): SDK-only host communication; standalone DemoHost ("Demo credits, no value") when there is no parent frame or no handshake within 3 s.
+- [Manifest](apps/web/public/game.manifest.json): gameId "ruckus", served same-origin.
+- [Money model and novelty check](docs/decisions/ADR-001-money-model.md), [competitor originals checked against](docs/competitors.md).
+
+## Games
+- [Web app](apps/web/src): hub and the four games (apps/web/src/games/<game>; games never import each other).
+- [Chickenz sim](crates/chickenz-sim): Rust fixed-point, 4-player FFA, wasm build in packages/sim-chickenz.
+- [Pool sim](packages/sim-pool), [Soccer sim](packages/sim-soccer), [Runner sim](packages/sim-runner): deterministic TypeScript, no clocks or Math.random, bots on the sim PRNG.
+- [Game server rooms](apps/server/src/rooms): Colyseus rooms per game, authoritative sims, bots and watchers.
+
+## Decisions and sources
+- [Architecture decision records](docs/decisions): ADR-001 to ADR-007.
+- [Research behind tuning numbers](docs/research/deep): cited from constants files.
+- [Credits and licences](docs/CREDITS.md).
