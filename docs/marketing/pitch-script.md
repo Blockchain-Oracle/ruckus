@@ -31,5 +31,5 @@ Get a good time, send your friend a link.
 "Beat my run."
 They will try.
 
-Go try it now at [domain].
+Go try it now at playruckus.xyz.
 And bring your friends.

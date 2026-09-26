@@ -43,7 +43,7 @@
 **NEXT ACTION:**
 1. **✱E submission. This needs the user**; ask, don't do.
    - The form wants the Discord, X and Telegram handles, source access (repo reviewers invited) and the go-ahead.
-   - Prepared: title RUCKUS, URL https://ruckus-nine.vercel.app, declared RTP 96%, pitch in the session 5 summary.
+   - Prepared: title RUCKUS, URL https://playruckus.xyz (custom domain, Namecheap → Vercel; ruckus-nine.vercel.app still works), declared RTP 96%, pitch in the session 5 summary.
    - Production is checked: widget tag, og:image 1200×630, manifest, no frame-blocking headers.
    - The contract now has bet types 0–23. They are final unless a new wager is added (the one-contract rule).
 2. S27 tournaments / daily seeded cups (a fixed daily seed per game; runner PB ghosts per daily course).
@@ -58,7 +58,7 @@
 - Simulator: `cd casino-sdk && npm start` (:3300, chain :8545). RuckusGame is at `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` with bet types 0–23 (re-sync with `pnpm -F @arena/contracts sync`, then restart).
 - Web dev server: :5173. Local game server: `node apps/server/dist/index.js` on :2567 (rebuild after protocol changes: it runs protocol 2).
 - **Coolify deploys:** open the tunnel yourself with `ssh -N -L 8001:127.0.0.1:8000 agari-box` (the key is in ~/.ssh/config), then `coolify deploy uuid kkeghmfwz9wl40u2l0n11iow`. Production server: protocol 2, commit 424f9c0+.
-- Vercel production: https://ruckus-nine.vercel.app, which deploys on push to main.
+- Vercel production: https://playruckus.xyz (alias https://ruckus-nine.vercel.app), which deploys on push to main.
 - Dev handles (DEV builds only): `__ruckusRunner`, `__ruckusRunnerTutorial`, `__ruckusWipeout`.
 - `?capture` (DEV) centres attract framing for recording previews.
 

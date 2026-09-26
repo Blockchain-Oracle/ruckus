@@ -58,7 +58,7 @@ It follows the Chickenz video's tone: first person, a little about the game, and
 | **why I made it** | Your real reason, whatever it is | (only you know this one; one or two sentences, like "I wanted to explore something different" in the Chickenz video) |
 | **send a link · beat my run** | What keeps people coming back | "Get a good time, send your friend the link. Beat my run. They will try." |
 
-**Last line (memorise):** "Go try it now at **[domain]**. And bring your friends."
+**Last line (memorise):** "Go try it now at **playruckus.xyz**. And bring your friends."
 
 That's about 30–45 s. Act 1 carries the video; this part just says what they watched and where to play.
 
