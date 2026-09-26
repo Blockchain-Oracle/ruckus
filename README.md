@@ -129,8 +129,8 @@ The tests cover what can quietly go wrong: RTP and payout parity, unbiased class
 | Brand colours and type | [apps/web/src/styles/tokens.css](apps/web/src/styles/tokens.css) |
 | A plain-text index for automated readers | [llms.txt](llms.txt) |
 
-## Credits
+## Built with
 
-RUCKUS stands on open work: the original [Chickenz](https://github.com/AshFrancis/chickenz) (MIT), [pooltool](https://github.com/ekiefl/pooltool)'s physics models (Apache-2.0), [KaspaKinesis](https://github.com/peavey2787/KaspaKinesis)' runner rules (MIT), Pixel Frog and Quaternius art (CC0), and sound and music made with ElevenLabs. Their notices ship with the code that uses them ([crates/chickenz-sim/NOTICE](crates/chickenz-sim/NOTICE), [packages/sim-pool/NOTICE](packages/sim-pool/NOTICE)).
+[React](https://react.dev), [three.js](https://threejs.org) and [React Three Fiber](https://r3f.docs.pmnd.rs), [Colyseus](https://colyseus.io), [Convex](https://convex.dev), [Vite](https://vite.dev), [Foundry](https://getfoundry.sh) and the Chain casino SDK. 8-Ball's ball physics follows [pooltool](https://github.com/ekiefl/pooltool)'s published models (Apache-2.0). Art from Pixel Frog and Quaternius (CC0); sound and music made with ElevenLabs. Third-party licence notices ship with the code that uses them.
 
 Made by **Abubakr Jimoh**. [MIT licensed](LICENSE); third-party material keeps its own terms.
