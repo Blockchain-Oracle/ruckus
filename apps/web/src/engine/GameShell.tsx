@@ -1,5 +1,5 @@
-import { Canvas, extend, useThree } from '@react-three/fiber';
-import { Suspense, useEffect } from 'react';
+import { Canvas, extend } from '@react-three/fiber';
+import { Suspense } from 'react';
 import * as THREE from 'three/webgpu';
 
 import { getLoadedGame } from '@/games/loader.ts';
@@ -9,7 +9,6 @@ import { CameraDirector } from './CameraDirector.tsx';
 import { DPR_MIN } from './config.ts';
 import { isInteractive, useGameMachine } from './gameMachine.ts';
 import { createRenderer } from './renderer.ts';
-import { stageWarmed } from './stageWarm.ts';
 import { WelcomeScene, welcomeRig } from './WelcomeScene.tsx';
 
 // The webgpu build's classes (node materials, WebGPURenderer-aware objects) back every JSX element.
@@ -46,29 +45,10 @@ export default function GameShell({ onReady }: { onReady?: () => void }) {
           ) : (
             <WelcomeScene />
           )}
-          {/* Same boundary as the scene: it mounts only once the scene's assets have loaded. */}
-          <StageWarmer key={generation} />
         </Suspense>
         <CameraDirector rig={rig} />
         <AdaptiveDpr />
       </Canvas>
     </div>
   );
-}
-
-/**
- * Compiles every shader the new scene uses while the scrim still covers it, then tells the fade
- * it may lift: first-use compiles are the stutter a phone feels when a game appears.
- */
-function StageWarmer() {
-  const gl = useThree((s) => s.gl) as unknown as {
-    compileAsync?: (...a: unknown[]) => Promise<unknown>;
-  };
-  const scene = useThree((s) => s.scene);
-  const camera = useThree((s) => s.camera);
-  useEffect(() => {
-    const compile = gl.compileAsync?.(scene, camera) ?? Promise.resolve();
-    void compile.catch(() => {}).finally(stageWarmed);
-  }, [gl, scene, camera]);
-  return null;
 }
