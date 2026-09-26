@@ -82,6 +82,8 @@ export const MAGNET_RANGE_M = 5;
 
 // Race flow.
 export const COUNTDOWN_S = 3;
+/** Past the line a runner eases to a stop over this long (then celebrates). */
+export const COAST_S = 2;
 /** After the first runner finishes, everyone else has this long to cross. */
 export const FINISH_GRACE_S = 12;
 export const MAX_RUNNERS = 4;

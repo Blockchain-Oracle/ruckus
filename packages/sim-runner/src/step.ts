@@ -1,4 +1,5 @@
 import {
+  COAST_S,
   COIN_VALUE,
   COLLECT_RADIUS_M,
   COURSE_M,
@@ -64,7 +65,7 @@ export function step(w: World) {
   }
   w.runners.forEach((r, i) => {
     if (r.out) return;
-    if (r.finished >= 0) coast(r);
+    if (r.finished >= 0) coast(w, r);
     else run(w, r, i);
   });
   if (w.grace > 0) w.grace -= 1;
@@ -75,9 +76,12 @@ export function step(w: World) {
   }
 }
 
-/** Past the line: keep jogging on the road so the finish reads, with no more collisions. */
-function coast(r: Runner) {
-  r.s += baseSpeedAt(COURSE_M) * DT;
+/** Past the line: ease to a stop on the road (no more collisions), ready to celebrate. */
+export const coastSpeed = (w: World, r: Runner) =>
+  baseSpeedAt(COURSE_M) * Math.max(0, 1 - (w.tick - r.finished) / (COAST_S * TICK_HZ));
+
+function coast(w: World, r: Runner) {
+  r.s += coastSpeed(w, r) * DT;
   r.ducking = false;
   if (r.grounded && r.platform < 0) return;
   r.platform = -1;

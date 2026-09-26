@@ -2,7 +2,7 @@ export { thinkBot } from './bot.ts';
 export * from './constants.ts';
 export * from './course.ts';
 export * from './serialize.ts';
-export { runnerHeight, speedOf, step } from './step.ts';
+export { coastSpeed, momentum, runnerHeight, speedOf, step } from './step.ts';
 export * from './world.ts';
 
 import { thinkBot } from './bot.ts';
