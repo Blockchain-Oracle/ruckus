@@ -1,0 +1,105 @@
+/* README art: the hub's Art Bible tokens (apps/web/src/styles/tokens.css), for static renders. */
+@import url("https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;500;700&family=Silkscreen&display=block");
+
+:root {
+  --ink: #1b1024;
+  --ink-2: #24163a;
+  --ink-3: #2a1838;
+  --line: #4a2d5e;
+  --cream: #fff1d6;
+  --cream-dim: #cdbfa8;
+  --tomato: #ff5a36;
+  --tomato-deep: #7a1f10;
+  --teal: #2ec4b6;
+  --teal-deep: #178075;
+  --gold: #ffc23a;
+  --gold-deep: #b8780e;
+  --violet: #8c6bff;
+  --lime: #9be15d;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: Rubik, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.canvas {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 0% 0%, #34195a 0%, transparent 55%),
+    radial-gradient(70% 70% at 100% 100%, rgb(255 90 54 / 0.16) 0%, transparent 60%), var(--ink);
+}
+
+/* Film grain so flat fills don't band. */
+.canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.wordmark {
+  font-family: Bungee, sans-serif;
+  color: var(--tomato);
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  text-shadow:
+    0 2px 0 var(--tomato-deep),
+    0 4px 0 var(--tomato-deep),
+    0 6px 0 var(--tomato-deep),
+    0 8px 0 var(--tomato-deep),
+    0 18px 30px rgb(0 0 0 / 0.45);
+}
+
+.display {
+  font-family: Bungee, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.pixel {
+  font-family: Silkscreen, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 14px 22px;
+  font-family: Bungee, sans-serif;
+  font-size: 18px;
+}
+
+.btn.gold {
+  background: var(--gold);
+  color: var(--ink);
+  box-shadow:
+    0 6px 0 var(--gold-deep),
+    0 14px 24px rgb(0 0 0 / 0.35);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: 2px solid var(--line);
+  background: rgb(36 22 58 / 0.8);
+  color: var(--cream-dim);
+  font-size: 15px;
+  font-weight: 500;
+}

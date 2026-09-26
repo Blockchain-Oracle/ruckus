@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RUCKUS watch</title>
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      .canvas {
+        width: 1280px;
+        height: 720px;
+      }
+
+      /* Four games as slanted strips behind the play button. */
+      .strips {
+        position: absolute;
+        inset: -60px -120px;
+        display: flex;
+        transform: skewX(-10deg);
+        gap: 10px;
+      }
+
+      .strips div {
+        flex: 1;
+        background-size: cover;
+        background-position: center;
+        filter: saturate(1.1) brightness(0.55);
+      }
+
+      .shade {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(60% 70% at 50% 50%, rgb(27 16 36 / 0.25), rgb(27 16 36 / 0.85)),
+          linear-gradient(transparent 55%, rgb(27 16 36 / 0.95));
+      }
+
+      .tag {
+        position: absolute;
+        left: 48px;
+        top: 40px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .tag .wordmark {
+        font-size: 44px;
+        text-shadow:
+          0 2px 0 var(--tomato-deep),
+          0 4px 0 var(--tomato-deep),
+          0 10px 18px rgb(0 0 0 / 0.5);
+      }
+
+      .rec {
+        color: var(--cream);
+        font-size: 14px;
+        background: rgb(27 16 36 / 0.7);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 12px;
+      }
+
+      .rec::before {
+        content: '';
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 8px;
+        border-radius: 50%;
+        background: var(--tomato);
+        vertical-align: 1px;
+      }
+
+      .play {
+        position: absolute;
+        left: 50%;
+        top: 44%;
+        width: 150px;
+        height: 150px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: var(--tomato);
+        box-shadow:
+          0 9px 0 var(--tomato-deep),
+          0 0 0 12px rgb(255 90 54 / 0.18),
+          0 30px 60px rgb(0 0 0 / 0.55);
+        display: grid;
+        place-items: center;
+      }
+
+      .play svg {
+        margin-left: 10px;
+      }
+
+      .caption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 70px;
+        text-align: center;
+      }
+
+      .caption .display {
+        font-size: 52px;
+        text-shadow: 0 6px 20px rgb(0 0 0 / 0.6);
+      }
+
+      .caption p {
+        margin-top: 12px;
+        color: var(--cream-dim);
+        font-size: 22px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="canvas">
+      <div class="strips">
+        <div style="background-image: url(frames/chickenz.jpg)"></div>
+        <div style="background-image: url(frames/soccer.jpg)"></div>
+        <div style="background-image: url(frames/pool.jpg)"></div>
+        <div style="background-image: url(frames/runner.jpg)"></div>
+      </div>
+      <div class="shade"></div>
+      <div class="tag">
+        <span class="wordmark">RUCKUS</span>
+        <span class="rec pixel">Demo video</span>
+      </div>
+      <div class="play">
+        <svg width="62" height="70" viewBox="0 0 62 70" aria-hidden="true">
+          <path d="M6 4 L58 35 L6 66 Z" fill="#FFF1D6" stroke="#FFF1D6" stroke-width="8" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="caption">
+        <div class="display">Watch game night</div>
+        <p>Four games, real friends, real reactions.</p>
+      </div>
+    </div>
+  </body>
+</html>

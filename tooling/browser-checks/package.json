@@ -22,7 +22,9 @@
     "runner-challenge": "tsx src/runner-challenge.ts",
     "runner-wipeout": "tsx src/runner-wipeout-e2e.ts",
     "runner-tutorial": "tsx src/runner-tutorial.ts",
-    "capture-previews": "tsx src/capture-previews.ts ../../assets-src/hub/previews"
+    "capture-previews": "tsx src/capture-previews.ts ../../assets-src/hub/previews",
+    "capture-stills": "tsx src/capture-stills.ts",
+    "readme-art": "tsx src/render-readme-art.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
