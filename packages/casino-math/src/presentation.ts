@@ -68,36 +68,38 @@ export function presentationSeed(
 /** The map a bank seed plays on (`mapRule: "seed % 3"`). */
 export const bankMapFor = (seed: number, mapCount = 3) => seed % mapCount;
 
-/** keccak256 of the canonical bank JSON bytes, published so anyone can check the bank. */
+/**
+ * keccak256 of the bank in canonical form (compact JSON of the parsed file), published so anyone
+ * can check the bank. Canonical, so reformatting the committed file never changes the hash.
+ */
 export function bankHash(json: string): `0x${string}` {
-  const digest = keccak_256(ascii(json));
+  const digest = keccak_256(ascii(JSON.stringify(JSON.parse(json))));
   return `0x${Array.from(digest, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
-const FINISH_DOMAIN = ascii('finish');
-
 /**
- * "Call the Finish" presentation. The contract settles make or miss for the call; the same VRF
- * word then picks *which* finish shows, among the finishes the outcome allows, weighted by the
- * declared table (so over many rounds every finish appears at its declared rate), and a bank seed
- * that ends exactly that way.
+ * Presentation for a call-style round (Call the Finish, Call the Wipeout). The contract settles
+ * make or miss for the call; the same VRF word, under the round's own domain, then picks *which*
+ * ending shows among the endings the outcome allows, weighted by the declared table (so over many
+ * rounds every ending appears at its declared rate), and a bank seed that ends exactly that way.
  */
-export function finishPresentation(
+function coverPresentation(
+  domain: Uint8Array,
   bank: SeedBank,
   randomness: `0x${string}`,
   covers: readonly number[],
   outcomeClass: number,
   weights: readonly number[],
-): { finish: number; seed: number } {
+): { ending: number; seed: number } {
   const made = outcomeClass === 0;
   const allowed = weights.map((w, i) => ({ i, w })).filter(({ i }) => covers.includes(i) === made);
   const total = allowed.reduce((sum, a) => sum + a.w, 0);
-  if (total <= 0) throw new Error('No finish fits that outcome');
+  if (total <= 0) throw new Error('No ending fits that outcome');
   const n = BigInt(total);
   const limit = UINT256_SPAN - (UINT256_SPAN % n);
-  const input = new Uint8Array(32 + FINISH_DOMAIN.length);
+  const input = new Uint8Array(32 + domain.length);
   input.set(toBytes(randomness));
-  input.set(FINISH_DOMAIN, 32);
+  input.set(domain, 32);
   let word = keccak_256(input);
   while (toBigint(word) >= limit) word = keccak_256(word);
   // Walk the cumulative weights to the drawn point.
@@ -111,5 +113,37 @@ export function finishPresentation(
     pick -= a.w;
   }
   if (!chosen) throw new Error('unreachable: allowed is non-empty');
-  return { finish: chosen.i, seed: presentationSeed(bank, randomness, chosen.i) };
+  return { ending: chosen.i, seed: presentationSeed(bank, randomness, chosen.i) };
+}
+
+const FINISH_DOMAIN = ascii('finish');
+/** "Call the Finish": which golden-goal finish shows, and the bank match that ends that way. */
+export function finishPresentation(
+  bank: SeedBank,
+  randomness: `0x${string}`,
+  covers: readonly number[],
+  outcomeClass: number,
+  weights: readonly number[],
+): { finish: number; seed: number } {
+  const { ending, seed } = coverPresentation(
+    FINISH_DOMAIN,
+    bank,
+    randomness,
+    covers,
+    outcomeClass,
+    weights,
+  );
+  return { finish: ending, seed };
+}
+
+const WIPEOUT_DOMAIN = ascii('wipeout');
+/** "Call the Wipeout": which gauntlet ending shows, and the bank run that ends that way. */
+export function wipeoutPresentation(
+  bank: SeedBank,
+  randomness: `0x${string}`,
+  covers: readonly number[],
+  outcomeClass: number,
+  weights: readonly number[],
+): { ending: number; seed: number } {
+  return coverPresentation(WIPEOUT_DOMAIN, bank, randomness, covers, outcomeClass, weights);
 }

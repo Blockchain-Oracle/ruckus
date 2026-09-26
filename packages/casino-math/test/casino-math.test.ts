@@ -17,6 +17,7 @@ import {
   maxReservedProfit,
   payout,
   rtp,
+  WIPEOUT_CALLS,
 } from '../src/index.ts';
 
 const VECTORS_DIR = resolve(import.meta.dirname, '../../../contracts/vectors');
@@ -27,6 +28,7 @@ const VECTOR_FILES = [
   [BET_TYPE.callShotThin, 'call-shot-3.json'],
   [BET_TYPE.callShotLong, 'call-shot-4.json'],
   ...FINISH_CALLS.map((c) => [c.betType, `finish-${c.betType}.json`] as const),
+  ...WIPEOUT_CALLS.map((c) => [c.betType, `wipeout-${c.betType}.json`] as const),
 ] as const;
 
 describe('bet tables', () => {

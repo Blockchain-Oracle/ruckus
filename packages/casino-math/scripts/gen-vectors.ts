@@ -2,7 +2,13 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { BET_TYPE, type BetType, buildParityVectors, FINISH_CALLS } from '../src/index.ts';
+import {
+  BET_TYPE,
+  type BetType,
+  buildParityVectors,
+  FINISH_CALLS,
+  WIPEOUT_CALLS,
+} from '../src/index.ts';
 
 const DIR = resolve(import.meta.dirname, '../../../contracts/vectors');
 const FILES = {
@@ -12,6 +18,7 @@ const FILES = {
   [BET_TYPE.callShotThin]: 'call-shot-3.json',
   [BET_TYPE.callShotLong]: 'call-shot-4.json',
   ...Object.fromEntries(FINISH_CALLS.map((c) => [c.betType, `finish-${c.betType}.json`])),
+  ...Object.fromEntries(WIPEOUT_CALLS.map((c) => [c.betType, `wipeout-${c.betType}.json`])),
 } as Record<number, string>;
 
 for (const [betType, file] of Object.entries(FILES)) {

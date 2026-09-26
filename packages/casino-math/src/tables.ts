@@ -28,6 +28,12 @@ export const BET_TYPE = {
   finishEitherWood: 15,
   finishAnyGoal: 16,
   finishNoGoal: 17,
+  wipeoutAny: 18,
+  wipeoutJump: 19,
+  wipeoutDuck: 20,
+  wipeoutMove: 21,
+  wipeoutStrict: 22,
+  wipeoutClean: 23,
 } as const;
 export type BetType = (typeof BET_TYPE)[keyof typeof BET_TYPE];
 
@@ -103,6 +109,59 @@ function finishTables() {
   return out;
 }
 
+/**
+ * Neon Dash "Call the Wipeout". A lone bot runs a short all-barrier gauntlet with no coins, so
+ * its first hit ends the run; it ends one of five ways, in twentieths (close to what the gauntlet
+ * bot actually does: docs/roadmap/stages/S25-runner-wager.md). Mirrors `_wipeoutCover`.
+ * `verb` names the barrier colour that stopped the runner (sim-runner `WIPEOUTS` order).
+ */
+export const WIPEOUT_CLASSES = [
+  { id: 'jump', verb: 'jump', weight: 5 },
+  { id: 'duck', verb: 'duck', weight: 6 },
+  { id: 'move', verb: 'move', weight: 3 },
+  { id: 'strict', verb: 'strict', weight: 2 },
+  { id: 'clean', verb: 'clean', weight: 4 },
+] as const;
+export const WIPEOUT_DENOMINATOR = 20n;
+type WipeoutClassIndex = 0 | 1 | 2 | 3 | 4;
+
+/** Calls in bet-type order (bet type = BET_TYPE.wipeoutAny + index). */
+export const WIPEOUT_CALLS = [
+  { betType: BET_TYPE.wipeoutAny, name: 'Any wipeout', covers: [0, 1, 2, 3] },
+  { betType: BET_TYPE.wipeoutJump, name: 'Fails a jump', covers: [0] },
+  { betType: BET_TYPE.wipeoutDuck, name: 'Fails a duck', covers: [1] },
+  { betType: BET_TYPE.wipeoutMove, name: 'Fails a dodge', covers: [2] },
+  { betType: BET_TYPE.wipeoutStrict, name: 'Fails a strict duck', covers: [3] },
+  { betType: BET_TYPE.wipeoutClean, name: 'Clean run', covers: [4] },
+] as const satisfies readonly {
+  betType: BetType;
+  name: string;
+  covers: readonly WipeoutClassIndex[];
+}[];
+
+export const wipeoutCover = (covers: readonly number[]) =>
+  covers.reduce((sum, i) => sum + BigInt(WIPEOUT_CLASSES[i]?.weight ?? 0), 0n);
+
+function wipeoutTables() {
+  const out = {} as Record<(typeof WIPEOUT_CALLS)[number]['betType'], BetTable>;
+  for (const call of WIPEOUT_CALLS) {
+    const make = wipeoutCover(call.covers);
+    out[call.betType] = {
+      betType: call.betType,
+      name: `Call the Wipeout · ${call.name}`,
+      classes: [
+        {
+          id: 'make',
+          weight: make,
+          multiplierBps: (DECLARED_RTP_BPS * WIPEOUT_DENOMINATOR) / make,
+        },
+        { id: 'miss', weight: WIPEOUT_DENOMINATOR - make, multiplierBps: 0n },
+      ],
+    };
+  }
+  return out;
+}
+
 export const BET_TABLES = {
   [BET_TYPE.backChicken]: {
     betType: BET_TYPE.backChicken,
@@ -119,6 +178,7 @@ export const BET_TABLES = {
   ...callShot(BET_TYPE.callShotThin, 'Call Your Shot · Thin', 1n, 3n, 38_400n),
   ...callShot(BET_TYPE.callShotLong, 'Call Your Shot · Long', 1n, 9n, 96_000n),
   ...finishTables(),
+  ...wipeoutTables(),
 } as const satisfies Record<BetType, BetTable>;
 
 /** Call Your Shot tiers: two classes, make (top) and miss, mirroring `_makeMiss` in Solidity. */
