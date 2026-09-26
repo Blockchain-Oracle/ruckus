@@ -4,6 +4,7 @@ import { loadGame } from '@/games/loader.ts';
 import type { GameId } from '@/games/registry.ts';
 
 import { crossfade } from './scrim.ts';
+import { awaitStageWarm } from './stageWarm.ts';
 
 export type Phase = 'attract' | 'entering' | 'play' | 'results' | 'leaving';
 
@@ -49,7 +50,7 @@ export const useGameMachine = create<GameMachine>()((set, get) => ({
     try {
       // Load before fading so the scrim never lifts onto an empty stage.
       if (gameId) await loadGame(gameId);
-      await crossfade(() => set((s) => ({ gameId, generation: s.generation + 1 })));
+      await crossfade(() => set((s) => ({ gameId, generation: s.generation + 1 })), awaitStageWarm);
     } finally {
       if (selecting === gameId) selecting = undefined;
     }

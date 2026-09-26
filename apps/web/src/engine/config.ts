@@ -26,3 +26,6 @@ export const FRAME_MS_SLOW = 1000 / SLOW_FPS;
 export const FRAME_MS_FAST = 1000 / FAST_FPS;
 
 export const FORCE_WEBGL_PARAM = 'forceWebGL';
+
+/** Longest the scrim waits for a new game's scene to load and compile before revealing anyway. */
+export const STAGE_WARM_MAX_MS = 3000;

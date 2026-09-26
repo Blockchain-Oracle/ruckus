@@ -13,8 +13,16 @@ export type CameraRig = {
   /**
    * `lensShift` slides the image sideways (camera.filmOffset, mm) so the attract subject can sit
    * beside the menu without breaking the orbit around it; play always frames dead centre.
+   * `swayRad` swings back and forth through ±that angle instead of orbiting all the way round:
+   * flat scenes (a 2D board) have no back worth showing.
    */
-  attract: { target: Vec3; distance: number; height: number; lensShift?: number };
+  attract: {
+    target: Vec3;
+    distance: number;
+    height: number;
+    lensShift?: number;
+    swayRad?: number;
+  };
   play: { position: Vec3; target: Vec3 };
   /**
    * Optional live framing during play: where to look (world units) and a zoom (1 = the play pose's

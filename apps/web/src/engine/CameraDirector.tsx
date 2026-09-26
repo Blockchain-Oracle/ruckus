@@ -44,7 +44,7 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
   const phase = useGameMachine((s) => s.phase);
   const send = useGameMachine((s) => s.send);
   const reducedMotion = useSettings((s) => s.reducedMotion);
-  const state = useRef({ angle: 0, blend: 0, fx: Number.NaN, fy: 0, fz: 1 });
+  const state = useRef({ angle: 0, swayT: 0, blend: 0, fx: Number.NaN, fy: 0, fz: 1 });
 
   useEffect(() => {
     camera.fov = rig.fov;
@@ -72,9 +72,15 @@ export function CameraDirector({ rig }: { rig: CameraRig }) {
     const s = state.current;
     const { attract, play } = rig;
 
-    if (phase === 'attract' || phase === 'leaving') {
+    const sway = attract.swayRad;
+    if ((phase === 'attract' || phase === 'leaving') && sway) {
+      // Same peak speed as the orbit, so a swaying scene moves as gently as an orbiting one.
+      s.swayT += delta;
+      s.angle = sway * Math.sin((s.swayT * ATTRACT_ORBIT_RAD_PER_S) / sway);
+    } else if (phase === 'attract' || phase === 'leaving') {
       s.angle = wrapAngle(s.angle + ATTRACT_ORBIT_RAD_PER_S * delta);
     } else {
+      s.swayT = 0;
       s.angle = MathUtils.damp(s.angle, 0, ORBIT_UNWIND_RATE, delta);
     }
 

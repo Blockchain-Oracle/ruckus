@@ -14,10 +14,18 @@ const CENTER = [MAP_W / 2, MAP_H / 2, 0] as const;
 const PLAY_FOV_DEG = 30;
 /** Height-locked like Chickenz: 540 px of world always fills the view height. */
 const PLAY_DISTANCE = MAP_H / 2 / Math.tan(((PLAY_FOV_DEG / 2) * Math.PI) / 180);
+/** The arena is a flat board: sway ±30° so the diorama parallax shows but its blank back never does. */
+const ATTRACT_SWAY_RAD = Math.PI / 6;
 
 export const rig: CameraRig = {
   fov: PLAY_FOV_DEG,
-  attract: { target: CENTER, distance: PLAY_DISTANCE * 0.9, height: MAP_H * 0.2, lensShift: -6 },
+  attract: {
+    target: CENTER,
+    distance: PLAY_DISTANCE * 0.9,
+    height: MAP_H * 0.2,
+    lensShift: -6,
+    swayRad: ATTRACT_SWAY_RAD,
+  },
   play: { position: [CENTER[0], CENTER[1], PLAY_DISTANCE], target: CENTER },
   follow: chickenzFollow,
 };

@@ -21,6 +21,16 @@ function Preview({ game }: { game: Game }) {
   useEffect(() => {
     const v = ref.current;
     if (!v || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Fetch a screen ahead: phones stack the cards, and a clip that only starts downloading once
+    // it is on screen shows its poster for seconds on mobile data.
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        v.preload = 'auto';
+        near.disconnect();
+      },
+      { rootMargin: '100% 0px' },
+    );
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) void v.play().catch(() => {});
@@ -28,8 +38,12 @@ function Preview({ game }: { game: Game }) {
       },
       { threshold: 0.35 },
     );
+    near.observe(v);
     io.observe(v);
-    return () => io.disconnect();
+    return () => {
+      near.disconnect();
+      io.disconnect();
+    };
   }, []);
   return (
     <video
@@ -56,7 +70,10 @@ export function ArenaLanding({ onChoose }: { onChoose: (id: Game['id']) => void 
   const t = useT();
   const games = visibleGames();
   return (
-    <div className="pointer-events-auto absolute inset-0 overflow-y-auto overscroll-contain bg-[radial-gradient(120%_80%_at_50%_0%,#2a1650_0%,#1b1024_55%,#120a1a_100%)]">
+    <div
+      data-arena-landing
+      className="pointer-events-auto absolute inset-0 overflow-y-auto overscroll-contain bg-[radial-gradient(120%_80%_at_50%_0%,#2a1650_0%,#1b1024_55%,#120a1a_100%)]"
+    >
       <div className="mx-auto flex min-h-full max-w-6xl flex-col justify-center gap-5 px-4 pt-[max(5.5rem,calc(env(safe-area-inset-top)+4.5rem))] pb-[max(4.5rem,env(safe-area-inset-bottom))] sm:gap-7 sm:px-8 [@media(max-height:480px)]:gap-3 [@media(max-height:480px)]:pt-16">
         <m.header
           initial={{ opacity: 0, y: 16 }}
