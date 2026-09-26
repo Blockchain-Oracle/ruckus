@@ -1,6 +1,7 @@
 import { ArrowsInIcon, ArrowsOutIcon } from '@phosphor-icons/react';
 import { lazy, Suspense, useSyncExternalStore } from 'react';
 
+import { isIos, launchedFromHomeScreen } from '@/lib/platform.ts';
 import { cn } from '@/lib/utils.ts';
 
 const subscribe = (onChange: () => void) => {
@@ -8,15 +9,6 @@ const subscribe = (onChange: () => void) => {
   return () => document.removeEventListener('fullscreenchange', onChange);
 };
 const isFullscreen = () => document.fullscreenElement !== null;
-
-/** iPadOS reports itself as a Mac; the touch points give it away. */
-const isIos = () =>
-  /iP(hone|od|ad)/.test(navigator.userAgent) ||
-  (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1);
-
-const launchedFromHomeScreen = () =>
-  window.matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches ||
-  (navigator as { standalone?: boolean }).standalone === true;
 
 /**
  * iPhone browsers (Safari and Chrome alike, both WebKit) have no page fullscreen, so there the
@@ -30,8 +22,9 @@ const HomeScreenHint = lazy(() =>
   import('./HomeScreenHint.tsx').then((m) => ({ default: m.HomeScreenHint })),
 );
 
+/** Opts back into pointer events itself: game HUDs are `pointer-events-none` layers. */
 export const BUTTON =
-  'grid size-10 place-items-center rounded-full border-2 border-line bg-ink-2 text-cream hover:border-cream-dim';
+  'pointer-events-auto grid size-10 place-items-center rounded-full border-2 border-line bg-ink-2 text-cream hover:border-cream-dim';
 
 /**
  * Chickenz's top-bar fullscreen toggle. Hidden where the page can't go fullscreen and there's
