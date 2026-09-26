@@ -103,3 +103,32 @@
     transform: rotate(-90deg);
   }
 }
+
+/*
+ * The jam's badge (widget.js) sits at z 2147483000 over everything. It stays on every screen, but
+ * outside the landing it slots between the canvas (z 0) and the UI shell (z 10): visible over the
+ * game, never on top of a button or sheet. The landing's backdrop is opaque, so there it stays up.
+ */
+body:not(:has([data-arena-landing])) #chain-jam-badge {
+  z-index: 5;
+}
+
+/*
+ * Game HUD box: clear of the notch / Dynamic Island in landscape, and on iPhone browsers with bars
+ * lowered past the top strip where a tap only summons the toolbar (see lib/platform.ts).
+ */
+:root {
+  --hud-top: 0px;
+}
+@media (orientation: landscape) and (pointer: coarse) {
+  html[data-ios-bars] {
+    --hud-top: 2.75rem;
+  }
+}
+@utility hud-frame {
+  position: absolute;
+  top: var(--hud-top);
+  right: env(safe-area-inset-right);
+  bottom: 0;
+  left: env(safe-area-inset-left);
+}

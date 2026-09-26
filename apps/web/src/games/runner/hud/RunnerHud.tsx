@@ -54,7 +54,7 @@ export function RunnerHud({ onLeave }: { onLeave: () => void }) {
   const hint = status === 'playing' && w.tick < HINT_TICKS;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <Flash />
       {lessons ? (
         <LessonCard />

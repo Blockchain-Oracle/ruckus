@@ -7,11 +7,13 @@ import { App } from '@/app/App.tsx';
 import { Providers } from '@/app/providers.tsx';
 import { startCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { blockPageZoom } from '@/lib/noPageZoom.ts';
+import { flagIosBrowserBars } from '@/lib/platform.ts';
 import { ErrorBoundary } from '@/ui/ErrorBoundary.tsx';
 
 // Start the host handshake immediately; it races the ~3 s demo fallback, not React.
 void startCasinoBridge();
 blockPageZoom();
+flagIosBrowserBars();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Missing #root element');

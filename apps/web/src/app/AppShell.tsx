@@ -77,7 +77,7 @@ function TopBar({ hidden }: { hidden: boolean }) {
   return (
     <header
       aria-hidden={hidden}
-      className="relative z-20 flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] transition-opacity duration-300 sm:px-8"
+      className="relative z-20 flex items-center justify-between px-[max(1rem,env(safe-area-inset-left))] pt-[max(1rem,env(safe-area-inset-top),var(--hud-top))] transition-opacity duration-300 sm:px-8"
       style={{ opacity: hidden ? 0 : 1, visibility: hidden ? 'hidden' : 'visible' }}
     >
       <Logo className="text-3xl max-[380px]:text-2xl sm:text-4xl" />

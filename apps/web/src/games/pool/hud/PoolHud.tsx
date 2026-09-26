@@ -90,7 +90,7 @@ export function PoolHud({ onLeave }: { onLeave: () => void }) {
           : null;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <div className="absolute inset-x-0 top-3 flex items-start gap-3 px-16 sm:top-4 sm:px-24">
         <PlayerCard seat={0} />
         <PlayerCard seat={1} />

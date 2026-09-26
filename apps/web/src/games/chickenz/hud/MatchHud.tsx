@@ -38,7 +38,7 @@ export function MatchHud({ onLeave }: { onLeave: () => void }) {
   const suddenDeath = (v[H.zoneLeft] ?? 0) > 0 && !(v[H.matchOver] ?? 0);
 
   return (
-    <div className="pointer-events-none absolute inset-0 font-pixel">
+    <div className="pointer-events-none hud-frame font-pixel">
       <div className="absolute inset-x-0 top-3 flex justify-center gap-2 px-16 sm:gap-3 [@media(pointer:fine)]:top-4">
         {heroes.map((hero, slot) => {
           const b = playerBase(slot);

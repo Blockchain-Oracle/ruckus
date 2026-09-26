@@ -38,7 +38,7 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
   const firstMinute = w.clock > (MATCH_SECONDS - HINT_S) * TICK_HZ && w.score[0] + w.score[1] === 0;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none hud-frame">
       <div className="absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-16 [@media(pointer:fine)]:top-4">
         {!lessons && <ScoreBug w={w} names={names} you={you} />}
         {!lessons && <PowerChips w={w} />}
