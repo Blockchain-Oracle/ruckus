@@ -31,11 +31,17 @@ describe('Call the Finish seed bank v1', () => {
   });
 
   // ADR-001: every bank entry must reproduce its class on the current sim build.
-  it('every entry replays to its finish', () => {
-    bank.classes.forEach((seeds, finish) => {
-      for (const seed of seeds) expect(finishOf(seed), `seed ${seed}`).toBe(finish);
-    });
-  }, 60_000);
+  // Whole-bank work: seconds on a laptop, past vitest's 5 s default on shared CI runners.
+  it(
+    'every entry replays to its finish',
+    { timeout: 60_000 },
+    () => {
+      bank.classes.forEach((seeds, finish) => {
+        for (const seed of seeds) expect(finishOf(seed), `seed ${seed}`).toBe(finish);
+      });
+    },
+    60_000,
+  );
 
   it('a made call always shows a finish it covers, a missed call never does', () => {
     for (const call of FINISH_CALLS) {

@@ -28,7 +28,8 @@ describe('Back a Bird seed bank v1', () => {
   });
 
   // ADR-001: every bank entry must reproduce its class on the current sim build.
-  it('every entry replays to its class', () => {
+  // Whole-bank work: seconds on a laptop, past vitest's 5 s default on shared CI runners.
+  it('every entry replays to its class', { timeout: 60_000 }, () => {
     const difficulties = Int32Array.from({ length: bank.players }, () => bank.difficulty);
     bank.classes.forEach((seeds, classIndex) => {
       for (const seed of seeds) {

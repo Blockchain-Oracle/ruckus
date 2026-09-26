@@ -32,11 +32,17 @@ describe('Call the Wipeout seed bank v1', () => {
   });
 
   // ADR-001: every bank entry must reproduce its class on the current sim build.
-  it('every entry replays to its ending', () => {
-    bank.classes.forEach((seeds, ending) => {
-      for (const seed of seeds) expect(runWipeout(seed), `seed ${seed}`).toBe(ending);
-    });
-  }, 120_000);
+  // Whole-bank work: seconds on a laptop, past vitest's 5 s default on shared CI runners.
+  it(
+    'every entry replays to its ending',
+    { timeout: 60_000 },
+    () => {
+      bank.classes.forEach((seeds, ending) => {
+        for (const seed of seeds) expect(runWipeout(seed), `seed ${seed}`).toBe(ending);
+      });
+    },
+    120_000,
+  );
 
   it('a made call always shows an ending it covers, a missed call never does', () => {
     for (const call of WIPEOUT_CALLS) {

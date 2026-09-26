@@ -57,7 +57,8 @@ describe('drawClass', () => {
     ]);
   });
 
-  it('is unbiased over many draws (within 4σ of the table)', () => {
+  // Whole-bank work: seconds on a laptop, past vitest's 5 s default on shared CI runners.
+  it('is unbiased over many draws (within 4σ of the table)', { timeout: 60_000 }, () => {
     const counts = [0, 0, 0, 0];
     const draws = 40_000;
     for (let i = 0; i < draws; i++) {
