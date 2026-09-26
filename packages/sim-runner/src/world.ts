@@ -27,7 +27,7 @@ export type Runner = {
   coyote: number;
   power: PickupId | null;
   powerTicks: number;
-  /** Tick the runner crossed the line, or −1. */
+  /** When the runner crossed the line, in ticks to the sub-tick (photo finishes), or −1. */
   finished: number;
   out: boolean;
   input: Input;

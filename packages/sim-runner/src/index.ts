@@ -17,8 +17,12 @@ export function tick(w: World) {
   step(w);
 }
 
+/** A dead heat's last resort: a per-race draw from the seed, so no seat (the host) always wins it. */
+const draw = (w: World, slot: number) =>
+  Math.imul((w.seed ^ Math.imul(slot + 1, 0x9e3779b1)) >>> 0, 0x85ebca6b) >>> 0;
+
 /**
- * Finishers by the tick they crossed; everyone else by distance, then coins. Wiped-out runners
+ * Finishers by the moment they crossed; everyone else by distance, then coins. Wiped-out runners
  * rank on how far they got, like everyone still out on the road.
  */
 export function standings(w: World): number[] {
@@ -27,7 +31,7 @@ export function standings(w: World): number[] {
   return order.sort((a, b) => {
     const ra = w.runners[a] as Runner;
     const rb = w.runners[b] as Runner;
-    return key(ra) - key(rb) || rb.s - ra.s || rb.coins - ra.coins || a - b;
+    return key(ra) - key(rb) || rb.s - ra.s || rb.coins - ra.coins || draw(w, a) - draw(w, b);
   });
 }
 
@@ -43,3 +47,4 @@ export function hashWorld(w: World): string {
   for (const b of bytes) h = Math.imul(h ^ b, 0x01000193) >>> 0;
   return h.toString(16);
 }
+export * from './recording.ts';

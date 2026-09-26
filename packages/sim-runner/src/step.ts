@@ -63,11 +63,19 @@ export function step(w: World) {
     }
     return;
   }
+  const crossed: number[] = [];
   w.runners.forEach((r, i) => {
     if (r.out) return;
     if (r.finished >= 0) coast(w, r);
-    else run(w, r, i);
+    else if (run(w, r, i)) crossed.push(i);
   });
+  // Runners crossing in the same tick place by their exact crossing time, never by slot.
+  crossed.sort((a, b) => (w.runners[a]?.finished ?? 0) - (w.runners[b]?.finished ?? 0) || a - b);
+  for (const i of crossed) {
+    w.finishers += 1;
+    w.events.push({ kind: 'finish', runner: i, place: w.finishers });
+    if (w.grace < 0) w.grace = ticks(FINISH_GRACE_S);
+  }
   if (w.grace > 0) w.grace -= 1;
   const done = w.runners.every((r) => r.out || r.finished >= 0);
   if (done || w.grace === 0) {
@@ -94,8 +102,10 @@ function coast(w: World, r: Runner) {
   }
 }
 
+/** One tick of racing; true if the runner crossed the line on it. */
 function run(w: World, r: Runner, i: number) {
   controls(w, r, i);
+  const from = r.s;
   r.s += speedOf(r) * DT;
   vertical(w, r, i);
   while (r.cursor < w.course.length && endOf(w.course[r.cursor] as Entity) < r.s - REACH_M) {
@@ -103,12 +113,10 @@ function run(w: World, r: Runner, i: number) {
   }
   contacts(w, r, i);
   timers(w, r, i);
-  if (r.s >= COURSE_M && !r.out) {
-    r.finished = w.tick;
-    w.finishers += 1;
-    w.events.push({ kind: 'finish', runner: i, place: w.finishers });
-    if (w.grace < 0) w.grace = ticks(FINISH_GRACE_S);
-  }
+  if (r.s < COURSE_M || r.out) return false;
+  // The exact moment within the tick the line was crossed (ticks, fractional): photo finishes.
+  r.finished = w.tick - 1 + (COURSE_M - from) / (r.s - from);
+  return true;
 }
 
 /** Presses from held input; the Reverse debuff swaps left↔right and jump↔duck. */
