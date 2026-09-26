@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RUCKUS og:image</title>
+    <link rel="stylesheet" href="brand.css" />
+    <!--
+      1200×630 share image, composed centre-out: the jam gallery crops it to a tall cartridge that
+      shows only the middle ~500 px, so that strip is a complete poster on its own (wordmark,
+      line, all four games). The sides are ambient game art for wide link previews.
+    -->
+    <style>
+      .canvas {
+        width: 1200px;
+        height: 630px;
+      }
+
+      /* Ambient art either side: big, soft and dim, so the centre column owns the eye. */
+      .ambient {
+        position: absolute;
+        top: -40px;
+        width: 520px;
+        height: 710px;
+        object-fit: cover;
+        filter: blur(3px) saturate(1.1);
+        opacity: 0.38;
+      }
+      .ambient.left {
+        left: -120px;
+        -webkit-mask-image: linear-gradient(to right, black 45%, transparent 100%);
+      }
+      .ambient.right {
+        right: -120px;
+        -webkit-mask-image: linear-gradient(to left, black 45%, transparent 100%);
+      }
+
+      .column {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 500px;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+      }
+
+      /* A dark pool behind the column keeps text crisp over the ambient art. */
+      .column::before {
+        content: "";
+        position: absolute;
+        inset: -40px -70px;
+        background: radial-gradient(closest-side, rgb(27 16 36 / 0.92), transparent);
+        z-index: -1;
+      }
+
+      .kicker {
+        color: var(--teal);
+        font-size: 12px;
+      }
+
+      .wordmark {
+        font-size: 84px;
+      }
+
+      .headline {
+        margin-top: 10px;
+        font-size: 25px;
+      }
+
+      .grid {
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: repeat(2, 240px);
+        gap: 14px;
+      }
+
+      .tile {
+        position: relative;
+        height: 135px;
+        border-radius: 10px;
+        border: 3px solid var(--line);
+        background: var(--ink-3);
+        overflow: hidden;
+        box-shadow: 0 14px 30px rgb(0 0 0 / 0.5);
+      }
+      .tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .tile .label {
+        position: absolute;
+        inset: auto 0 0 0;
+        padding: 26px 10px 7px;
+        background: linear-gradient(transparent, rgb(27 16 36 / 0.94));
+        font-family: Bungee, sans-serif;
+        font-size: 17px;
+      }
+      .tile.hot {
+        border-color: var(--tomato);
+      }
+
+      .free {
+        margin-top: 6px;
+        color: var(--gold);
+        font-size: 15px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="canvas">
+      <img class="ambient left" src="frames/soccer.jpg" alt="" />
+      <img class="ambient right" src="frames/runner.jpg" alt="" />
+      <div class="column">
+        <div class="kicker pixel">Chain Jam Vol. 1 · party arena</div>
+        <div class="wordmark">RUCKUS</div>
+        <div class="headline display">Four games. One arena.</div>
+        <div class="grid">
+          <div class="tile hot"><img src="frames/chickenz.jpg" alt="" /><div class="label">Chickenz</div></div>
+          <div class="tile"><img src="frames/pool.jpg" alt="" /><div class="label">8-Ball</div></div>
+          <div class="tile"><img src="frames/soccer.jpg" alt="" /><div class="label">Egg Soccer</div></div>
+          <div class="tile"><img src="frames/runner.jpg" alt="" /><div class="label">Neon Dash</div></div>
+        </div>
+        <div class="free">Free to play · playruckus.xyz</div>
+      </div>
+    </div>
+  </body>
+</html>
