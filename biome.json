@@ -80,7 +80,11 @@
     },
     {
       "path": "./tooling/biome/exact-math.grit",
-      "includes": ["**/packages/sim-pool/src/**", "**/packages/sim-soccer/src/**"]
+      "includes": [
+        "**/packages/sim-pool/src/**",
+        "**/packages/sim-soccer/src/**",
+        "**/packages/sim-runner/src/**"
+      ]
     }
   ],
   "overrides": [

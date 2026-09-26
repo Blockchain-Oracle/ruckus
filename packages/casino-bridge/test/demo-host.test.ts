@@ -90,7 +90,7 @@ describe('DemoHost', () => {
       host.openSession({ wager: (DEMO.startingBalance + 1n).toString(), gameData: backChicken }),
     ).rejects.toThrow('Insufficient');
     await expect(
-      host.openSession({ wager: ONE.toString(), gameData: encodeBet(9 as 0, '0x') }),
+      host.openSession({ wager: ONE.toString(), gameData: encodeBet(200 as 0, '0x') }),
     ).rejects.toThrow();
   });
 
