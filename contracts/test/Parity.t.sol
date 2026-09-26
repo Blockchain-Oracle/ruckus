@@ -33,6 +33,16 @@ contract ParityTest is Test {
         }
     }
 
+    function test_wipeout_matchesTsMirror() public view {
+        for (
+            uint8 betType = game.BET_WIPEOUT_FIRST();
+            betType <= game.BET_WIPEOUT_LAST();
+            ++betType
+        ) {
+            _replay(string.concat("wipeout-", vm.toString(betType), ".json"), betType, bytes(""));
+        }
+    }
+
     function _replay(string memory file, uint8 betType, bytes memory params) private view {
         string memory json = vm.readFile(string.concat(vm.projectRoot(), "/vectors/", file));
         bytes32[] memory randomness = vm.parseJsonBytes32Array(json, ".randomness");

@@ -21,7 +21,11 @@ contract RuckusGameTest is Test {
         return abi.encode(betType, uint8(1), abi.encode(fighter));
     }
 
-    function _ctx(uint256 wager, bytes memory gameData) private pure returns (SessionContext memory ctx) {
+    function _ctx(uint256 wager, bytes memory gameData)
+        private
+        pure
+        returns (SessionContext memory ctx)
+    {
         ctx.wagerBase = wager;
         ctx.escrowedStake = wager;
         ctx.gameData = gameData;
@@ -29,7 +33,8 @@ contract RuckusGameTest is Test {
 
     /// Declared math = paytable: exact RTP from the on-chain table.
     function test_backChicken_rtpIsExactlyDeclared() public view {
-        (uint256[] memory weights, uint256[] memory multipliersBps) = game.betTable(game.BET_BACK_CHICKEN());
+        (uint256[] memory weights, uint256[] memory multipliersBps) =
+            game.betTable(game.BET_BACK_CHICKEN());
         uint256 denominator;
         uint256 weighted;
         for (uint256 i = 0; i < weights.length; ++i) {
@@ -40,7 +45,10 @@ contract RuckusGameTest is Test {
     }
 
     /// The payout-cap trap: every class, including the top multiplier, must fit escrow + reserve.
-    function testFuzz_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 fighter) public view {
+    function testFuzz_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 fighter)
+        public
+        view
+    {
         wager = bound(wager, 1, MAX_WAGER);
         fighter = uint8(bound(fighter, 0, game.CHICKENZ_FIGHTERS() - 1));
         bytes memory data = _gameData(game.BET_BACK_CHICKEN(), fighter);
@@ -103,32 +111,52 @@ contract RuckusGameTest is Test {
     }
 
     function test_revert_unknownBetType() public {
-        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__UnknownBetType.selector, uint8(18)));
-        game.quoteCaps(1e18, _gameData(18, 0));
+        uint8 past = game.BET_WIPEOUT_LAST() + 1;
+        vm.expectRevert(
+            abi.encodeWithSelector(RuckusGame.RuckusGame__UnknownBetType.selector, past)
+        );
+        game.quoteCaps(1e18, _gameData(past, 0));
     }
 
     function test_revert_invalidFighter() public {
-        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, uint8(0)));
+        vm.expectRevert(
+            abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, uint8(0))
+        );
         game.quoteCaps(1e18, _gameData(0, 4));
     }
 
     // ── Call Your Shot ───────────────────────────────────────────────────────────
 
-    function _shotData(uint8 betType, uint8 ball, uint8 pocket) private pure returns (bytes memory) {
+    function _shotData(uint8 betType, uint8 ball, uint8 pocket)
+        private
+        pure
+        returns (bytes memory)
+    {
         return abi.encode(betType, uint8(1), abi.encode(ball, pocket));
     }
 
     function test_callShot_everyTierIsExactlyDeclared() public view {
-        for (uint8 betType = game.BET_CALL_SHOT_STRAIGHT(); betType <= game.BET_CALL_SHOT_LONG(); ++betType) {
+        for (
+            uint8 betType = game.BET_CALL_SHOT_STRAIGHT();
+            betType <= game.BET_CALL_SHOT_LONG();
+            ++betType
+        ) {
             (uint256[] memory weights, uint256[] memory multipliersBps) = game.betTable(betType);
             assertEq(weights.length, 2, "make / miss");
             assertEq(multipliersBps[1], 0, "a miss pays nothing");
             uint256 denominator = weights[0] + weights[1];
-            assertEq(weights[0] * multipliersBps[0], DECLARED_RTP_BPS * denominator, "RTP must be exactly 96.00%");
+            assertEq(
+                weights[0] * multipliersBps[0],
+                DECLARED_RTP_BPS * denominator,
+                "RTP must be exactly 96.00%"
+            );
         }
     }
 
-    function testFuzz_callShot_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 tier) public view {
+    function testFuzz_callShot_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 tier)
+        public
+        view
+    {
         wager = bound(wager, 1, MAX_WAGER);
         uint8 betType = uint8(bound(tier, game.BET_CALL_SHOT_STRAIGHT(), game.BET_CALL_SHOT_LONG()));
         bytes memory gameData = _shotData(betType, 1, 3);
@@ -173,7 +201,9 @@ contract RuckusGameTest is Test {
             assertEq(weights.length, 2, "make / miss");
             assertEq(weights[0] + weights[1], 20, "twentieths of the finish table");
             assertEq(multipliersBps[1], 0, "a miss pays nothing");
-            assertEq(weights[0] * multipliersBps[0], DECLARED_RTP_BPS * 20, "RTP must be exactly 96.00%");
+            assertEq(
+                weights[0] * multipliersBps[0], DECLARED_RTP_BPS * 20, "RTP must be exactly 96.00%"
+            );
         }
     }
 
@@ -184,7 +214,10 @@ contract RuckusGameTest is Test {
         assertEq(anyGoal[0], 12_000, "any goal is 1.2x");
     }
 
-    function testFuzz_finish_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 call) public view {
+    function testFuzz_finish_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 call)
+        public
+        view
+    {
         wager = bound(wager, 1, MAX_WAGER);
         uint8 betType = uint8(bound(call, game.BET_FINISH_FIRST(), game.BET_FINISH_LAST()));
         bytes memory gameData = _finishData(betType);
@@ -198,10 +231,64 @@ contract RuckusGameTest is Test {
 
     function test_revert_finish_badParams() public {
         uint8 first = game.BET_FINISH_FIRST();
-        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, first));
+        vm.expectRevert(
+            abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, first)
+        );
         game.quoteCaps(1e18, abi.encode(first, uint8(1), abi.encode(uint8(1))));
-        uint8 past = game.BET_FINISH_LAST() + 1;
-        vm.expectRevert(abi.encodeWithSelector(RuckusGame.RuckusGame__UnknownBetType.selector, past));
+        uint8 past = game.BET_WIPEOUT_LAST() + 1;
+        vm.expectRevert(
+            abi.encodeWithSelector(RuckusGame.RuckusGame__UnknownBetType.selector, past)
+        );
         game.quoteCaps(1e18, _finishData(past));
+    }
+
+    // ── Call the Wipeout ─────────────────────────────────────────────────────────
+
+    function test_wipeout_everyCallIsExactlyDeclared() public view {
+        for (
+            uint8 betType = game.BET_WIPEOUT_FIRST();
+            betType <= game.BET_WIPEOUT_LAST();
+            ++betType
+        ) {
+            (uint256[] memory weights, uint256[] memory multipliersBps) = game.betTable(betType);
+            assertEq(weights.length, 2, "make / miss");
+            assertEq(weights[0] + weights[1], 20, "twentieths of the ending table");
+            assertEq(multipliersBps[1], 0, "a miss pays nothing");
+            assertEq(
+                weights[0] * multipliersBps[0], DECLARED_RTP_BPS * 20, "RTP must be exactly 96.00%"
+            );
+        }
+    }
+
+    function test_wipeout_callsPayAsDesigned() public view {
+        uint8 first = game.BET_WIPEOUT_FIRST();
+        uint256[6] memory expected = [uint256(12_000), 38_400, 32_000, 64_000, 96_000, 48_000];
+        for (uint8 i = 0; i < 6; ++i) {
+            (, uint256[] memory m) = game.betTable(first + i);
+            assertEq(m[0], expected[i], "call multiplier");
+        }
+    }
+
+    function testFuzz_wipeout_payoutNeverExceedsCap(uint256 wager, bytes32 randomness, uint8 call)
+        public
+        view
+    {
+        wager = bound(wager, 1, MAX_WAGER);
+        uint8 betType = uint8(bound(call, game.BET_WIPEOUT_FIRST(), game.BET_WIPEOUT_LAST()));
+        bytes memory gameData = _finishData(betType);
+        (uint256 maxEscrow, uint256 maxProfit) = game.quoteCaps(wager, gameData);
+        StepResult memory start = game.onSessionStart(_ctx(wager, gameData));
+        StepResult memory settle = game.onRandomness(_ctx(wager, gameData), randomness);
+        assertLe(settle.payout, maxEscrow + maxProfit, "payout exceeds escrow + reserve");
+        assertEq(uint256(start.reservedProfitDelta), maxProfit);
+        assertEq(settle.reservedProfitDelta, 0);
+    }
+
+    function test_revert_wipeout_badParams() public {
+        uint8 first = game.BET_WIPEOUT_FIRST();
+        vm.expectRevert(
+            abi.encodeWithSelector(RuckusGame.RuckusGame__InvalidParams.selector, first)
+        );
+        game.quoteCaps(1e18, abi.encode(first, uint8(1), abi.encode(uint8(2))));
     }
 }

@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {ICasinoGameV2, SessionContext, SessionPhase, StepResult} from "./interfaces/ICasinoGameV2.sol";
+import {
+    ICasinoGameV2,
+    SessionContext,
+    SessionPhase,
+    StepResult
+} from "./interfaces/ICasinoGameV2.sol";
 
 /// @title RUCKUS — class-table casino game (ADR-001, ADR-004)
 /// @notice Every bet type is a constant table of (weight, multiplier) outcome classes. The VRF word
@@ -42,6 +47,14 @@ contract RuckusGame is ICasinoGameV2 {
     uint8 public constant BET_FINISH_FIRST = 5;
     uint8 public constant BET_FINISH_LAST = 17;
     uint256 private constant FINISH_DENOMINATOR = 20;
+    /// @notice Neon Dash "Call the Wipeout": a VRF-seeded bot runs a short all-barrier gauntlet
+    ///         with no coins, so its first hit ends the run. You call what stops it. The ending
+    ///         table (twentieths) is jump barrier 5, duck 6, dodge 3, strict duck 2, clean run 4.
+    ///         Each call is its own two-class table (make, miss) paying 96% exactly. params = empty.
+    ///         Order: any wipeout, jump, duck, dodge, strict duck, clean run.
+    uint8 public constant BET_WIPEOUT_FIRST = 18;
+    uint8 public constant BET_WIPEOUT_LAST = 23;
+    uint256 private constant WIPEOUT_DENOMINATOR = 20;
 
     error RuckusGame__UnknownBetType(uint8 betType);
     error RuckusGame__InvalidParams(uint8 betType);
@@ -62,7 +75,12 @@ contract RuckusGame is ICasinoGameV2 {
     function quoteRiskParams(uint256 wager, bytes calldata gameData)
         external
         pure
-        returns (uint256 maxPayout, uint256 probabilityWad, uint256 expectedPayout, uint256 bodyVarianceScaled)
+        returns (
+            uint256 maxPayout,
+            uint256 probabilityWad,
+            uint256 expectedPayout,
+            uint256 bodyVarianceScaled
+        )
     {
         (uint8 betType,,) = _decodeBet(gameData);
         (uint256[] memory weights, uint256[] memory multipliersBps) = _table(betType);
@@ -80,15 +98,24 @@ contract RuckusGame is ICasinoGameV2 {
         bodyVarianceScaled = _bodyVarianceScaled(wager, weights, multipliersBps, denominator, top);
     }
 
-    function onSessionStart(SessionContext calldata ctx) external pure returns (StepResult memory result) {
+    function onSessionStart(SessionContext calldata ctx)
+        external
+        pure
+        returns (StepResult memory result)
+    {
         (uint8 betType, uint8 presentationVersion, bytes memory params) = _decodeBet(ctx.gameData);
-        result.newGameState = abi.encode(betType, presentationVersion, params, CLASS_PENDING, uint256(0));
+        result.newGameState =
+            abi.encode(betType, presentationVersion, params, CLASS_PENDING, uint256(0));
         result.reservedProfitDelta = int256(_maxReservedProfit(ctx.wagerBase, betType));
         result.nextPhase = SessionPhase.WAITING_RANDOMNESS;
         result.requestRandomnessNow = true;
     }
 
-    function onPlayerAction(SessionContext calldata, bytes calldata) external pure returns (StepResult memory) {
+    function onPlayerAction(SessionContext calldata, bytes calldata)
+        external
+        pure
+        returns (StepResult memory)
+    {
         revert RuckusGame__NoPlayerAction();
     }
 
@@ -135,13 +162,21 @@ contract RuckusGame is ICasinoGameV2 {
         revert RuckusGame__UnknownBetType(type(uint8).max); // unreachable: ticket < denominator
     }
 
-    function betTable(uint8 betType) external pure returns (uint256[] memory weights, uint256[] memory multipliersBps) {
+    function betTable(uint8 betType)
+        external
+        pure
+        returns (uint256[] memory weights, uint256[] memory multipliersBps)
+    {
         return _table(betType);
     }
 
     // ── Internals ────────────────────────────────────────────────────────────────────────────
 
-    function _table(uint8 betType) internal pure returns (uint256[] memory weights, uint256[] memory multipliersBps) {
+    function _table(uint8 betType)
+        internal
+        pure
+        returns (uint256[] memory weights, uint256[] memory multipliersBps)
+    {
         if (betType == BET_BACK_CHICKEN) {
             // RTP = (1·60000 + 4·28000 + 5·4000 + 10·0) / (20·10000) = 96.00%
             weights = new uint256[](4);
@@ -160,7 +195,16 @@ contract RuckusGame is ICasinoGameV2 {
         if (betType >= BET_FINISH_FIRST && betType <= BET_FINISH_LAST) {
             uint256 make = _finishCover(betType);
             // make/20 × (0.96·20/make) = 96.00%; every cover divides 192_000 exactly.
-            return _makeMiss(make, FINISH_DENOMINATOR - make, (DECLARED_RTP_BPS * FINISH_DENOMINATOR) / make);
+            return _makeMiss(
+                make, FINISH_DENOMINATOR - make, (DECLARED_RTP_BPS * FINISH_DENOMINATOR) / make
+            );
+        }
+        if (betType >= BET_WIPEOUT_FIRST && betType <= BET_WIPEOUT_LAST) {
+            uint256 make = _wipeoutCover(betType);
+            // make/20 × (0.96·20/make) = 96.00%; every cover divides 192_000 exactly.
+            return _makeMiss(
+                make, WIPEOUT_DENOMINATOR - make, (DECLARED_RTP_BPS * WIPEOUT_DENOMINATOR) / make
+            );
         }
         revert RuckusGame__UnknownBetType(betType);
     }
@@ -182,6 +226,12 @@ contract RuckusGame is ICasinoGameV2 {
         return cover[betType - BET_FINISH_FIRST];
     }
 
+    /// @dev How many twentieths of the gauntlet's ending table a call covers.
+    function _wipeoutCover(uint8 betType) internal pure returns (uint256) {
+        uint8[6] memory cover = [16, 5, 6, 3, 2, 4];
+        return cover[betType - BET_WIPEOUT_FIRST];
+    }
+
     function _decodeBet(bytes calldata gameData)
         internal
         pure
@@ -198,7 +248,7 @@ contract RuckusGame is ICasinoGameV2 {
             uint8 fighter = abi.decode(params, (uint8));
             if (fighter >= CHICKENZ_FIGHTERS) revert RuckusGame__InvalidParams(betType);
         } else if (betType >= BET_FINISH_FIRST) {
-            // Call the Finish: the call is the bet type itself.
+            // Call the Finish and Call the Wipeout: the call is the bet type itself.
             if (params.length != 0) revert RuckusGame__InvalidParams(betType);
         } else {
             // Call Your Shot: a real object ball and one of the six pockets.
@@ -211,7 +261,11 @@ contract RuckusGame is ICasinoGameV2 {
     }
 
     /// @dev The one payout function (see contract natspec).
-    function _payout(uint256 wager, uint8 betType, uint256 outcomeClass) internal pure returns (uint256) {
+    function _payout(uint256 wager, uint8 betType, uint256 outcomeClass)
+        internal
+        pure
+        returns (uint256)
+    {
         (, uint256[] memory multipliersBps) = _table(betType);
         return (wager * multipliersBps[outcomeClass]) / BPS;
     }
