@@ -6,11 +6,11 @@ import { WIPEOUT_CALLS } from '@arena/casino-math';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { useTick } from '@/ui/game/useTick.ts';
 import { RoundBanner } from '@/ui/RoundBanner.tsx';
 import { StakeField } from '@/ui/StakeField.tsx';
 
 import { Announce } from '../hud/Announce.tsx';
-import { useTick } from '../hud/useTick.ts';
 import { getDriver } from '../match/runtime.ts';
 import { callAt, describeEnding } from './calls.ts';
 import { openCallTheWipeout, placeWipeoutCall } from './controller.ts';

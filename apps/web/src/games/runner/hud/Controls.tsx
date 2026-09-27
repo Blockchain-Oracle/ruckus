@@ -1,6 +1,4 @@
-import { QuestionIcon, XIcon } from '@phosphor-icons/react';
-import { useState } from 'react';
-
+import { HelpPanel } from '@/ui/game/HelpPanel.tsx';
 import { PreMatchCard, type PreMatchIntro } from '@/ui/game/PreMatchCard.tsx';
 import { useCoarse } from '@/ui/game/useCoarse.ts';
 
@@ -106,35 +104,9 @@ export function IntroCard({ onGo, onLearn }: { onGo: () => void; onLearn: () => 
 
 /** One tap away during a race. */
 export function ControlsButton() {
-  const [open, setOpen] = useState(false);
-  if (!open)
-    return (
-      <button
-        type="button"
-        aria-label="How to play"
-        onClick={() => setOpen(true)}
-        className="pointer-events-auto grid size-10 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream hover:border-cream-dim"
-      >
-        <QuestionIcon weight="bold" className="size-5" />
-      </button>
-    );
   return (
-    <div
-      role="dialog"
-      className="pointer-events-auto absolute top-0 left-0 max-h-[calc(100dvh-6rem)] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border-2 border-teal bg-ink/95 p-4 text-sm shadow-[0_12px_40px_rgb(0_0_0/0.5)]"
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <span className="font-display text-teal">HOW TO PLAY</span>
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={() => setOpen(false)}
-          className="text-cream-dim hover:text-cream"
-        >
-          <XIcon weight="bold" className="size-4" />
-        </button>
-      </div>
+    <HelpPanel>
       <Rows />
-    </div>
+    </HelpPanel>
   );
 }

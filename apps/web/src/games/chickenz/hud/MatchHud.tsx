@@ -6,6 +6,7 @@ import { useUi } from '@/app/stores/ui.ts';
 import { cn } from '@/lib/utils.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { type ResultRow, MatchResults as SharedResults } from '@/ui/game/MatchResults.tsx';
+import { useTick } from '@/ui/game/useTick.ts';
 
 import { WINS_TO_TAKE_MATCH } from '../match/config.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -13,7 +14,6 @@ import { useMatch } from '../match/store.ts';
 import { primaryKey, useChickenzPrefs } from '../prefs.ts';
 import { HeroPortrait } from '../wager/HeroPortrait.tsx';
 import { EmoteBar } from './EmoteBar.tsx';
-import { useTick } from './useTick.ts';
 
 const HUD_HZ = 12;
 /** Chickenz's announce style: Silkscreen, #ffee58 with a #c9a800 drop and a soft black shadow. */

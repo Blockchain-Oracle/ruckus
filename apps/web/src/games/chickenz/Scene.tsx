@@ -8,6 +8,7 @@ import { useGameMachine } from '@/engine/gameMachine.ts';
 import { StadiumRig } from '@/engine/look/StadiumRig.tsx';
 import type { GameSceneProps } from '@/engine/types.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
+import { PLAYER_COLORS, PLAYERS } from '@/ui/game/players.ts';
 
 import { playEvents } from './audio/sfx.ts';
 import { LOOK } from './config.ts';
@@ -41,7 +42,6 @@ const MS_PER_S = 1000;
  * on the cards and results, so four long labels never pile up over a scrum.
  */
 const BOT_PREFIX = /^Bot · /;
-const SLOT_COLORS = ['#ff5a36', '#2ec4b6', '#8c6bff', '#9be15d'] as const;
 
 export function ChickenzScene({ generation }: GameSceneProps) {
   const driver = useMemo(() => new ChickenzDriver(ATTRACT_SEED_BASE + generation), [generation]);
@@ -181,7 +181,7 @@ export function ChickenzScene({ generation }: GameSceneProps) {
           key={`${slot}:${name}`}
           slot={slot}
           name={name.replace(BOT_PREFIX, '')}
-          color={SLOT_COLORS[slot] ?? SLOT_COLORS[0]}
+          color={PLAYER_COLORS[slot] ?? PLAYERS[0].color}
           driver={driver}
           front={slot === markedSlot}
         />

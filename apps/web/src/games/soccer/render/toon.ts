@@ -7,8 +7,6 @@ import {
   Vector2,
 } from 'three/webgpu';
 
-import { COLORS } from '../config.ts';
-
 /** Egg height over its width; the body circle is the sim's, the extra rises above it. */
 export const EGG_TALL = 1.18;
 /** The egg is widest a little below its middle. */

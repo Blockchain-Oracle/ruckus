@@ -2,6 +2,7 @@ import { CEILING, HALF_WIDTH } from '@arena/sim-soccer';
 
 import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
+import { PLAYERS } from '@/ui/game/players.ts';
 
 import { soccerPose } from './match/camera.ts';
 
@@ -32,8 +33,8 @@ export const rig: CameraRig = {
 
 /** Kits: the hub's player-1 and player-3 colours; a 2v2 partner wears the lighter shade. */
 export const KITS = [
-  { body: '#ff5a36', partner: '#ff8a5c', dark: '#7a1f10', band: '#fff1d6', name: 'Tomato' },
-  { body: '#8c6bff', partner: '#ab94ff', dark: '#35207a', band: '#fff1d6', name: 'Violet' },
+  { body: PLAYERS[0].color, partner: '#ff8a5c', dark: '#7a1f10', band: '#fff1d6', name: 'Tomato' },
+  { body: PLAYERS[2].color, partner: '#ab94ff', dark: '#35207a', band: '#fff1d6', name: 'Violet' },
 ] as const;
 
 export const COLORS = {

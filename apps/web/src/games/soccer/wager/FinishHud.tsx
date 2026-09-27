@@ -4,13 +4,13 @@ import { formatUnits } from 'viem';
 import { useCasinoBridge } from '@/lib/casino/useCasinoBridge.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { useTick } from '@/ui/game/useTick.ts';
 import { RoundBanner } from '@/ui/RoundBanner.tsx';
 import { StakeField } from '@/ui/StakeField.tsx';
 
 import { KITS } from '../config.ts';
 import { Announce } from '../hud/Announce.tsx';
 import { ScoreBug } from '../hud/ScoreBug.tsx';
-import { useTick } from '../hud/useTick.ts';
 import { getDriver } from '../match/runtime.ts';
 import { callFor, describeFinish, type FinishPick, type TeamPick } from './calls.ts';
 import { openCallTheFinish, placeFinishCall } from './controller.ts';

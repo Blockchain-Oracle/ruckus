@@ -2,6 +2,7 @@ import { LANE_WIDTH_M } from '@arena/sim-runner';
 
 import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
+import { PLAYERS } from '@/ui/game/players.ts';
 
 import { CAMERA, runnerPose } from './match/camera.ts';
 
@@ -31,13 +32,8 @@ export const rig: CameraRig = {
   pose: runnerPose,
 };
 
-/** Runner colours: the hub's four player colours (ART-BIBLE), you are always Tomato. */
-export const SLOTS = [
-  { color: '#ff5a36', name: 'Tomato' },
-  { color: '#2ec4b6', name: 'Teal' },
-  { color: '#8c6bff', name: 'Violet' },
-  { color: '#9be15d', name: 'Lime' },
-] as const;
+/** Runner colours: the hub's four player colours, you are always Tomato. */
+export const SLOTS = PLAYERS;
 
 /** DAG Dasher's palette: Kaspa teal and purple neon on near-black, barrier colours as verbs. */
 export const COLORS = {

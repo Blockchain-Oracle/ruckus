@@ -5,6 +5,7 @@ import { MATCH_SECONDS, TICK_HZ } from '@arena/sim-soccer';
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { useCoarse } from '@/ui/game/useCoarse.ts';
+import { useTick } from '@/ui/game/useTick.ts';
 
 import { startLessons, startMatch } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -15,7 +16,6 @@ import { LessonCard } from './Lesson.tsx';
 import { Results } from './Results.tsx';
 import { PowerChips, ScoreBug } from './ScoreBug.tsx';
 import { TouchPad } from './TouchPad.tsx';
-import { useTick } from './useTick.ts';
 
 const HUD_HZ = 12;
 /** The key reminder stays up for the opening seconds, until the first goal. */

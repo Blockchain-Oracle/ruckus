@@ -5,6 +5,7 @@ import { COUNTDOWN_S, TICK_HZ } from '@arena/sim-runner';
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { useCoarse } from '@/ui/game/useCoarse.ts';
+import { useTick } from '@/ui/game/useTick.ts';
 
 import { currentChallenge, startChallenge, startLessons, startRace } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -15,7 +16,6 @@ import { ControlsButton, IntroCard } from './Controls.tsx';
 import { CoinsAndSpeed, PowerChip, ProgressRail, Standings } from './Gauges.tsx';
 import { LessonCard } from './Lesson.tsx';
 import { Results } from './Results.tsx';
-import { useTick } from './useTick.ts';
 
 const HUD_HZ = 15;
 
