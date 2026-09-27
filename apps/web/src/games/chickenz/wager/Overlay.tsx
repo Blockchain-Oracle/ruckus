@@ -15,6 +15,7 @@ import { getDirectors } from '../match/runtime.ts';
 import { useMatch } from '../match/store.ts';
 import { installOnline } from '../net/online.ts';
 import { RoomSheet } from '../net/RoomSheet.tsx';
+import { useRoom } from '../net/roomStore.ts';
 import { inRoom, joinRoom, leaveRoom } from '../net/session.ts';
 import { useRoomSheet } from '../net/sheetStore.ts';
 import { useTutorial } from '../tutorial/director.ts';
@@ -58,6 +59,7 @@ export function ChickenzOverlay() {
   const setGameOwnsHud = useShell((s) => s.setGameOwnsHud);
   const setImmersive = useShell((s) => s.setImmersive);
   const coarse = useCoarsePointer();
+  const roomStatus = useRoom((s) => s.status);
   const controlling =
     matchStatus === 'countdown' ||
     matchStatus === 'playing' ||
@@ -79,7 +81,11 @@ export function ChickenzOverlay() {
       {coarse && controlling && <TouchControls />}
       {coarse && busy && <RotateHint />}
       <DiamondWipe />
-      <MatchResults onRematch={() => getDirectors()?.match.rematch()} onLeave={leave} />
+      <MatchResults
+        online={roomStatus === 'inRoom'}
+        onRematch={() => getDirectors()?.match.rematch()}
+        onLeave={leave}
+      />
       <TutorialHud
         onSkip={() => {
           getDirectors()?.tutorial.skip();

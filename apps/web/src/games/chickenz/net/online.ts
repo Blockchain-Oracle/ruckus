@@ -9,6 +9,7 @@ import { HERO_NAMES, HEROES } from '../sprites.ts';
 import { isHero } from './heroes.ts';
 import { useRoom } from './roomStore.ts';
 import { sendInput, setOnlineHandlers } from './session.ts';
+import { useRoomSheet } from './sheetStore.ts';
 
 /**
  * Bridges server room events into the shared match presentation (HUD, wipe, banners) and the
@@ -64,11 +65,13 @@ export function installOnline() {
     const driver = getDriver();
     if (driver?.kind !== 'online') return;
     if (s.phase === 'playing' && prev.phase !== 'playing') driver.frozen = false;
-    // Back in the room lobby after a match: stand down the match HUD.
+    // Back in the room lobby after a match: stand down the match HUD and reopen the lobby, so
+    // the group stays together (it used to drop players back to the hub; Codex UX #4).
     if (s.phase === 'lobby' && prev.phase !== 'lobby') {
       getDirectors()?.match.stop();
       driver.exhibit();
       useGameMachine.getState().send('leaving');
+      useRoomSheet.getState().setOpen(true);
     }
   });
   return () => {

@@ -4,8 +4,8 @@ import { ALIVE_FLAG, H, MAX_HEALTH_HP, P, playerBase, TICK_HZ } from '@arena/sim
 
 import { useUi } from '@/app/stores/ui.ts';
 import { cn } from '@/lib/utils.ts';
-import { Button } from '@/ui/Button.tsx';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
+import { type ResultRow, MatchResults as SharedResults } from '@/ui/game/MatchResults.tsx';
 
 import { WINS_TO_TAKE_MATCH } from '../match/config.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -159,50 +159,37 @@ function ControlsHint() {
   );
 }
 
-/** Match over: standings, then rematch or back to the hub. */
+/** Match over: standings on the shared results screen (ADR-010). */
 export function MatchResults({
+  online,
   onRematch,
   onLeave,
 }: {
+  online: boolean;
   onRematch: () => void;
   onLeave: () => void;
 }) {
   const { heroes, names, wins, winner, localSlot, status, announce } = useMatch();
   if (status !== 'matchOver' || announce) return null;
   const order = heroes.map((_, slot) => slot).sort((a, b) => (wins[b] ?? 0) - (wins[a] ?? 0));
+  const rows: ResultRow[] = order.map((slot, place) => ({
+    key: String(slot),
+    place: String(place + 1),
+    name: names[slot] ?? '',
+    // The portrait stands in for the colour dot.
+    color: '#fff1d6',
+    value: `${wins[slot] ?? 0} ${wins[slot] === 1 ? 'win' : 'wins'}`,
+    you: slot === localSlot,
+    icon: <HeroPortrait hero={heroes[slot] ?? heroes[0] ?? 'ninja-frog'} className="w-8" />,
+  }));
   return (
-    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/50 px-4">
-      <div className="flex w-full max-w-md flex-col gap-4 rounded-2xl border-2 border-line bg-ink-2 p-6 text-center shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
-        <div
-          className={cn('font-display text-4xl', winner === localSlot ? 'text-gold' : 'text-cream')}
-        >
-          {winner === localSlot ? 'YOU WIN!' : 'GOOD GAME'}
-        </div>
-        <ol className="flex flex-col gap-2 text-left">
-          {order.map((slot, place) => (
-            <li
-              key={slot}
-              className={cn(
-                'flex items-center gap-3 rounded-lg border-2 bg-ink-3 px-3 py-2',
-                slot === localSlot ? 'border-tomato' : 'border-line',
-              )}
-            >
-              <span className="font-display w-6 text-cream-dim">{place + 1}</span>
-              <HeroPortrait hero={heroes[slot] ?? heroes[0] ?? 'ninja-frog'} className="w-8" />
-              <span className="flex-1 truncate">{names[slot]}</span>
-              <span className="tabular font-bold">{wins[slot] ?? 0} wins</span>
-            </li>
-          ))}
-        </ol>
-        <div className="flex justify-center gap-3">
-          <Button variant="tomato" sound="ui.confirm" onClick={onRematch}>
-            Rematch
-          </Button>
-          <Button sound="ui.back" onClick={onLeave}>
-            Back to hub
-          </Button>
-        </div>
-      </div>
-    </div>
+    <SharedResults
+      title={winner === localSlot ? 'YOU WIN!' : 'GOOD GAME'}
+      won={winner === localSlot}
+      rows={rows}
+      online={online}
+      onRematch={onRematch}
+      onLeave={onLeave}
+    />
   );
 }
