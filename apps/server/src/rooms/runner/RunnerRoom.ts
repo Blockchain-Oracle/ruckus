@@ -20,12 +20,22 @@ import { newWorld, packedLength, packWorld, standings, tick, type World } from '
 
 import { PROTOCOL_MISMATCH, releaseCode, uniqueCode } from '../codes.ts';
 import {
+  dropOrphanBots,
+  GRACE_LOBBY_S,
+  GRACE_MATCH_S,
+  HOST_HANDOVER_MS,
+  nextHost,
+  reclaim,
+  returningSeat,
+  takeOver,
+  validPlayerId,
+} from '../lobby.ts';
+import {
   BOT_NAMES,
   BOT_SKILL,
   MAX_CLIENTS,
   MAX_NAME_LENGTH,
   OVER_MS,
-  RECONNECT_SECONDS,
   SNAPSHOT_EVERY_TICKS,
   TICK_MS,
 } from './config.ts';
@@ -79,34 +89,62 @@ export class RunnerRoom extends Room<{ state: InstanceType<typeof RunnerRoomStat
 
   override onJoin(client: Client, options: RunnerJoinOptions) {
     const inPlay = this.state.phase !== RUNNER_PHASE.lobby;
-    const slot = inPlay ? -1 : this.freeSlot();
-    const seat = new RunnerSeat();
-    seat.slot = slot < 0 ? RUNNER_WATCHER : slot;
-    seat.kind = seat.slot === RUNNER_WATCHER ? RUNNER_SEAT.waiting : RUNNER_SEAT.human;
-    seat.sessionId = client.sessionId;
-    seat.name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
-    this.state.seats.push(seat);
-    if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    const name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    const playerId = validPlayerId(options.playerId);
+    // A reload, new tab or late return takes the player's own seat back (ADR-009).
+    const back = returningSeat(this.state.seats, playerId);
+    if (back) {
+      const wasHost = back.sessionId !== '' && back.sessionId === this.state.hostSessionId;
+      reclaim(back, client.sessionId, name);
+      const r = this.world?.runners[back.slot];
+      if (r) r.bot = -1;
+      if (wasHost || !this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    } else {
+      const slot = inPlay ? -1 : this.freeSlot();
+      const seat = new RunnerSeat();
+      seat.slot = slot < 0 ? RUNNER_WATCHER : slot;
+      seat.kind = seat.slot === RUNNER_WATCHER ? RUNNER_SEAT.waiting : RUNNER_SEAT.human;
+      seat.sessionId = client.sessionId;
+      seat.name = name;
+      seat.playerId = playerId;
+      this.state.seats.push(seat);
+      if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    }
     if (this.clients.length >= MAX_CLIENTS) void this.lock();
-    // Mid-race: watch it live from the next snapshot.
-    if (inPlay && this.current) client.send(RUNNER_MSG.raceStart, this.current);
+    // Mid-race: run on (a reclaimed seat) or watch live from the next snapshot.
+    this.sendStart(client);
   }
 
-  override async onDrop(client: Client) {
+  /**
+   * Hold the seat while the phone comes back (not awaited: when the grace runs out, Colyseus calls
+   * onLeave itself, which releases the seat exactly once).
+   */
+  override onDrop(client: Client) {
     const seat = this.seatOf(client);
-    if (seat) seat.connected = false;
-    try {
-      await this.allowReconnection(client, RECONNECT_SECONDS);
-    } catch {
-      this.release(client);
-    }
+    if (!seat) return;
+    seat.connected = false;
+    const grace = this.state.phase === RUNNER_PHASE.lobby ? GRACE_LOBBY_S : GRACE_MATCH_S;
+    this.allowReconnection(client, grace).catch(() => {});
+    if (this.state.hostSessionId === client.sessionId)
+      this.after(HOST_HANDOVER_MS, () => {
+        if (this.state.hostSessionId === client.sessionId && !this.seatOf(client)?.connected)
+          this.state.hostSessionId = nextHost(this.state.seats) || this.state.hostSessionId;
+      });
   }
 
   override onReconnect(client: Client) {
     const seat = this.seatOf(client);
     if (seat) seat.connected = true;
-    if (this.state.phase !== RUNNER_PHASE.lobby && this.current)
-      client.send(RUNNER_MSG.raceStart, this.current);
+    if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    this.sendStart(client);
+  }
+
+  /** Mid-race, a client (re)joining gets the race with its own slot (−1 watching). */
+  private sendStart(client: Client) {
+    if (this.state.phase === RUNNER_PHASE.lobby || !this.current) return;
+    const seat = this.seatOf(client);
+    const you = seat && seat.kind === RUNNER_SEAT.human ? seat.slot : -1;
+    client.send(RUNNER_MSG.raceStart, { ...this.current, you } satisfies RunnerRaceStart);
   }
 
   override onLeave(client: Client) {
@@ -167,16 +205,12 @@ export class RunnerRoom extends Room<{ state: InstanceType<typeof RunnerRoomStat
     if (this.state.phase === RUNNER_PHASE.lobby || seat.kind === RUNNER_SEAT.waiting) {
       this.state.seats.splice(this.state.seats.indexOf(seat), 1);
     } else {
-      seat.kind = RUNNER_SEAT.bot;
-      seat.sessionId = '';
-      seat.connected = true;
-      seat.name = `Bot (${seat.name})`;
+      takeOver(seat);
       const r = this.world?.runners[seat.slot];
       if (r) r.bot = BOT_SKILL;
     }
     if (this.state.hostSessionId === client.sessionId)
-      this.state.hostSessionId =
-        this.state.seats.find((s) => s.kind === RUNNER_SEAT.human)?.sessionId ?? '';
+      this.state.hostSessionId = nextHost(this.state.seats, client.sessionId);
     if (this.clients.length < MAX_CLIENTS) void this.unlock();
   }
 
@@ -202,9 +236,10 @@ export class RunnerRoom extends Room<{ state: InstanceType<typeof RunnerRoomStat
     this.world = newWorld(this.seed, bots);
     this.packed = new Float64Array(packedLength(this.world));
     this.latestInputs.clear();
-    this.current = { seed: this.seed, bots, names: seats.map((s) => s.name) };
+    this.current = { seed: this.seed, bots, names: seats.map((s) => s.name), you: -1 };
     this.state.phase = RUNNER_PHASE.playing;
-    this.broadcast(RUNNER_MSG.raceStart, this.current);
+    // Per client, with its slot: seats were just renumbered and the state patch lags behind.
+    for (const client of this.clients) this.sendStart(client);
     this.sendSnapshots();
   }
 
@@ -224,6 +259,7 @@ export class RunnerRoom extends Room<{ state: InstanceType<typeof RunnerRoomStat
     this.world = null;
     this.current = null;
     this.state.phase = RUNNER_PHASE.lobby;
+    dropOrphanBots(this.state.seats);
     // Watchers take the free seats for the next race.
     for (const s of this.state.seats) {
       if (s.kind !== RUNNER_SEAT.waiting) continue;

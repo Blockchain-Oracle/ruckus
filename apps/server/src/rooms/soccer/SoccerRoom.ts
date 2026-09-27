@@ -20,12 +20,22 @@ import { newWorld, packedLength, packWorld, tick, type World } from '@arena/sim-
 
 import { PROTOCOL_MISMATCH, releaseCode, uniqueCode } from '../codes.ts';
 import {
+  dropOrphanBots,
+  GRACE_LOBBY_S,
+  GRACE_MATCH_S,
+  HOST_HANDOVER_MS,
+  nextHost,
+  reclaim,
+  returningSeat,
+  takeOver,
+  validPlayerId,
+} from '../lobby.ts';
+import {
   BOT_DIFFICULTY,
   BOT_NAMES,
   MAX_CLIENTS,
   MAX_NAME_LENGTH,
   OVER_MS,
-  RECONNECT_SECONDS,
   SNAPSHOT_EVERY_TICKS,
   TICK_MS,
 } from './config.ts';
@@ -78,34 +88,63 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
 
   override onJoin(client: Client, options: SoccerJoinOptions) {
     const inPlay = this.state.phase !== SOCCER_PHASE.lobby;
-    const slot = inPlay ? -1 : this.freeSlot();
-    const seat = new SoccerSeat();
-    seat.slot = slot < 0 ? SOCCER_WATCHER : slot;
-    seat.kind = seat.slot === SOCCER_WATCHER ? SOCCER_SEAT.waiting : SOCCER_SEAT.human;
-    seat.sessionId = client.sessionId;
-    seat.name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
-    this.state.seats.push(seat);
-    if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    const name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    const playerId = validPlayerId(options.playerId);
+    // A reload, new tab or late return takes the player's own seat back (ADR-009).
+    const back = returningSeat(this.state.seats, playerId);
+    if (back) {
+      const wasHost = back.sessionId !== '' && back.sessionId === this.state.hostSessionId;
+      reclaim(back, client.sessionId, name);
+      const p = this.world?.players[back.slot];
+      if (p) p.bot = -1;
+      if (wasHost || !this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    } else {
+      const slot = inPlay ? -1 : this.freeSlot();
+      const seat = new SoccerSeat();
+      seat.slot = slot < 0 ? SOCCER_WATCHER : slot;
+      seat.kind = seat.slot === SOCCER_WATCHER ? SOCCER_SEAT.waiting : SOCCER_SEAT.human;
+      seat.sessionId = client.sessionId;
+      seat.name = name;
+      seat.playerId = playerId;
+      this.state.seats.push(seat);
+      if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    }
     if (this.clients.length >= MAX_CLIENTS) void this.lock();
-    // Mid-match: watch it live from the next snapshot.
-    if (inPlay && this.current) client.send(SOCCER_MSG.matchStart, this.current);
+    // Mid-match: play on (a reclaimed seat) or watch live from the next snapshot.
+    this.sendStart(client);
   }
 
-  override async onDrop(client: Client) {
+  /**
+   * Hold the seat while the phone comes back (not awaited: when the grace runs out, Colyseus calls
+   * onLeave itself, which releases the seat exactly once).
+   */
+  override onDrop(client: Client) {
     const seat = this.seatOf(client);
-    if (seat) seat.connected = false;
-    try {
-      await this.allowReconnection(client, RECONNECT_SECONDS);
-    } catch {
-      this.release(client);
-    }
+    if (!seat) return;
+    seat.connected = false;
+    const grace = this.state.phase === SOCCER_PHASE.lobby ? GRACE_LOBBY_S : GRACE_MATCH_S;
+    this.allowReconnection(client, grace).catch(() => {});
+    // A dropped host keeps the role for a moment; then the lobby shouldn't wait on them.
+    if (this.state.hostSessionId === client.sessionId)
+      this.after(HOST_HANDOVER_MS, () => {
+        if (this.state.hostSessionId === client.sessionId && !this.seatOf(client)?.connected)
+          this.state.hostSessionId = nextHost(this.state.seats) || this.state.hostSessionId;
+      });
   }
 
   override onReconnect(client: Client) {
     const seat = this.seatOf(client);
     if (seat) seat.connected = true;
-    if (this.state.phase !== SOCCER_PHASE.lobby && this.current)
-      client.send(SOCCER_MSG.matchStart, this.current);
+    if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    this.sendStart(client);
+  }
+
+  /** Mid-match, a client (re)joining gets the match with its own slot (−1 watching). */
+  private sendStart(client: Client) {
+    if (this.state.phase === SOCCER_PHASE.lobby || !this.current) return;
+    const seat = this.seatOf(client);
+    const you = seat && seat.kind === SOCCER_SEAT.human ? seat.slot : -1;
+    client.send(SOCCER_MSG.matchStart, { ...this.current, you } satisfies SoccerMatchStart);
   }
 
   override onLeave(client: Client) {
@@ -159,23 +198,22 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     }
   }
 
-  /** Leaving mid-match hands the egg to a labelled bot; in the lobby the seat simply frees up. */
+  /**
+   * Called once per departure (a consented leave, or a drop whose grace ran out). Mid-match a
+   * labelled bot keeps the egg warm until its player returns; in the lobby the seat frees up.
+   */
   private release(client: Client) {
     const seat = this.seatOf(client);
     if (!seat) return;
     if (this.state.phase === SOCCER_PHASE.lobby || seat.kind === SOCCER_SEAT.waiting) {
       this.state.seats.splice(this.state.seats.indexOf(seat), 1);
     } else {
-      seat.kind = SOCCER_SEAT.bot;
-      seat.sessionId = '';
-      seat.connected = true;
-      seat.name = `Bot (${seat.name})`;
+      takeOver(seat);
       const p = this.world?.players[seat.slot];
       if (p) p.bot = BOT_DIFFICULTY;
     }
     if (this.state.hostSessionId === client.sessionId)
-      this.state.hostSessionId =
-        this.state.seats.find((s) => s.kind === SOCCER_SEAT.human)?.sessionId ?? '';
+      this.state.hostSessionId = nextHost(this.state.seats, client.sessionId);
     if (this.clients.length < MAX_CLIENTS) void this.unlock();
   }
 
@@ -213,9 +251,10 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     this.world = newWorld(this.seed, perTeam, bots);
     this.packed = new Float64Array(packedLength(seats.length));
     this.latestInputs.clear();
-    this.current = { seed: this.seed, perTeam, bots, names: seats.map((s) => s.name) };
+    this.current = { seed: this.seed, perTeam, bots, names: seats.map((s) => s.name), you: -1 };
     this.state.phase = SOCCER_PHASE.playing;
-    this.broadcast(SOCCER_MSG.matchStart, this.current);
+    // Per client, with its slot: seats were just renumbered and the state patch lags behind.
+    for (const client of this.clients) this.sendStart(client);
     this.sendSnapshots();
   }
 
@@ -234,6 +273,7 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     this.world = null;
     this.current = null;
     this.state.phase = SOCCER_PHASE.lobby;
+    dropOrphanBots(this.state.seats);
     // Watchers take the free seats for the next match.
     for (const s of this.state.seats) {
       if (s.kind !== SOCCER_SEAT.waiting) continue;

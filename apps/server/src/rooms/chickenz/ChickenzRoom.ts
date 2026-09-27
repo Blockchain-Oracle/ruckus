@@ -22,6 +22,17 @@ import { H, Sim, VIEW_LEN } from '@arena/sim-chickenz';
 
 import { PROTOCOL_MISMATCH, ROOM_FULL, releaseCode, uniqueCode } from '../codes.ts';
 import {
+  dropOrphanBots,
+  GRACE_LOBBY_S,
+  GRACE_MATCH_S,
+  HOST_HANDOVER_MS,
+  nextHost,
+  reclaim,
+  returningSeat,
+  takeOver,
+  validPlayerId,
+} from '../lobby.ts';
+import {
   BOT_DIFFICULTY,
   COUNTDOWN_MS,
   HEROES,
@@ -30,7 +41,6 @@ import {
   MAX_NAME_LENGTH,
   MAX_SEATS,
   MIN_PLAYERS_TO_START,
-  RECONNECT_SECONDS,
   ROUND_OVER_MS,
   SNAPSHOT_EVERY_TICKS,
   TICK_MS,
@@ -115,6 +125,18 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
 
   override onJoin(client: Client, options: ChickenzJoinOptions) {
     const midMatch = this.state.phase !== CHICKENZ_PHASE.lobby;
+    const name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    const playerId = validPlayerId(options.playerId);
+    // A reload, new tab or late return takes the player's own bird back (ADR-009).
+    const back = returningSeat(this.state.seats, playerId);
+    if (back) {
+      const wasHost = back.sessionId !== '' && back.sessionId === this.state.hostSessionId;
+      reclaim(back, client.sessionId, name);
+      this.sim?.clear_bot(back.slot);
+      if (wasHost || !this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+      this.sendRound(client);
+      return;
+    }
     const slot = midMatch ? NO_SLOT : this.freeSlot();
     if (slot < 0) throw new ServerError(ROOM_FULL, 'That room is full.');
     const seat = new ChickenzSeat();
@@ -122,7 +144,8 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     // Joining mid-match: watch this one live, play the next (never turned away at the door).
     seat.kind = midMatch ? SEAT_KIND.waiting : SEAT_KIND.human;
     seat.sessionId = client.sessionId;
-    seat.name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    seat.name = name;
+    seat.playerId = playerId;
     const wanted =
       options.hero && HEROES.includes(options.hero as never) && !this.heroTaken(options.hero)
         ? options.hero
@@ -131,22 +154,40 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     this.state.seats.push(seat);
     if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
     void this.lockIfFull();
-    if (midMatch && this.currentRound) client.send(CHICKENZ_MSG.roundStart, this.currentRound);
+    // Joining mid-match: watch this round live.
+    this.sendRound(client);
   }
 
-  override async onDrop(client: Client) {
+  /**
+   * Hold the seat while the phone comes back (not awaited: when the grace runs out, Colyseus calls
+   * onLeave itself, which releases the seat exactly once).
+   */
+  override onDrop(client: Client) {
     const seat = this.seatOf(client);
-    if (seat) seat.connected = false;
-    try {
-      await this.allowReconnection(client, RECONNECT_SECONDS);
-    } catch {
-      this.release(client);
-    }
+    if (!seat) return;
+    seat.connected = false;
+    const grace = this.state.phase === CHICKENZ_PHASE.lobby ? GRACE_LOBBY_S : GRACE_MATCH_S;
+    this.allowReconnection(client, grace).catch(() => {});
+    if (this.state.hostSessionId === client.sessionId)
+      this.after(HOST_HANDOVER_MS, () => {
+        if (this.state.hostSessionId === client.sessionId && !this.seatOf(client)?.connected)
+          this.state.hostSessionId = nextHost(this.state.seats) || this.state.hostSessionId;
+      });
   }
 
   override onReconnect(client: Client) {
     const seat = this.seatOf(client);
     if (seat) seat.connected = true;
+    if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+    this.sendRound(client);
+  }
+
+  /** Mid-match, a client (re)joining gets the round with its own slot (−1 watching). */
+  private sendRound(client: Client) {
+    if (this.state.phase === CHICKENZ_PHASE.lobby || !this.currentRound) return;
+    const seat = this.seatOf(client);
+    const you = seat && seat.kind === SEAT_KIND.human ? seat.slot : -1;
+    client.send(CHICKENZ_MSG.roundStart, { ...this.currentRound, you } satisfies RoundStartEvent);
   }
 
   override onLeave(client: Client) {
@@ -221,16 +262,11 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
       this.state.seats.splice(this.state.seats.indexOf(seat), 1);
       void this.lockIfFull();
     } else {
-      seat.kind = SEAT_KIND.bot;
-      seat.sessionId = '';
-      seat.connected = true;
-      seat.name = `Bot (${seat.name})`;
+      takeOver(seat);
       this.sim?.set_bot(seat.slot, BOT_DIFFICULTY);
     }
-    if (this.state.hostSessionId === client.sessionId) {
-      this.state.hostSessionId =
-        this.state.seats.find((s) => s.kind === SEAT_KIND.human)?.sessionId ?? '';
-    }
+    if (this.state.hostSessionId === client.sessionId)
+      this.state.hostSessionId = nextHost(this.state.seats, client.sessionId);
   }
 
   // ── match flow ────────────────────────────────────────────────────────
@@ -265,14 +301,23 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     this.frozen = true;
     this.roundEnded = false;
     this.state.phase = CHICKENZ_PHASE.countdown;
-    const event: RoundStartEvent = {
+    const lineup = [...this.state.seats]
+      .filter((s) => s.kind !== SEAT_KIND.waiting)
+      .sort((a, b) => a.slot - b.slot);
+    // Kept for watchers and returning players (it used to stay null, so they never got a round).
+    this.currentRound = {
       round: this.state.round,
       seed: this.seed,
       mapId,
       countdownMs: COUNTDOWN_MS,
       players,
+      you: -1,
+      heroes: lineup.map((s) => s.hero),
+      names: lineup.map((s) => s.name),
+      wins: lineup.map((s) => s.wins),
     };
-    this.broadcast(CHICKENZ_MSG.roundStart, event);
+    // Per client, with its slot: seats were just renumbered and the state patch lags behind.
+    for (const client of this.clients) this.sendRound(client);
     this.sendSnapshots();
     this.after(COUNTDOWN_MS, () => {
       this.frozen = false;
@@ -310,6 +355,7 @@ export class ChickenzRoom extends Room<{ state: InstanceType<typeof ChickenzRoom
     this.sim = null;
     this.currentRound = null;
     this.state.phase = CHICKENZ_PHASE.lobby;
+    dropOrphanBots(this.state.seats);
     // Watchers take the free seats for the next match.
     for (const s of this.state.seats) {
       if (s.kind !== SEAT_KIND.waiting) continue;

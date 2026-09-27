@@ -9,6 +9,4 @@ export const BOT_SKILL = 65;
 export const BOT_NAMES = ['Dash', 'Zip', 'Blitz', 'Nova'] as const;
 /** The finish board: read it, then the room returns to its lobby. */
 export const OVER_MS = 8_000;
-/** Seconds a dropped runner keeps their seat before a labelled bot takes over. */
-export const RECONNECT_SECONDS = 20;
 export const MAX_NAME_LENGTH = 16;

@@ -15,6 +15,10 @@ export const SoccerSeat = schema(
     ready: t.boolean().default(false),
     connected: t.boolean().default(true),
     wins: t.uint8().default(0),
+    /** Stable per-device id (ADR-009): a reload or new tab reclaims this seat. */
+    playerId: t.string().default(''),
+    /** Set while a labelled bot holds a dropped player's seat; they take it back on return. */
+    takeoverOf: t.string().default(''),
   },
   'SoccerSeat',
 );
@@ -55,7 +59,12 @@ export const SOCCER_MSG = {
 export const SOCCER_INPUT_BYTES = 6;
 export const SOCCER_SNAPSHOT_HEADER_BYTES = 8;
 
-export type SoccerJoinOptions = { protocolVersion: number; name: string; private?: boolean };
+export type SoccerJoinOptions = {
+  protocolVersion: number;
+  name: string;
+  playerId?: string;
+  private?: boolean;
+};
 /** A match begins: every client builds the identical world, then follows snapshots. */
 export type SoccerMatchStart = {
   seed: number;
@@ -63,5 +72,7 @@ export type SoccerMatchStart = {
   /** Per sim slot: bot difficulty, or −1 for a human seat. */
   bots: number[];
   names: string[];
+  /** Per client: this client's sim slot, or −1 watching (seats are renumbered at match start). */
+  you: number;
 };
 export type SoccerMatchEnd = { score: [number, number]; winner: -1 | 0 | 1 };

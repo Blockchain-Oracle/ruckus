@@ -35,7 +35,18 @@ import {
   set,
 } from '@arena/sim-pool';
 
-import { PROTOCOL_MISMATCH, ROOM_FULL, releaseCode, uniqueCode } from '../codes.ts';
+import { PROTOCOL_MISMATCH, releaseCode, uniqueCode } from '../codes.ts';
+import {
+  dropOrphanBots,
+  GRACE_LOBBY_S,
+  GRACE_MATCH_S,
+  HOST_HANDOVER_MS,
+  nextHost,
+  reclaim,
+  returningSeat,
+  takeOver,
+  validPlayerId,
+} from '../lobby.ts';
 import {
   AIM_MIN_INTERVAL_MS,
   BOT_DIFFICULTY,
@@ -43,7 +54,6 @@ import {
   MAX_CLIENTS,
   MAX_NAME_LENGTH,
   OVER_MS,
-  RECONNECT_SECONDS,
   STROKE_MS,
 } from './config.ts';
 
@@ -98,12 +108,24 @@ export class PoolRoom extends Room<{ state: InstanceType<typeof PoolRoomState> }
 
   override onJoin(client: Client, options: PoolJoinOptions) {
     const inPlay = this.state.phase !== POOL_PHASE.lobby;
+    const name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    const playerId = validPlayerId(options.playerId);
+    // A reload, new tab or late return takes the player's own seat back (ADR-009).
+    const back = returningSeat(this.state.seats, playerId);
+    if (back) {
+      const wasHost = back.sessionId !== '' && back.sessionId === this.state.hostSessionId;
+      reclaim(back, client.sessionId, name);
+      if (wasHost || !this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
+      if (inPlay) client.send(POOL_MSG.rack, this.rackEvent());
+      return;
+    }
     const slot = inPlay ? POOL_WATCHER : this.freeSlot();
     const seat = new PoolSeat();
     seat.slot = slot === -1 ? POOL_WATCHER : slot;
     seat.kind = seat.slot === POOL_WATCHER ? POOL_SEAT.waiting : POOL_SEAT.human;
     seat.sessionId = client.sessionId;
-    seat.name = (options.name || 'Guest').slice(0, MAX_NAME_LENGTH);
+    seat.name = name;
+    seat.playerId = playerId;
     this.state.seats.push(seat);
     if (!this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
     if (this.clients.length >= MAX_CLIENTS) void this.lock();
@@ -111,14 +133,21 @@ export class PoolRoom extends Room<{ state: InstanceType<typeof PoolRoomState> }
     if (inPlay) client.send(POOL_MSG.rack, this.rackEvent());
   }
 
-  override async onDrop(client: Client) {
+  /**
+   * Hold the seat while the phone comes back (not awaited: when the grace runs out, Colyseus calls
+   * onLeave itself, which releases the seat exactly once).
+   */
+  override onDrop(client: Client) {
     const seat = this.seatOf(client);
-    if (seat) seat.connected = false;
-    try {
-      await this.allowReconnection(client, RECONNECT_SECONDS);
-    } catch {
-      this.release(client);
-    }
+    if (!seat) return;
+    seat.connected = false;
+    const grace = this.state.phase === POOL_PHASE.lobby ? GRACE_LOBBY_S : GRACE_MATCH_S;
+    this.allowReconnection(client, grace).catch(() => {});
+    if (this.state.hostSessionId === client.sessionId)
+      this.after(HOST_HANDOVER_MS, () => {
+        if (this.state.hostSessionId === client.sessionId && !this.seatOf(client)?.connected)
+          this.state.hostSessionId = nextHost(this.state.seats) || this.state.hostSessionId;
+      });
   }
 
   override onReconnect(client: Client) {
@@ -180,16 +209,12 @@ export class PoolRoom extends Room<{ state: InstanceType<typeof PoolRoomState> }
     if (this.state.phase === POOL_PHASE.lobby || seat.kind === POOL_SEAT.waiting) {
       this.state.seats.splice(this.state.seats.indexOf(seat), 1);
     } else {
-      seat.kind = POOL_SEAT.bot;
-      seat.sessionId = '';
-      seat.connected = true;
-      seat.name = `Bot (${seat.name})`;
+      takeOver(seat);
       // If it was their turn, the bot takes it.
       if (this.rackState.shooter === seat.slot) this.maybeBotTurn();
     }
     if (this.state.hostSessionId === client.sessionId)
-      this.state.hostSessionId =
-        this.state.seats.find((s) => s.kind === POOL_SEAT.human)?.sessionId ?? '';
+      this.state.hostSessionId = nextHost(this.state.seats, client.sessionId);
     if (this.clients.length < MAX_CLIENTS) void this.unlock();
   }
 
@@ -349,6 +374,7 @@ export class PoolRoom extends Room<{ state: InstanceType<typeof PoolRoomState> }
 
   private backToLobby() {
     this.state.phase = POOL_PHASE.lobby;
+    dropOrphanBots(this.state.seats);
     for (const s of this.state.seats) {
       if (s.kind !== POOL_SEAT.waiting) continue;
       const slot = this.freeSlot();

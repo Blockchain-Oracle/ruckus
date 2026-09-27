@@ -10,7 +10,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsdown",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@arena/protocol": "workspace:*",
@@ -32,6 +33,7 @@
     "@types/node": "^24.10.0",
     "tsdown": "^0.23.0",
     "tsx": "^4.21.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -14,6 +14,10 @@ export const ChickenzSeat = schema(
     ready: t.boolean().default(false),
     connected: t.boolean().default(true),
     wins: t.uint8().default(0),
+    /** Stable per-device id (ADR-009): a reload or new tab reclaims this seat. */
+    playerId: t.string().default(''),
+    /** Set while a labelled bot holds a dropped player's seat; they take it back on return. */
+    takeoverOf: t.string().default(''),
   },
   'ChickenzSeat',
 );
@@ -76,6 +80,8 @@ export type EmoteEvent = { slot: number; emote: ChickenzEmote };
 export type ChickenzJoinOptions = {
   protocolVersion: number;
   name: string;
+  /** Stable per-device id: a returning player reclaims their seat (ADR-009). */
+  playerId?: string;
   hero?: string;
   private?: boolean;
 };
@@ -85,6 +91,14 @@ export type RoundStartEvent = {
   mapId: number;
   countdownMs: number;
   players: number;
+  /**
+   * Sent per client (seats are renumbered at match start, before the state patch lands): this
+   * client's sim slot (−1 watching), and the lineup the sim was built with.
+   */
+  you: number;
+  heroes: string[];
+  names: string[];
+  wins: number[];
 };
 export type RoundEndEvent = { round: number; winner: number; wins: number[] };
 export type MatchEndEvent = { winner: number; wins: number[] };

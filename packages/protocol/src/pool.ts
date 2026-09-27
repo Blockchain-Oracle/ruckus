@@ -15,6 +15,10 @@ export const PoolSeat = schema(
     ready: t.boolean().default(false),
     connected: t.boolean().default(true),
     wins: t.uint8().default(0),
+    /** Stable per-device id (ADR-009): a reload or new tab reclaims this seat. */
+    playerId: t.string().default(''),
+    /** Set while a labelled bot holds a dropped player's seat; they take it back on return. */
+    takeoverOf: t.string().default(''),
   },
   'PoolSeat',
 );
@@ -90,7 +94,12 @@ export type PlayedEvent = {
 };
 export type OverEvent = { winner: 0 | 1; wins: [number, number] };
 
-export type PoolJoinOptions = { protocolVersion: number; name: string; private?: boolean };
+export type PoolJoinOptions = {
+  protocolVersion: number;
+  name: string;
+  playerId?: string;
+  private?: boolean;
+};
 
 /** Tables travel as raw Float64 bytes so every client starts and ends bit-identical. */
 export const tableBytes = (balls: Float64Array) =>

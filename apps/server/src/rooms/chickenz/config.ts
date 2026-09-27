@@ -17,8 +17,6 @@ export const MAX_SEATS = 4;
 export const MIN_PLAYERS_TO_START = 2;
 /** Labelled bot seats play at this difficulty (0–100). */
 export const BOT_DIFFICULTY = 60;
-/** Seconds a dropped player keeps their seat before a labelled bot takes over. */
-export const RECONNECT_SECONDS = 20;
 export const MAX_NAME_LENGTH = 16;
 /** 5-letter join codes without look-alikes (no I, O). */
 export const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';

@@ -1,4 +1,10 @@
-import { createEndpoint, createRouter, defineRoom, defineServer } from 'colyseus';
+import {
+  createEndpoint,
+  createRouter,
+  defineRoom,
+  defineServer,
+  WebSocketTransport,
+} from 'colyseus';
 
 import { ROOM } from '@arena/protocol';
 import { PROTOCOL_VERSION } from '@arena/shared';
@@ -11,8 +17,18 @@ import { RunnerRoom } from '#app/rooms/runner/RunnerRoom.ts';
 import { SoccerRoom } from '#app/rooms/soccer/SoccerRoom.ts';
 
 const BOOTED_AT = Date.now();
+/**
+ * A suspended phone leaves a half-open socket: ping every 2 s so it's noticed in ~6 s and the
+ * seat's reconnection grace starts (the default 3 s × 2 retries took ~9 s).
+ */
+const PING_INTERVAL_MS = 2000;
+const PING_MAX_RETRIES = 2;
 
 export const server = defineServer({
+  transport: new WebSocketTransport({
+    pingInterval: PING_INTERVAL_MS,
+    pingMaxRetries: PING_MAX_RETRIES,
+  }),
   rooms: {
     [ROOM.hello]: defineRoom(HelloRoom),
     [ROOM.chickenz]: defineRoom(ChickenzRoom),

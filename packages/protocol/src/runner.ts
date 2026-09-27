@@ -15,6 +15,10 @@ export const RunnerSeat = schema(
     ready: t.boolean().default(false),
     connected: t.boolean().default(true),
     wins: t.uint8().default(0),
+    /** Stable per-device id (ADR-009): a reload or new tab reclaims this seat. */
+    playerId: t.string().default(''),
+    /** Set while a labelled bot holds a dropped player's seat; they take it back on return. */
+    takeoverOf: t.string().default(''),
   },
   'RunnerSeat',
 );
@@ -56,13 +60,20 @@ export const RUNNER_MSG = {
 export const RUNNER_INPUT_BYTES = 7;
 export const RUNNER_SNAPSHOT_HEADER_BYTES = 8;
 
-export type RunnerJoinOptions = { protocolVersion: number; name: string; private?: boolean };
+export type RunnerJoinOptions = {
+  protocolVersion: number;
+  name: string;
+  playerId?: string;
+  private?: boolean;
+};
 /** A race begins: every client builds the identical course and runners, then follows snapshots. */
 export type RunnerRaceStart = {
   seed: number;
   /** Per sim slot: bot skill, or −1 for a human seat. */
   bots: number[];
   names: string[];
+  /** Per client: this client's sim slot, or −1 watching (seats are compacted at race start). */
+  you: number;
 };
 /** Finishing order by sim slot (standings), best first. */
 export type RunnerRaceEnd = { order: number[] };

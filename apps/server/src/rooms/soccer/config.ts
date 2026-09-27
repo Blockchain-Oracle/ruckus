@@ -9,6 +9,4 @@ export const BOT_DIFFICULTY = 65;
 export const BOT_NAMES = ['Yolk', 'Shelly', 'Omelette', 'Benedict'] as const;
 /** Full time: read the result, then the room returns to its lobby. */
 export const OVER_MS = 7_000;
-/** Seconds a dropped player keeps their seat before a labelled bot takes over. */
-export const RECONNECT_SECONDS = 20;
 export const MAX_NAME_LENGTH = 16;
