@@ -95,24 +95,43 @@ export function nextRandom(w: World): number {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
-/** A new match. `perTeam` is 1 (1v1) or 2 (2v2); `bots[i]` is each seat's difficulty or −1. */
-export function newWorld(seed: number, perTeam: 1 | 2, bots: readonly number[]): World {
+export type Team = 0 | 1;
+/**
+ * Who plays: 1 or 2 per side, alternating Tomato, Violet (1v1, 2v2), or one team per player for
+ * any line-up up to 2 a side (2v1, 1v2). The numeric forms build exactly the lists they always did.
+ */
+export type Layout = 1 | 2 | readonly Team[];
+export const MAX_PER_TEAM = 2;
+
+export const layoutTeams = (layout: Layout): Team[] =>
+  typeof layout === 'number'
+    ? Array.from({ length: layout * 2 }, (_, i) => (i % 2) as Team)
+    : [...layout];
+
+/** A line-up the sim can play: at least one a side, at most two. */
+export function validLayout(teams: readonly Team[]) {
+  const count = (t: Team) => teams.filter((x) => x === t).length;
+  return [0, 1].every((t) => count(t as Team) >= 1 && count(t as Team) <= MAX_PER_TEAM);
+}
+
+/** A new match: `layout` says who plays for whom; `bots[i]` is each seat's difficulty or −1. */
+export function newWorld(seed: number, layout: Layout, bots: readonly number[]): World {
   const players: Player[] = [];
-  for (let i = 0; i < perTeam * 2; i++) {
+  for (const team of layoutTeams(layout)) {
     players.push({
       x: 0,
       y: PLAYER_RADIUS,
       vx: 0,
       vy: 0,
-      team: (i % 2) as 0 | 1,
-      facing: i % 2 === 0 ? 1 : -1,
+      team,
+      facing: team === 0 ? 1 : -1,
       onGround: true,
       input: { h: 0, jump: false },
       speed: 0,
       grow: 0,
       shrink: 0,
       frozen: 0,
-      bot: bots[i] ?? -1,
+      bot: bots[players.length] ?? -1,
       brain: { next: 0, h: 0, jump: false, slop: 0 },
     });
   }
@@ -139,10 +158,14 @@ export function newWorld(seed: number, perTeam: 1 | 2, bots: readonly number[]):
 
 /** Line everyone up, drop the ball from the centre, and freeze for the countdown. */
 export function kickoff(w: World) {
-  const perTeam = w.players.length / 2;
-  const spots = perTeam === 1 ? SPAWN_X_1V1 : SPAWN_X_2V2;
-  w.players.forEach((p, i) => {
-    const slot = Math.floor(i / 2);
+  const size = [0, 0];
+  for (const p of w.players) size[p.team] = (size[p.team] ?? 0) + 1;
+  const seen = [0, 0];
+  w.players.forEach((p) => {
+    // Each side lines up by its own size, so a lone player in a 2v1 stands where a 1v1 player would.
+    const spots = size[p.team] === 1 ? SPAWN_X_1V1 : SPAWN_X_2V2;
+    const slot = seen[p.team] ?? 0;
+    seen[p.team] = slot + 1;
     const side = p.team === 0 ? -1 : 1;
     p.x = side * (spots[slot] ?? spots[0]);
     p.y = PLAYER_RADIUS;
