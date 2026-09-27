@@ -9,6 +9,7 @@ import {
   FRAME_MS_FAST,
   FRAME_MS_SLOW,
 } from './config.ts';
+import { useLookQuality } from './look/quality.ts';
 
 export const dprCeiling = () => Math.min(window.devicePixelRatio || 1, DPR_MAX);
 
@@ -29,6 +30,9 @@ export function AdaptiveDpr() {
     a.ms = 0;
     a.frames = 0;
     const ceiling = dprCeiling();
+    // DPR is the first lever; post tiers move only once DPR is pinned at its end.
+    if (avg > FRAME_MS_SLOW && a.dpr <= DPR_MIN) useLookQuality.getState().report('slow');
+    else if (avg < FRAME_MS_FAST && a.dpr >= ceiling) useLookQuality.getState().report('fast');
     const next =
       avg > FRAME_MS_SLOW
         ? Math.max(DPR_MIN, a.dpr - DPR_STEP)

@@ -22,18 +22,23 @@ import {
   type Texture,
 } from 'three/webgpu';
 
-/** Three flat light bands: the one cartoon read every RUCKUS character shares (ADR-008). */
-/** Soft bands: textured characters (feathers) read grainy under hard 90/170/255 steps. */
-const TONES = [150, 205, 255] as const;
-let gradient: DataTexture | null = null;
-export function toonGradient() {
-  if (gradient) return gradient;
-  gradient = new DataTexture(new Uint8Array(TONES), TONES.length, 1, RedFormat);
-  gradient.minFilter = NearestFilter;
-  gradient.magFilter = NearestFilter;
-  gradient.generateMipmaps = false;
-  gradient.needsUpdate = true;
-  return gradient;
+/**
+ * Three flat light bands: the one cartoon read every RUCKUS character shares (ADR-008). Soft for
+ * textured characters (feathers read grainy under hard steps); hard for flat-coloured props.
+ */
+const BANDS = { soft: [150, 205, 255], hard: [90, 170, 255] } as const;
+const gradients = new Map<keyof typeof BANDS, DataTexture>();
+export function toonGradient(bands: keyof typeof BANDS = 'soft') {
+  const cached = gradients.get(bands);
+  if (cached) return cached;
+  const tones = BANDS[bands];
+  const g = new DataTexture(new Uint8Array(tones), tones.length, 1, RedFormat);
+  g.minFilter = NearestFilter;
+  g.magFilter = NearestFilter;
+  g.generateMipmaps = false;
+  g.needsUpdate = true;
+  gradients.set(bands, g);
+  return g;
 }
 
 /** Near-white, unsaturated texels take the player colour; beak, feet, comb and goggles keep theirs. */

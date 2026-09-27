@@ -2,6 +2,8 @@ import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import type { Mesh } from 'three/webgpu';
 
+import { WELCOME_LOOK } from './config.ts';
+import { StadiumRig } from './look/StadiumRig.tsx';
 import type { CameraRig } from './types.ts';
 
 /** The hub's own backdrop before a game is picked: the arcade room the cabinets stand in. */
@@ -25,11 +27,7 @@ const SCREEN_FLICKER_HZ = 0.35;
 export function WelcomeScene() {
   return (
     <>
-      <color attach="background" args={['#1b1024']} />
-      <fog attach="fog" args={['#1b1024', 12, 26]} />
-      <hemisphereLight args={['#fff1d6', '#24163a', 1.1]} />
-      <directionalLight position={[-6, 5, -6]} intensity={1.6} color="#2ec4b6" />
-      <spotLight position={[0, 8, 4]} angle={0.7} penumbra={0.8} intensity={220} color="#fff1d6" />
+      <StadiumRig look={WELCOME_LOOK} />
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[14, 48]} />
         <meshStandardMaterial color={FLOOR} roughness={0.85} />

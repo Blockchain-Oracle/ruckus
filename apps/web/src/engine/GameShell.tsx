@@ -8,6 +8,7 @@ import { AdaptiveDpr, dprCeiling } from './AdaptiveDpr.tsx';
 import { CameraDirector } from './CameraDirector.tsx';
 import { DPR_MIN } from './config.ts';
 import { isInteractive, useGameMachine } from './gameMachine.ts';
+import { StadiumPost } from './look/StadiumPost.tsx';
 import { createRenderer } from './renderer.ts';
 import { WelcomeScene, welcomeRig } from './WelcomeScene.tsx';
 import { setLabelCamera } from './worldLabels.ts';
@@ -50,6 +51,7 @@ export default function GameShell({ onReady }: { onReady?: () => void }) {
         <CameraDirector rig={rig} />
         <LabelCamera />
         <AdaptiveDpr />
+        <StadiumPost />
       </Canvas>
     </div>
   );
