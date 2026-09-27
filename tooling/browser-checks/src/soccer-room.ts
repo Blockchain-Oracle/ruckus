@@ -62,24 +62,30 @@ try {
 
   const friend = await open(`${WEB_URL}/?game=soccer&room=${code}`, 'FRIEND');
   await host.getByText('FRIEND', { exact: true }).first().waitFor({ timeout: 30_000 });
+  // S35: the friend joins the host's side (Tomato) and the host seats one bot against them: 2v1.
+  await friend.getByRole('button', { name: 'Move here' }).click({ timeout: 20_000 });
   await friend.getByRole('button', { name: 'Ready up' }).click({ timeout: 20_000 });
-  await host.getByRole('button', { name: 'Add bot' }).click();
-  await host
-    .getByText(/Bot · /)
-    .first()
-    .waitFor({ timeout: 10_000 });
+  await host.getByRole('button', { name: /^Bot$/ }).first().click();
+  await host.getByRole('button', { name: 'Remove bot' }).waitFor({ timeout: 10_000 });
   if (process.env.DEBUG_ROOM)
     console.info('lobby:', JSON.stringify(await host.locator('[role=dialog]').innerText()));
   await host.getByRole('button', { name: 'Start' }).click();
   await Promise.all([waitOnline(host), waitOnline(friend)]);
   const [h0, f0] = [await view(host), await view(friend)];
-  if (h0.players !== 4 || f0.players !== 4) {
+  if (h0.players !== 3 || f0.players !== 3) {
     const names = await host.evaluate('JSON.stringify(document.body.innerText.slice(0, 400))');
-    throw new Error(`expected 2v2, got ${h0.players} / ${f0.players}; host sees ${names}`);
+    throw new Error(`expected 2v1, got ${h0.players} / ${f0.players}; host sees ${names}`);
   }
+  const teams = (await host.evaluate(
+    'globalThis.__ruckusSoccer.world.players.map((p) => p.team)',
+  )) as number[];
+  if (teams[h0.slot] !== teams[f0.slot] || teams.filter((t) => t === teams[h0.slot]).length !== 2)
+    throw new Error(`friends not on one side: teams ${teams}, host ${h0.slot}, friend ${f0.slot}`);
   if (h0.slot < 0 || f0.slot < 0 || h0.slot === f0.slot)
     throw new Error(`bad seats host ${h0.slot} friend ${f0.slot}`);
-  console.info(`  ✓ 2v2 started: host seat ${h0.slot}, friend seat ${f0.slot}, bot fills the gap`);
+  console.info(
+    `  ✓ 2v1 as picked: host ${h0.slot} and friend ${f0.slot} together vs one bot (teams ${teams})`,
+  );
 
   // Both players run at the ball and jump now and then (a real, messy match).
   const drive = async (p: Page, keys: string[]) => {

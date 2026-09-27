@@ -4,7 +4,7 @@ export type SoccerStatus = 'off' | 'intro' | 'tutorial' | 'playing' | 'over';
 
 type SoccerState = {
   status: SoccerStatus;
-  /** Seat names, in sim slot order (team = slot % 2). */
+  /** Seat names, in sim slot order (each player's side is `world.players[i].team`). */
   names: string[];
   /** A room match (server-paced: no local rematch). */
   online: boolean;

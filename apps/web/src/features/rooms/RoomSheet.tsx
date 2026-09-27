@@ -28,6 +28,13 @@ type Props = {
   avatar: (seat: SeatView) => ReactNode;
   /** Game-specific lobby controls (a hero picker…). */
   extra?: ReactNode;
+  /**
+   * The game draws its own table (soccer's team columns, with per-slot bots) in place of the seat
+   * grid and the generic Add/Remove bot buttons.
+   */
+  table?: ReactNode;
+  /** Why Start is disabled, if it is (a game rule on top of "everyone ready"). */
+  blocked?: (table: SeatView[]) => string | null;
   commands: { ready: string; addBot: string; removeBot: string; start: string };
 };
 
@@ -147,20 +154,31 @@ function Entry({ kit }: { kit: RoomKit }) {
   );
 }
 
-function Lobby({ kit, gameId, seats: seatCount, minToStart, avatar, extra, commands }: Props) {
+function Lobby({
+  kit,
+  gameId,
+  seats: seatCount,
+  minToStart,
+  avatar,
+  extra,
+  table: customTable,
+  blocked,
+  commands,
+}: Props) {
   const room = kit.useRoom();
   const me = mySeat(room);
   const host = isHost(room);
   const table = room.seats.filter((s) => s.kind !== 'waiting').sort((a, b) => a.slot - b.slot);
   const watchers = room.seats.filter((s) => s.kind === 'waiting');
-  const canStart =
-    table.length >= minToStart && table.every((s) => s.ready || s.sessionId === room.hostSessionId);
+  const ruleBlock = blocked?.(table) ?? null;
+  const allReady = table.every((s) => s.ready || s.sessionId === room.hostSessionId);
+  const canStart = table.length >= minToStart && allReady && !ruleBlock;
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-card)] border-2 border-line bg-ink-3 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-card)] border-2 border-line bg-ink-3 px-4 py-3 max-[380px]:px-3 max-[380px]:[&_button]:px-2.5">
         <div>
           <div className="label-caps text-xs text-cream-dim">Room code</div>
-          <div className="font-pixel text-3xl tracking-[0.3em] text-[#ffee58] select-all">
+          <div className="font-pixel text-3xl tracking-[0.3em] text-[#ffee58] select-all max-[380px]:text-2xl max-[380px]:tracking-[0.15em]">
             {room.code}
           </div>
         </div>
@@ -169,55 +187,60 @@ function Lobby({ kit, gameId, seats: seatCount, minToStart, avatar, extra, comma
         </Button>
       </div>
 
-      <ul
-        className={cn('grid gap-3', seatCount <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4')}
-      >
-        {Array.from({ length: seatCount }, (_, slot) => {
-          const seat = table.find((s) => s.slot === slot);
-          return (
-            <li
-              // biome-ignore lint/suspicious/noArrayIndexKey: seats are positional
-              key={slot}
-              className={cn(
-                'flex min-h-28 flex-col items-center justify-center gap-1 rounded-[var(--radius-card)] border-2 p-2 text-center',
-                seat
-                  ? seat.sessionId === room.mySessionId
-                    ? 'border-tomato bg-ink-3'
-                    : 'border-line bg-ink-3'
-                  : 'border-dashed border-line/60',
-              )}
-            >
-              {seat ? (
-                <>
-                  <span className={cn(!seat.connected && 'opacity-40')}>{avatar(seat)}</span>
-                  <span className="flex items-center gap-1 text-sm font-bold">
-                    {seat.sessionId === room.hostSessionId && (
-                      <CrownIcon weight="fill" className="size-3.5 text-[#ffee58]" />
-                    )}
-                    {seat.kind === 'bot' && (
-                      <RobotIcon weight="bold" className="size-3.5 text-teal" />
-                    )}
-                    <span className="max-w-28 truncate">{seat.name}</span>
-                  </span>
-                  <span className="font-pixel text-[10px] uppercase text-cream-dim">
-                    {seat.kind === 'bot'
-                      ? 'BOT'
-                      : seat.sessionId === room.mySessionId
-                        ? 'YOU'
-                        : seat.connected
-                          ? seat.ready
-                            ? 'READY'
-                            : 'NOT READY'
-                          : 'RECONNECTING'}
-                  </span>
-                </>
-              ) : (
-                <span className="font-pixel text-[10px] uppercase text-cream-dim">Waiting…</span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {customTable ?? (
+        <ul
+          className={cn(
+            'grid gap-3',
+            seatCount <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4',
+          )}
+        >
+          {Array.from({ length: seatCount }, (_, slot) => {
+            const seat = table.find((s) => s.slot === slot);
+            return (
+              <li
+                // biome-ignore lint/suspicious/noArrayIndexKey: seats are positional
+                key={slot}
+                className={cn(
+                  'flex min-h-28 flex-col items-center justify-center gap-1 rounded-[var(--radius-card)] border-2 p-2 text-center',
+                  seat
+                    ? seat.sessionId === room.mySessionId
+                      ? 'border-tomato bg-ink-3'
+                      : 'border-line bg-ink-3'
+                    : 'border-dashed border-line/60',
+                )}
+              >
+                {seat ? (
+                  <>
+                    <span className={cn(!seat.connected && 'opacity-40')}>{avatar(seat)}</span>
+                    <span className="flex items-center gap-1 text-sm font-bold">
+                      {seat.sessionId === room.hostSessionId && (
+                        <CrownIcon weight="fill" className="size-3.5 text-[#ffee58]" />
+                      )}
+                      {seat.kind === 'bot' && (
+                        <RobotIcon weight="bold" className="size-3.5 text-teal" />
+                      )}
+                      <span className="max-w-28 truncate">{seat.name}</span>
+                    </span>
+                    <span className="font-pixel text-[10px] uppercase text-cream-dim">
+                      {seat.kind === 'bot'
+                        ? 'BOT'
+                        : seat.sessionId === room.mySessionId
+                          ? 'YOU'
+                          : seat.connected
+                            ? seat.ready
+                              ? 'READY'
+                              : 'NOT READY'
+                            : 'RECONNECTING'}
+                    </span>
+                  </>
+                ) : (
+                  <span className="font-pixel text-[10px] uppercase text-cream-dim">Waiting…</span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {watchers.length > 0 && (
         <p className="flex flex-wrap items-center justify-center gap-2 text-xs text-cream-dim">
@@ -235,20 +258,24 @@ function Lobby({ kit, gameId, seats: seatCount, minToStart, avatar, extra, comma
       <div className="flex flex-wrap justify-center gap-3">
         {host ? (
           <>
-            <Button
-              size="sm"
-              disabled={table.length >= seatCount}
-              onClick={() => kit.send(commands.addBot)}
-            >
-              <RobotIcon weight="bold" /> Add bot
-            </Button>
-            <Button
-              size="sm"
-              disabled={!table.some((s) => s.kind === 'bot')}
-              onClick={() => kit.send(commands.removeBot)}
-            >
-              Remove bot
-            </Button>
+            {!customTable && (
+              <>
+                <Button
+                  size="sm"
+                  disabled={table.length >= seatCount}
+                  onClick={() => kit.send(commands.addBot)}
+                >
+                  <RobotIcon weight="bold" /> Add bot
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={!table.some((s) => s.kind === 'bot')}
+                  onClick={() => kit.send(commands.removeBot)}
+                >
+                  Remove bot
+                </Button>
+              </>
+            )}
             <Button
               variant="tomato"
               sound="ui.confirm"
@@ -274,7 +301,7 @@ function Lobby({ kit, gameId, seats: seatCount, minToStart, avatar, extra, comma
         <p className="text-center text-xs text-cream-dim">
           {table.length < minToStart
             ? 'Invite a friend or add a bot to start.'
-            : 'Waiting for everyone to ready up.'}
+            : (ruleBlock ?? 'Waiting for everyone to ready up.')}
         </p>
       )}
     </div>

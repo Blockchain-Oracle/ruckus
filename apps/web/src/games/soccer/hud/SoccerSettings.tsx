@@ -6,12 +6,13 @@ import { Button } from '@/ui/Button.tsx';
 import type { BotLevel } from '../config.ts';
 import { queueLessons, startLessons } from '../match/flow.ts';
 import { soccerRooms } from '../net/online.ts';
-import { useSoccerPrefs } from '../prefs.ts';
+import { type Format, useSoccerPrefs } from '../prefs.ts';
 
-const FORMATS = [
-  { v: 1, label: '1 v 1', hint: 'You against one bot' },
-  { v: 2, label: '2 v 2', hint: 'You and a bot partner against two bots' },
-] as const;
+const FORMAT_OPTIONS = [
+  { v: '1v1', label: '1 v 1', hint: 'You against one bot' },
+  { v: '1v2', label: '1 v 2', hint: 'You against two bots' },
+  { v: '2v2', label: '2 v 2', hint: 'You and a bot partner against two bots' },
+] as const satisfies readonly { v: Format; label: string; hint: string }[];
 const LEVELS = [
   { v: 'rookie', label: 'Rookie' },
   { v: 'pro', label: 'Pro' },
@@ -58,7 +59,7 @@ function Segmented<T extends string | number>({
 
 /** Practice setup: format and bot level (applies from the next kickoff). */
 export function SoccerSettings() {
-  const { perTeam, level, set } = useSoccerPrefs();
+  const { format, level, set } = useSoccerPrefs();
   return (
     <section className="flex flex-col gap-4 border-t-2 border-line pt-5">
       <h3 className="font-display text-lg text-cream">Soccer</h3>
@@ -66,9 +67,9 @@ export function SoccerSettings() {
         <span>Practice match</span>
         <Segmented
           name="soccer-format"
-          value={perTeam}
-          options={FORMATS}
-          onChange={(v) => set({ perTeam: v })}
+          value={format}
+          options={FORMAT_OPTIONS}
+          onChange={(v) => set({ format: v })}
         />
       </div>
       <div className="flex flex-col gap-2 text-sm">

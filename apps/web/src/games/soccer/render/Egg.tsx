@@ -35,17 +35,23 @@ const FACE_TURN_RAD = 0.42;
 const GHOSTS = 3;
 const GHOST_LAG_S = 0.045;
 
-type Props = { slot: number; driver: () => SoccerDriver; you: boolean };
+type Props = {
+  slot: number;
+  driver: () => SoccerDriver;
+  you: boolean;
+  /** This egg's side (from the sim, not the slot: a 2v1 isn't alternating). */
+  team: 0 | 1;
+  /** The second egg on its side wears the lighter kit. */
+  partner: boolean;
+};
 
 /**
  * A code-drawn egg: toon body with an ink outline, eyes that follow the ball, boots that run, and
  * a spring that squashes it on landings and stretches it on take-off. Everything reads the sim;
  * nothing here feeds back into it.
  */
-export function Egg({ slot, driver, you }: Props) {
-  const team = (slot % 2) as 0 | 1;
+export function Egg({ slot, driver, you, team, partner }: Props) {
   const kit = KITS[team];
-  const partner = slot >= 2;
   const labelId = `soccer:${slot}`;
   const labelAt = useMemo(() => new Vector3(), []);
   useEffect(() => () => removeLabel(labelId), [labelId]);

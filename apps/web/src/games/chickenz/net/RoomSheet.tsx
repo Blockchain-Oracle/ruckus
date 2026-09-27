@@ -152,10 +152,10 @@ function Lobby() {
     seats.every((s) => s.ready || s.sessionId === room.hostSessionId);
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-card)] border-2 border-line bg-ink-3 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-card)] border-2 border-line bg-ink-3 px-4 py-3 max-[380px]:px-3 max-[380px]:[&_button]:px-2.5">
         <div>
           <div className="label-caps text-xs text-cream-dim">Room code</div>
-          <div className="font-pixel text-3xl tracking-[0.3em] text-[#ffee58] select-all">
+          <div className="font-pixel text-3xl tracking-[0.3em] text-[#ffee58] select-all max-[380px]:text-2xl max-[380px]:tracking-[0.15em]">
             {room.code}
           </div>
         </div>

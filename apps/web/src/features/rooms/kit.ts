@@ -21,6 +21,10 @@ export type SeatView = {
   ready: boolean;
   connected: boolean;
   wins: number;
+  /** Games with sides (soccer): 0/1, −1 unseated. */
+  team?: number;
+  /** Bots in games with levels (soccer). */
+  botLevel?: string;
 };
 
 export type RoomStatus = 'offline' | 'connecting' | 'inRoom' | 'error';

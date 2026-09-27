@@ -19,7 +19,7 @@ export function Results({
   onLeave: () => void;
 }) {
   const [a, b] = w.score;
-  const myTeam = you >= 0 ? you % 2 : -1;
+  const myTeam = you >= 0 ? (w.players[you]?.team ?? -1) : -1;
   const winner = a === b ? -1 : a > b ? 0 : 1;
   const title =
     winner < 0 ? 'DRAW' : winner === myTeam ? 'YOU WIN!' : `${KITS[winner as 0 | 1].name} win`;

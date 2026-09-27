@@ -7,7 +7,7 @@ import { playMusic } from '@/lib/audio/music.ts';
 import { STADIUM_TRACK } from '../audio/music.ts';
 import { playCue, setCrowdBed } from '../audio/sfx.ts';
 import { BOT_LEVELS, KITS } from '../config.ts';
-import { useSoccerPrefs } from '../prefs.ts';
+import { FORMATS, useSoccerPrefs } from '../prefs.ts';
 import { tutorial } from '../tutorial/director.ts';
 import { getDriver } from './runtime.ts';
 import { useSoccer } from './store.ts';
@@ -30,14 +30,14 @@ export const consumeLessonsNext = () => {
   return next;
 };
 
-/** Practice: you (team Tomato) vs bots, 1v1 or 2v2 with a bot partner. */
+/** Practice: you (Tomato) and bots in the chosen line-up: 1v1, you against two, or 2v2. */
 export function startMatch() {
   const d = getDriver();
   if (!d) return;
   tutorial.stop();
-  const { perTeam, level } = useSoccerPrefs.getState();
+  const { format, level } = useSoccerPrefs.getState();
   const seed = (Date.now() ^ Math.imul(matches + 1, 0x9e3779b1)) >>> 0;
-  d.startMatch(seed, perTeam, BOT_LEVELS[level]);
+  d.startMatch(seed, FORMATS[format], BOT_LEVELS[level]);
   const you = useProfile.getState().name || 'You';
   const pick = (i: number) => BOT_NAMES[(matches + i) % BOT_NAMES.length] ?? 'Bot';
   const names = d.world.players.map((_, i) => (i === 0 ? you : `Bot · ${pick(i)}`));
@@ -52,7 +52,7 @@ export function startMatch() {
 export function startOnlineMatch(e: SoccerMatchStart, slot: number) {
   const d = getDriver();
   if (!d) return;
-  d.startOnline(e.seed, e.perTeam, e.bots, slot);
+  d.startOnline(e.seed, e.teams, e.bots, slot);
   presenter.reset();
   useSoccer.getState().set({ status: 'playing', names: e.names, announce: null, online: true });
   setCrowdBed('match');

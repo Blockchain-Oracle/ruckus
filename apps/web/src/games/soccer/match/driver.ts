@@ -3,8 +3,11 @@ import {
   FinishTracker,
   goldenWorld,
   type Input,
+  type Layout,
+  layoutTeams,
   newWorld,
   type SimEvent,
+  type Team,
   tick,
   unpackWorld,
   type World,
@@ -14,13 +17,13 @@ import { EXHIBITION_RESTART_S, EXHIBITION_SKILL, SLOWMO_S, SLOWMO_SCALE } from '
 
 export type SoccerMode =
   | { kind: 'exhibition' }
-  | { kind: 'match'; perTeam: 1 | 2; bot: number; humanSlot: number }
+  | { kind: 'match'; layout: Layout; bot: number; humanSlot: number }
   /** Lessons: you and a parked second egg, staged by the tutorial director. */
   | { kind: 'tutorial'; humanSlot: number }
   /** Call the Finish: a bank seed's golden-goal bot match, watched (no human egg). */
   | { kind: 'wager'; seed: number }
   /** A room match: `humanSlot` is −1 for watchers. */
-  | { kind: 'online'; perTeam: 1 | 2; humanSlot: number };
+  | { kind: 'online'; humanSlot: number };
 
 /** Longest frame we'll catch up on; beyond this the match just slows rather than spiralling. */
 const MAX_STEPS_PER_FRAME = 8;
@@ -85,13 +88,13 @@ export class SoccerDriver {
     this.reset();
   }
 
-  /** A practice match: you (slot `humanSlot`, team 0) with an optional bot partner, vs bots. */
-  startMatch(seed: number, perTeam: 1 | 2, bot: number) {
+  /** A practice match: you (slot 0, Tomato), everyone else a bot, in the chosen line-up. */
+  startMatch(seed: number, layout: Layout, bot: number) {
     this.seed = seed >>> 0 || 1;
-    const seats = perTeam * 2;
+    const seats = layoutTeams(layout).length;
     const bots = Array.from({ length: seats }, (_, i) => (i === 0 ? -1 : bot));
-    this.mode = { kind: 'match', perTeam, bot, humanSlot: 0 };
-    this.world = newWorld(this.seed, perTeam, bots);
+    this.mode = { kind: 'match', layout, bot, humanSlot: 0 };
+    this.world = newWorld(this.seed, layout, bots);
     this.reset();
   }
 
@@ -138,9 +141,9 @@ export class SoccerDriver {
   }
 
   /** A room match: the same world every client builds from the server's seed. */
-  startOnline(seed: number, perTeam: 1 | 2, bots: readonly number[], humanSlot: number) {
-    this.mode = { kind: 'online', perTeam, humanSlot };
-    this.world = newWorld(seed, perTeam, bots);
+  startOnline(seed: number, teams: readonly Team[], bots: readonly number[], humanSlot: number) {
+    this.mode = { kind: 'online', humanSlot };
+    this.world = newWorld(seed, teams, bots);
     this.reset();
   }
 

@@ -16,6 +16,7 @@ import { closeCallTheFinish, useFinishController } from '../wager/controller.ts'
 import { FinishHud } from '../wager/FinishHud.tsx';
 import { useFinishBet } from '../wager/store.ts';
 import { SoccerHud } from './SoccerHud.tsx';
+import { lineupBlock, TeamLobby } from './TeamLobby.tsx';
 
 const leave = () => {
   if (useFinishBet.getState().phase !== 'off') closeCallTheFinish();
@@ -24,9 +25,9 @@ const leave = () => {
   useGameMachine.getState().send('leaving');
 };
 
-/** A lobby seat as a little egg in its team's kit (even slots Tomato, odd Violet). */
+/** A seat as a little egg in its team's kit (used for watchers; the table is TeamLobby). */
 const seatBadge = (seat: SeatView) => {
-  const kit = KITS[(seat.slot % 2) as 0 | 1] ?? KITS[0];
+  const kit = KITS[(seat.team === 1 ? 1 : 0) as 0 | 1] ?? KITS[0];
   return (
     <span
       title={`Team ${kit.name}`}
@@ -73,12 +74,8 @@ export function SoccerOverlay() {
         seats={SOCCER_SEATS}
         minToStart={SOCCER_MIN_TO_START}
         avatar={seatBadge}
-        extra={
-          <p className="text-xs text-cream-dim">
-            Two players play 1v1. Three or four play 2v2, and a labelled bot fills any gap. Even
-            seats are Tomato, odd seats are Violet.
-          </p>
-        }
+        table={<TeamLobby />}
+        blocked={lineupBlock}
         commands={{
           ready: SOCCER_MSG.ready,
           addBot: SOCCER_MSG.addBot,

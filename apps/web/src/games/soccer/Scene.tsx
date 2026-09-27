@@ -110,6 +110,9 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
 
   const get = () => driver;
   const you = status !== 'off' ? driver.humanSlot : -1;
+  // Sides come from the sim (re-read whenever a match starts): line-ups needn't alternate.
+  const teams = driver.world.players.map((p) => p.team);
+  const lineup = teams.join('');
   return (
     <group ref={stage}>
       <Stadium fx={fx} />
@@ -118,7 +121,14 @@ export function SoccerScene({ phase, generation }: GameSceneProps) {
       <Shadows driver={get} />
       {Array.from({ length: MAX_SEATS }, (_, slot) => (
         // Seats are fixed identities (slot = sim index); unused ones hide themselves.
-        <Egg key={`${generation}:${slot}`} slot={slot} driver={get} you={slot === you} />
+        <Egg
+          key={`${generation}:${lineup}:${slot}`}
+          slot={slot}
+          driver={get}
+          you={slot === you}
+          team={teams[slot] ?? ((slot % 2) as 0 | 1)}
+          partner={teams.slice(0, slot).includes(teams[slot] ?? ((slot % 2) as 0 | 1))}
+        />
       ))}
       <Ball driver={get} />
       <PowerUp driver={get} />

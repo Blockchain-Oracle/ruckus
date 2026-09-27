@@ -17,8 +17,11 @@ const mmss = (ticks: number) => {
 export function ScoreBug({ w, names, you }: { w: World; names: string[]; you: number }) {
   const secondsLeft = Math.ceil(w.clock / TICK_HZ);
   const urgent = secondsLeft <= URGENT_S && w.phase !== 'over';
+  const myTeam = you >= 0 ? (w.players[you]?.team ?? -1) : -1;
   const teamLabel = (team: 0 | 1) => {
-    const seats = names.filter((_, i) => i % 2 === team).map((n) => n.replace(/^Bot · /, ''));
+    const seats = names
+      .filter((_, i) => w.players[i]?.team === team)
+      .map((n) => n.replace(/^Bot · /, ''));
     return seats.length > 1 ? KITS[team].name : (seats[0] ?? KITS[team].name);
   };
   return (
@@ -38,12 +41,12 @@ export function ScoreBug({ w, names, you }: { w: World; names: string[]; you: nu
           <span
             className={cn(
               'max-w-[7rem] truncate text-xs uppercase sm:max-w-[10rem] sm:text-sm',
-              you >= 0 && you % 2 === team ? 'text-gold' : 'text-cream',
+              myTeam === team ? 'text-gold' : 'text-cream',
             )}
           >
             {teamLabel(team)}
           </span>
-          {you >= 0 && you % 2 === team && (
+          {myTeam === team && (
             <span className="rounded-full bg-gold px-1.5 text-[10px] text-ink">YOU</span>
           )}
           <span className="tabular min-w-[1.5ch] text-center text-2xl text-cream sm:text-3xl">
@@ -68,7 +71,7 @@ export function PowerChips({ w }: { w: World }) {
   const chips: { key: string; label: string; tone: string; left: number; team?: 0 | 1 }[] = [];
   const full = POWERUP_DURATION_S * TICK_HZ;
   w.players.forEach((p, i) => {
-    const team = (i % 2) as 0 | 1;
+    const team = p.team;
     if (p.speed > 0)
       chips.push({
         key: `s${i}`,
