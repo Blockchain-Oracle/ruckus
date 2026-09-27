@@ -1,3 +1,4 @@
+import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
 
 import { chickenzFollow } from './match/camera.ts';
@@ -39,3 +40,14 @@ export const BG_SCROLL_PX_PER_S = 18;
 export const SPRITE_FPS = 20;
 /** The stone frame sits 4 px outside the arena so its inner edge is flush with the walls. */
 export const BORDER_OUTSET_PX = 4;
+
+/**
+ * Unlit pixel art until the S39 arena: no lights, no bloom (it would smear the pixels), just the
+ * shared vignette so it sits in the same frame as the other games and takes hit flashes.
+ */
+export const LOOK = {
+  background: '#1b1024',
+  toneMapping: 'neutral',
+  exposure: 1,
+  post: { vignette: 0.35, saturation: 1 },
+} as const satisfies StadiumLook;

@@ -5,10 +5,12 @@ import { backBirdClass, runBotRound } from '@arena/sim-chickenz';
 
 import { useProfile } from '@/app/stores/profile.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { StadiumRig } from '@/engine/look/StadiumRig.tsx';
 import type { GameSceneProps } from '@/engine/types.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
 import { playEvents } from './audio/sfx.ts';
+import { LOOK } from './config.ts';
 import { onPlay, stopAll } from './flow.ts';
 import { MatchDirector } from './match/director.ts';
 import { input, setDirectors, setDriver } from './match/runtime.ts';
@@ -161,7 +163,7 @@ export function ChickenzScene({ generation }: GameSceneProps) {
 
   return (
     <>
-      <color attach="background" args={['#1b1024']} />
+      <StadiumRig look={LOOK} />
       <Arena seed={ATTRACT_SEED_BASE + generation + round} layout={layout} />
       <Pickups driver={driver} />
       {heroes.map((h, slot) => (
