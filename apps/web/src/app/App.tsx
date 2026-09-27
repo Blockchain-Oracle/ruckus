@@ -14,9 +14,12 @@ const ConnectivityPanel = lazy(() =>
   })),
 );
 
-const ChickenLab = lazy(() =>
-  import('@/features/chicken-lab/ChickenLab.tsx').then((m) => ({ default: m.ChickenLab })),
-);
+/** Dev only: behind the DEV constant so production builds drop the chunk and its GLB entirely. */
+const ChickenLab = import.meta.env.DEV
+  ? lazy(() =>
+      import('@/features/chicken-lab/ChickenLab.tsx').then((m) => ({ default: m.ChickenLab })),
+    )
+  : null;
 
 const DEBUG_PARAM = 'debug';
 
@@ -29,7 +32,7 @@ export function App() {
       </Suspense>
     );
   }
-  if (import.meta.env.DEV && debug === 'chicken') {
+  if (ChickenLab && debug === 'chicken') {
     return (
       <Suspense fallback={null}>
         <ChickenLab />
