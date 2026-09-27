@@ -4,7 +4,7 @@ import { useShell } from '@/app/stores/shell.ts';
 import { readUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
 
-import { skipTutorial, startMatch, startTutorial } from '../flow.ts';
+import { skipTutorial, startTutorial } from '../flow.ts';
 import { DiamondWipe } from '../hud/DiamondWipe.tsx';
 import { MatchHud, MatchResults } from '../hud/MatchHud.tsx';
 import { Onboarding } from '../hud/Onboarding.tsx';
@@ -85,7 +85,7 @@ export function ChickenzOverlay() {
           getDirectors()?.tutorial.skip();
         }}
       />
-      <Onboarding onTutorial={startTutorial} onSkip={skipTutorial} onNamed={startMatch} />
+      <Onboarding onTutorial={startTutorial} onSkip={skipTutorial} />
       <RoomSheet />
       <BetSheet />
       <WagerHud onReveal={reveal} />

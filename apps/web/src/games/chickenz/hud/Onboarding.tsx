@@ -1,6 +1,3 @@
-import { useState } from 'react';
-
-import { NAME_MAX, useProfile, validName } from '@/app/stores/profile.ts';
 import { Button } from '@/ui/Button.tsx';
 
 import { useOnboarding } from '../tutorial/onboarding.ts';
@@ -31,18 +28,8 @@ function Frame({
   );
 }
 
-export function Onboarding({
-  onTutorial,
-  onSkip,
-  onNamed,
-}: {
-  onTutorial(): void;
-  onSkip(): void;
-  onNamed(): void;
-}) {
+export function Onboarding({ onTutorial, onSkip }: { onTutorial(): void; onSkip(): void }) {
   const stage = useOnboarding((s) => s.stage);
-  const profile = useProfile();
-  const [draft, setDraft] = useState(profile.name);
 
   if (stage === 'prompt') {
     return (
@@ -55,31 +42,6 @@ export function Onboarding({
             Skip
           </Button>
         </div>
-      </Frame>
-    );
-  }
-  if (stage === 'username') {
-    const ok = validName(draft);
-    return (
-      <Frame title="Choose a username">
-        <input
-          value={draft}
-          maxLength={NAME_MAX}
-          onChange={(e) => setDraft(e.target.value.replace(/[^A-Za-z0-9_]/g, ''))}
-          className="h-12 w-full rounded-md border-2 border-line bg-ink px-3 text-center text-lg text-cream outline-none focus:border-teal"
-          aria-label="Username"
-        />
-        <Button
-          variant="tomato"
-          sound="ui.confirm"
-          disabled={!ok}
-          onClick={() => {
-            profile.setName(draft);
-            onNamed();
-          }}
-        >
-          Let's go!
-        </Button>
       </Frame>
     );
   }

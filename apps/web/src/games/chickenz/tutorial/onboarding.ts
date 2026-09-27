@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
-/** Chickenz first run: "new here?" prompt → tutorial → username → play. */
-export type OnboardingStage = 'none' | 'prompt' | 'tutorial' | 'username';
+/** Chickenz first run: "new here?" prompt → tutorial → play (names are asked in the lobby). */
+export type OnboardingStage = 'none' | 'prompt' | 'tutorial';
 
 type OnboardingState = { stage: OnboardingStage; set(stage: OnboardingStage): void };
 

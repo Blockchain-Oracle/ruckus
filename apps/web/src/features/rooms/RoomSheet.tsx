@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/ui/Button.tsx';
+import { NameField } from '@/ui/NameField.tsx';
 import {
   Sheet,
   SheetContent,
@@ -66,7 +67,7 @@ export function RoomSheet(props: Props) {
       >
         <SheetHeader>
           <SheetTitle className="font-display text-2xl text-cream sm:text-3xl">
-            {inLobby ? `Room ${room.code}` : 'Play online'}
+            {inLobby ? `Room ${room.code}` : 'Play with friends'}
           </SheetTitle>
           <SheetDescription className="text-cream-dim">
             {inLobby
@@ -88,6 +89,7 @@ function Entry({ kit }: { kit: RoomKit }) {
   const busy = room.status === 'connecting';
   return (
     <div className="flex flex-col gap-4">
+      <NameField />
       <div className="grid gap-3 sm:grid-cols-2">
         <Button
           variant="tomato"

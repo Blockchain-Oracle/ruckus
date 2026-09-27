@@ -1,4 +1,3 @@
-import { useProfile } from '@/app/stores/profile.ts';
 import { useUi } from '@/app/stores/ui.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
 import { playMusic } from '@/lib/audio/music.ts';
@@ -26,7 +25,10 @@ export function startMatch() {
   if (track) playMusic(track);
 }
 
-/** Play pressed: Chickenz first-run order is tutorial prompt → tutorial → username → play. */
+/**
+ * Play pressed: a first run offers the tutorial, then plays. Local play never asks for a name
+ * (ADR-010); the name is set once, in the Play-with-friends lobby, where others see it.
+ */
 export function onPlay() {
   if (tutorialNext) {
     tutorialNext = false;
@@ -34,7 +36,6 @@ export function onPlay() {
     return;
   }
   if (!tutorialDone()) useOnboarding.getState().set('prompt');
-  else if (!useProfile.getState().named) useOnboarding.getState().set('username');
   else startMatch();
 }
 
@@ -54,8 +55,7 @@ export function skipTutorial() {
 }
 
 function afterTutorial() {
-  if (!useProfile.getState().named) useOnboarding.getState().set('username');
-  else startMatch();
+  startMatch();
 }
 
 export function stopAll() {
