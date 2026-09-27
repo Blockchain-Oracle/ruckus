@@ -5,6 +5,7 @@ import { POOL_MSG, POOL_PLAYERS } from '@arena/protocol/pool';
 import { useShell } from '@/app/stores/shell.ts';
 import { readUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { ConnectionBanner } from '@/features/rooms/ConnectionBanner.tsx';
 import type { SeatView } from '@/features/rooms/kit.ts';
 import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 
@@ -64,6 +65,7 @@ export function PoolOverlay() {
       <LessonCard />
       <TutorialOffer />
       <PoolResults online={online} onRematch={() => getDirector()?.rematch()} onLeave={leave} />
+      <ConnectionBanner />
       <RoomSheet
         kit={poolRooms}
         gameId="pool"

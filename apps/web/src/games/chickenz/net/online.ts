@@ -18,18 +18,13 @@ import { useRoomSheet } from './sheetStore.ts';
 export function installOnline() {
   setOnlineHandlers({
     onRoundStart(e) {
-      const room = useRoom.getState();
-      // Watchers (joined mid-match) aren't in the sim: they spectate with no local bird.
-      const seats = [...room.seats]
-        .filter((s) => s.kind !== 'waiting')
-        .sort((a, b) => a.slot - b.slot);
-      const me = seats.find((s) => s.sessionId === room.mySessionId);
-      const heroes = seats.map((s) => (isHero(s.hero) ? s.hero : HEROES[0]));
-      // Bots are always labelled; a bot that took over a dropped player keeps their name in brackets.
-      const names = seats.map((s, i) => {
-        if (s.kind !== 'bot') return s.name;
-        return s.name.startsWith('Bot (') ? s.name : `Bot · ${HERO_NAMES[heroes[i] ?? HEROES[0]]}`;
-      });
+      // The lineup and our slot come with the round: seats are renumbered at match start and the
+      // state patch lands after this message (you −1: watching, no local bird).
+      const heroes = e.heroes.map((h) => (isHero(h) ? h : HEROES[0]));
+      // Bots are always labelled: an invited bot by its hero, a takeover keeps "Bot (Name)".
+      const names = e.names.map((n, i) =>
+        n === 'Bot' ? `Bot · ${HERO_NAMES[heroes[i] ?? HEROES[0]]}` : n,
+      );
       const machine = useGameMachine.getState();
       if (machine.phase === 'attract') machine.send('entering');
       const driver = getDriver();
@@ -39,10 +34,10 @@ export function installOnline() {
         e.seed,
         e.mapId,
         e.players,
-        me?.slot ?? 0,
+        e.you,
         heroes,
         names,
-        seats.map((s) => s.wins),
+        e.wins,
       );
     },
     onRoundEnd(e) {

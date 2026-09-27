@@ -11,7 +11,7 @@ import type { Input } from '@arena/sim-runner';
 
 import { useProfile } from '@/app/stores/profile.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
-import { createRoomKit, mySeat } from '@/features/rooms/kit.ts';
+import { createRoomKit } from '@/features/rooms/kit.ts';
 
 import { startOnlineRace, stopRace } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -60,8 +60,8 @@ export function applyPendingRace() {
   const e = pending;
   if (!d || !e) return;
   pending = null;
-  const me = mySeat(runnerRooms.useRoom.getState());
-  const slot = me && me.kind !== 'waiting' ? me.slot : -1;
+  // The server says which slot is ours: seats are renumbered at the start, before the state lands.
+  const slot = e.you;
   d.sendInput = sendInput;
   startOnlineRace(e, slot);
 }

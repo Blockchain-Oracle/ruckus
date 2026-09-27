@@ -4,6 +4,14 @@ import { create } from 'zustand';
 import { writeUrlState } from '@/app/urlState.ts';
 import { env } from '@/config/env.ts';
 
+import {
+  announceHostChange,
+  clearConnection,
+  playerId,
+  recoverRoom,
+  watchRoom,
+} from './resilience.ts';
+
 /** Seat fields every game's room schema shares (games may add more). */
 export type SeatView = {
   slot: number;
@@ -68,12 +76,16 @@ export function createRoomKit(cfg: KitConfig) {
     return "Couldn't reach the game server. Check your connection and try again.";
   };
 
+  /** Every join carries the stable player id, so the server can hand this player's seat back. */
+  const options = (priv: boolean) => ({ ...cfg.joinOptions(priv), playerId: playerId() });
+
   function attach(r: Room) {
     room = r;
     writeUrlState({ room: r.roomId });
     useRoom
       .getState()
       .set({ status: 'inRoom', error: null, mySessionId: r.sessionId, code: r.roomId });
+    watchRoom(r);
     r.onStateChange((state) => {
       const s = state as {
         seats: Iterable<SeatView>;
@@ -82,16 +94,32 @@ export function createRoomKit(cfg: KitConfig) {
         hostSessionId: string;
       };
       const seats = [...s.seats].map((x) => ({ ...x }) as SeatView).sort((a, b) => a.slot - b.slot);
+      const prev = useRoom.getState().hostSessionId;
+      if (prev) announceHostChange(prev === r.sessionId, s.hostSessionId === r.sessionId);
       useRoom
         .getState()
         .set({ seats, code: s.code, phase: s.phase, hostSessionId: s.hostSessionId });
     });
     cfg.onAttach(r);
     r.onLeave(() => {
+      // leaveRoom() clears `room` first: anything else is the connection giving up on us.
+      const lost = room === r;
       room = null;
+      if (lost) {
+        void recoverRoom(() => rejoin(r.roomId));
+        return;
+      }
       writeUrlState({ room: null });
       useRoom.getState().set({ status: 'offline', seats: [], code: '', phase: 'lobby' });
     });
+  }
+
+  /** Back into the same room by code: the server gives this player their seat back. */
+  async function rejoin(code: string) {
+    await connect((c) => c.joinById(code, options(true)));
+    if (room) return true;
+    useRoom.getState().set({ status: 'error', error: 'Lost connection to the room.' });
+    return false;
   }
 
   async function connect(run: (client: Client) => Promise<Room>) {
@@ -109,13 +137,14 @@ export function createRoomKit(cfg: KitConfig) {
 
   return {
     useRoom,
-    createRoom: () => connect((c) => c.create(cfg.roomName, cfg.joinOptions(true))),
-    quickPlay: () => connect((c) => c.joinOrCreate(cfg.roomName, cfg.joinOptions(false))),
+    createRoom: () => connect((c) => c.create(cfg.roomName, options(true))),
+    quickPlay: () => connect((c) => c.joinOrCreate(cfg.roomName, options(false))),
     joinRoom: (code: string) =>
-      connect((c) => c.joinById(code.trim().toUpperCase(), cfg.joinOptions(true))),
+      connect((c) => c.joinById(code.trim().toUpperCase(), options(true))),
     async leaveRoom() {
       const r = room;
       room = null;
+      clearConnection();
       await r?.leave(true).catch(() => {});
       writeUrlState({ room: null });
       useRoom.getState().set({ status: 'offline', seats: [], code: '', phase: 'lobby' });

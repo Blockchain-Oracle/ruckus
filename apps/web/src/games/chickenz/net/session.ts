@@ -16,6 +16,13 @@ import { PROTOCOL_VERSION } from '@arena/shared';
 import { useProfile } from '@/app/stores/profile.ts';
 import { writeUrlState } from '@/app/urlState.ts';
 import { env } from '@/config/env.ts';
+import {
+  announceHostChange,
+  clearConnection,
+  playerId,
+  recoverRoom,
+  watchRoom,
+} from '@/features/rooms/resilience.ts';
 
 import { useChickenzPrefs } from '../prefs.ts';
 import { type SeatView, useRoom } from './roomStore.ts';
@@ -28,7 +35,6 @@ type Handlers = {
   onEmote(e: EmoteEvent): void;
 };
 
-const RECONNECT_TOKEN_KEY = 'ruckus.chickenz.reconnect';
 const SLOTS = 4;
 
 let room: Room | null = null;
@@ -49,6 +55,8 @@ function syncSeats(state: {
   hostSessionId: string;
 }) {
   const seats = [...state.seats].map((s) => ({ ...s }) as SeatView).sort((a, b) => a.slot - b.slot);
+  const { hostSessionId: prev, mySessionId: me } = useRoom.getState();
+  if (prev) announceHostChange(prev === me, state.hostSessionId === me);
   useRoom
     .getState()
     .set({ seats, code: state.code, phase: state.phase, hostSessionId: state.hostSessionId });
@@ -57,14 +65,10 @@ function syncSeats(state: {
 function attach(r: Room) {
   room = r;
   writeUrlState({ room: r.roomId });
-  try {
-    window.sessionStorage.setItem(RECONNECT_TOKEN_KEY, r.reconnectionToken);
-  } catch {
-    /* reconnect across reloads just won't be offered */
-  }
   useRoom
     .getState()
     .set({ status: 'inRoom', error: null, mySessionId: r.sessionId, code: r.roomId });
+  watchRoom(r);
   r.onStateChange((state) => syncSeats(state as never));
   r.onMessage(CHICKENZ_MSG.roundStart, (e: RoundStartEvent) => handlers?.onRoundStart(e));
   r.onMessage(CHICKENZ_MSG.roundEnd, (e: RoundEndEvent) => handlers?.onRoundEnd(e));
@@ -86,10 +90,24 @@ function attach(r: Room) {
     );
   });
   r.onLeave(() => {
+    // leaveRoom() clears `room` first: anything else is the connection giving up on us.
+    const lost = room === r;
     room = null;
+    if (lost) {
+      void recoverRoom(() => rejoin(r.roomId));
+      return;
+    }
     writeUrlState({ room: null });
     useRoom.getState().set({ status: 'offline', seats: [], code: '', phase: 'lobby' });
   });
+}
+
+/** Back into the same room by code: the server gives this player their bird back. */
+async function rejoin(code: string) {
+  await connect((c) => c.joinById(code, joinOptions(true)));
+  if (room) return true;
+  useRoom.getState().set({ status: 'error', error: 'Lost connection to the room.' });
+  return false;
 }
 
 /** Server and matchmaker errors, in the words a player needs. */
@@ -106,6 +124,7 @@ function friendlyError(cause: unknown): string {
 const joinOptions = (priv: boolean): ChickenzJoinOptions => ({
   protocolVersion: PROTOCOL_VERSION,
   name: useProfile.getState().name,
+  playerId: playerId(),
   hero: useChickenzPrefs.getState().hero,
   private: priv,
 });
@@ -133,11 +152,7 @@ export const joinRoom = (code: string) =>
 export async function leaveRoom() {
   const r = room;
   room = null;
-  try {
-    window.sessionStorage.removeItem(RECONNECT_TOKEN_KEY);
-  } catch {
-    /* nothing to forget */
-  }
+  clearConnection();
   await r?.leave(true).catch(() => {});
   writeUrlState({ room: null });
   useRoom.getState().set({ status: 'offline', seats: [], code: '', phase: 'lobby' });

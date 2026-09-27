@@ -5,6 +5,7 @@ import { SOCCER_MIN_TO_START, SOCCER_MSG, SOCCER_SEATS } from '@arena/protocol/s
 import { useShell } from '@/app/stores/shell.ts';
 import { readUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { ConnectionBanner } from '@/features/rooms/ConnectionBanner.tsx';
 import type { SeatView } from '@/features/rooms/kit.ts';
 import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 
@@ -65,6 +66,7 @@ export function SoccerOverlay() {
     <>
       <SoccerHud onLeave={leave} />
       <FinishHud onLeave={leave} />
+      <ConnectionBanner />
       <RoomSheet
         kit={soccerRooms}
         gameId="soccer"

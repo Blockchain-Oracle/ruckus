@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useShell } from '@/app/stores/shell.ts';
 import { readUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { ConnectionBanner } from '@/features/rooms/ConnectionBanner.tsx';
 
 import { skipTutorial, startTutorial } from '../flow.ts';
 import { DiamondWipe } from '../hud/DiamondWipe.tsx';
@@ -92,6 +93,7 @@ export function ChickenzOverlay() {
         }}
       />
       <Onboarding onTutorial={startTutorial} onSkip={skipTutorial} />
+      <ConnectionBanner />
       <RoomSheet />
       <BetSheet />
       <WagerHud onReveal={reveal} />

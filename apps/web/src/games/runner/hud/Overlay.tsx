@@ -5,6 +5,7 @@ import { RUNNER_MIN_TO_START, RUNNER_MSG, RUNNER_SEATS } from '@arena/protocol/r
 import { useShell } from '@/app/stores/shell.ts';
 import { readUrlState } from '@/app/urlState.ts';
 import { useGameMachine } from '@/engine/gameMachine.ts';
+import { ConnectionBanner } from '@/features/rooms/ConnectionBanner.tsx';
 import type { SeatView } from '@/features/rooms/kit.ts';
 import { RoomSheet } from '@/features/rooms/RoomSheet.tsx';
 
@@ -67,6 +68,7 @@ export function RunnerOverlay() {
     <>
       <RunnerHud onLeave={leave} />
       <WipeoutHud onLeave={leave} />
+      <ConnectionBanner />
       <RoomSheet
         kit={runnerRooms}
         gameId="runner"

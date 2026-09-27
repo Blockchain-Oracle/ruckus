@@ -42,7 +42,7 @@ const tableHash = (p: Page) =>
 
 try {
   const host = await open(`${WEB_URL}/?game=pool&preview`, 'HOST');
-  await host.getByRole('button', { name: 'Online' }).click({ timeout: 20_000 });
+  await host.getByRole('button', { name: 'Play with friends' }).click({ timeout: 20_000 });
   await host.getByRole('button', { name: 'Create room' }).click();
   const codeEl = host.locator('.select-all');
   await codeEl.waitFor({ timeout: 15_000 });
