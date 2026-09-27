@@ -4,6 +4,7 @@ import { useGameMachine } from '@/engine/gameMachine.ts';
 import { getLoadedGame } from '@/games/loader.ts';
 import type { MessageKey } from '@/i18n/index.ts';
 import { useT } from '@/i18n/index.ts';
+import { Credits } from '@/ui/Credits.tsx';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/ui/primitives/sheet.tsx';
 import { Slider } from '@/ui/primitives/slider.tsx';
 import { Switch } from '@/ui/primitives/switch.tsx';
@@ -68,6 +69,7 @@ export function SettingsSheet() {
             </label>
           ))}
           {GameSettings && <GameSettings />}
+          <Credits />
         </div>
       </SheetContent>
     </Sheet>

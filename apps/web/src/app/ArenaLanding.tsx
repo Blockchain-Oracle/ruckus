@@ -7,6 +7,8 @@ import { type GAMES, visibleGames } from '@/games/registry.ts';
 import { useT } from '@/i18n/index.ts';
 import { uiSound } from '@/lib/audio/index.ts';
 
+import { useUi } from './stores/ui.ts';
+
 const ENTER = { duration: 0.35, ease: [0.22, 1, 0.36, 1] } as const;
 const STAGGER_S = 0.06;
 
@@ -136,6 +138,13 @@ export function ArenaLanding({ onChoose }: { onChoose: (id: Game['id']) => void 
             </m.button>
           ))}
         </nav>
+        <button
+          type="button"
+          onClick={() => useUi.getState().openSheet('settings')}
+          className="self-start text-xs text-cream-dim underline-offset-2 hover:text-cream hover:underline"
+        >
+          Credits and settings
+        </button>
       </div>
     </div>
   );
