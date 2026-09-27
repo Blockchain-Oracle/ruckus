@@ -1,0 +1,34 @@
+{
+  "id": "01a0e404-167b-7502-8b40-a9bb7dfb81c9",
+  "type": "retexture",
+  "name": "",
+  "art_style": "realistic",
+  "object_prompt": "",
+  "style_prompt": "",
+  "negative_prompt": "",
+  "texture_prompt": "",
+  "texture_image_url": "",
+  "text_style_prompt": "Clean smooth stylized cartoon toy look like a Fall Guys character: soft matte vinyl surfaces, PURE WHITE smooth body and white leather aviator cap with very subtle stitching, minimal feather texture, bright orange beak and feet, orange aviator goggles with dark glossy lenses, small red comb, big black glossy eyes with a white highlight, even flat lighting, no baked shadows, no noise",
+  "image_style_url": "",
+  "status": "SUCCEEDED",
+  "created_at": 1790531868768,
+  "progress": 100,
+  "started_at": 1790531868776,
+  "finished_at": 1790531913493,
+  "expires_at": 1790791113493,
+  "task_error": null,
+  "model_url": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/model.glb?Expires=1790791113&Signature=Sp6C4k2vvEBTqiezNR4bGdUUZEgjSCHkC5JpfJA7hWqCvNr-J12TMbji4ah4bRrAI-WukO1NasVLLw0cUwJ7-eEMUOgOKVbn98fFv6KO7RWDKIjCiSjf0FMM4qbM1AH-d4ioHBVPXBau9fmt26eWwEGrJarj-Eutxdm9H480odAiG6MGUm0A0yvDkjic3YeSiVvmU6vN71q56E2cODdWnJCWdg3vw3p19Fp7F9biNcIS5pPsGbm2Xjq8GvRXEFXOGJRlux7yhmMLPLI~WeeJu9wJ5H-ASx-mowgj9z8bZTRy7MjKCydaVC7X-jHkAJDIbWx0ldVXhNPT3NfvxPkXkw__&Key-Pair-Id=K1VGYTHIYLM9UM",
+  "model_urls": {
+    "glb": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/model.glb?Expires=1790791113&Signature=Sp6C4k2vvEBTqiezNR4bGdUUZEgjSCHkC5JpfJA7hWqCvNr-J12TMbji4ah4bRrAI-WukO1NasVLLw0cUwJ7-eEMUOgOKVbn98fFv6KO7RWDKIjCiSjf0FMM4qbM1AH-d4ioHBVPXBau9fmt26eWwEGrJarj-Eutxdm9H480odAiG6MGUm0A0yvDkjic3YeSiVvmU6vN71q56E2cODdWnJCWdg3vw3p19Fp7F9biNcIS5pPsGbm2Xjq8GvRXEFXOGJRlux7yhmMLPLI~WeeJu9wJ5H-ASx-mowgj9z8bZTRy7MjKCydaVC7X-jHkAJDIbWx0ldVXhNPT3NfvxPkXkw__&Key-Pair-Id=K1VGYTHIYLM9UM"
+  },
+  "thumbnail_url": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/preview.png?Expires=1790791113&Signature=Y8dd-9bP3-SZKyFMQb-6IGU0V6mE-p90BaAlEUsSL5DbZNpebTXerHgGWXRExR-Sx3EFhZDhV5oONqjeO0b2j-zdRpr3zmCrdtQxspYxXcP9aJc4EGUAcBXSf3Q0iKH8GXfxnc-fPypLsTr83TfxeiyI9xMwQ8BUC75NVZx40oCg8Ww0rwIyBW27Qg38BVqU6qRThO6QJGEzCtzmmGbW990vNzspPvsYfB6t7kl-bLzOzNOra2jwLgT5h3Gv5FrBOyTTjeK80QpFlGEjAvMXpa5IvjKnchVMAc8wI9h1OUdWznfFi2T8xEE~tcNkqKUf-82xbRM3QKrwSEr4IcdPtA__&Key-Pair-Id=K1VGYTHIYLM9UM",
+  "texture_urls": [
+    {
+      "base_color": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/texture_0.png?Expires=1790791113&Signature=O2bQI28YkOEBdnkrU5NCxc4iSNzQ24QH3AYB~UaP8hqP0DwVfLE7UzDE2cu~LWvMJI8rl6Kw1-2b~aClAwKVZ~3ffp0RFi~QBZ7g7ow83M6LQwATl4I6tXG8Wxe11o-oulpmes6J3EeLaeNP-TmdT73Z0DbK2hwZg~UYGbO4wqiHhd0jCEaywS8eC4UBwks9WSxilwEM5UUUm4qTHCzt4UibvGzx4mxib2QoWazXw2gTs6wW0KDaOoxhpHmHlkQyCkQI3u0i0-oZ3hqtv1Rc0Dy0TyVx61580MqozusoZOovmzfRmkcKzd5MeFypEHQaxmuYrTHmKypKmOZVo-DMRg__&Key-Pair-Id=K1VGYTHIYLM9UM",
+      "metallic": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/texture_0_metallic.png?Expires=1790791113&Signature=S-mwxJzFLFb8H7Ju4fnhxSkpTkPe5sp0qHNZtsj38Jx4kZt7nMvVpYIlm8VNnaQZv~UuW9QhsVV~9F8QWTbr5mAAAXGJZ5vs8AJxJHCtIVRskN2dvcSD1A~pR2UJPfTEsoHCNQr5Ed878VR-9S8LvZqnEuZxEiswjtfo9K8NFeFkR~bqHYXj7HAQ38abn1LTODAfGdgnWJH8dEZb4qFEiVchhZ51UXaoRyrd5ZvDPswfVqRuuY2tAOriEN20BEc9u8MlX83gOOSjbCiELJrcXA67yRTt9PdKZuQH-1BSJODqFRZiAaygyfPibIz~76wGI~iwvG6U9zsc14iOC5078w__&Key-Pair-Id=K1VGYTHIYLM9UM",
+      "roughness": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/texture_0_roughness.png?Expires=1790791113&Signature=Yd5Ua7dgbSbTTiW1p-9Jl4ykq5tP-bXeAy4SRqS5LArGlTHmi1fLjYyGfVLrewNqOTVZAgc6Opef1GfKCUZq-TPrboM1JG9FT-mkYSFtdbJDozq0AT4y22a6SZSdLf7wg3HMb~hRkvuYQnvpcknU2fd1hSpcy7dp-BTKIMyb4tH5ZNnM79nbh~oWwFk3UT6COcdsJ3uuPQ76UufsUdOzifWWukibEEAjJYIJrivF1dWhzkkcE1JXfAm-mpYjtsC2bd8OYDqklpENKocEcjHtGvlP5WsNYCo3JwdLd6s3RdqZEeM8QyKo7JMk--1QcMguzrz879yCqEfFxhVAIMi-gA__&Key-Pair-Id=K1VGYTHIYLM9UM",
+      "normal": "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/tasks/01a0e404-167b-7502-8b40-a9bb7dfb81c9/output/texture_0_normal.png?Expires=1790791113&Signature=LLoIQWas~RrnfPnMjCshgkvHFDMmmEw9vweK4t1x1HHdLNp4sVhcM9Sul11xFVRN1qO04rDVR2XMXVoN79HTHw4VF1k3l04TEparvh3HH1hfwx3lnVYXiZuR69W9tdo5eR8xIskJ-e5Foe9eWLoAmlWgoFFcUTMwiRJmyKXuI~hY0bm2FC9~ZxMUuknGxX3QiuK9XjO6iWepZrM0FmBnT5NZv4NozQDZWyzzJjR8Pl1ZfQTPlwEw68JPyr-CjA4JsbOqxfw2AcBa6o9Nx52dtKOAeX8i1ZnS5cTOzyiwiPpzzsg6XayZUcedA7rAjE0an0p8AAtfIyfKavYNfLgUkQ__&Key-Pair-Id=K1VGYTHIYLM9UM"
+    }
+  ],
+  "consumed_credits": 10
+}

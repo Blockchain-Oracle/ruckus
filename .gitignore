@@ -72,3 +72,7 @@ docs/*
 !docs/assets/
 docs/assets/*
 !docs/assets/readme/
+
+# Meshy raw downloads (6–8 MB each, textures duplicated per clip). The texture-stripped sources in
+# assets-src/chicken/src rebuild the chicken exactly; task ids and prompts are in docs/assets.
+assets-src/chicken/models/

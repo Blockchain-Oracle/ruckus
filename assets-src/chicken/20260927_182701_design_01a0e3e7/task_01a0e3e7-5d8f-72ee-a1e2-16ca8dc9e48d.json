@@ -1,0 +1,18 @@
+{
+  "id": "01a0e3e7-5d8f-72ee-a1e2-16ca8dc9e48d",
+  "type": "text-to-image",
+  "ai_model": "nano-banana-pro",
+  "prompt": "Stylized 3D cartoon mascot character for a party video game, in the style of Fall Guys and Stumble Guys: a chubby, round, cute chicken standing upright on two sturdy legs like a person, big round head with large friendly eyes, small orange beak, small red comb, fluffy WHITE feathers all over (pure white, no colour so it can be tinted), wings shaped like arms ending in feathery hands with three chunky fingers that can grip objects, orange legs and feet, soft rounded shapes, clean simple materials, full body, symmetric, neutral friendly expression, plain light grey background, no text. Wearing a glossy WHITE sporty helmet with orange goggles pushed up on the forehead.",
+  "status": "SUCCEEDED",
+  "progress": 100,
+  "created_at": 1790529986824,
+  "started_at": 1790529986834,
+  "finished_at": 1790530016923,
+  "expires_at": 1790789216923,
+  "image_urls": [
+    "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/uploads/multi_view_image_01a0e3e7-d450-77b3-9d3a-3d1d238121ce_part_0.png?Expires=1790789216&Signature=i5d5poR7suia6RdUDpO-pZQu0wDMKicpoLhkbH~8IJnDqahwUMh3gHo5Z6220-BVRMK~LPHvXv1PuNpKx7YAKkeOIYwc3zC620EwfbzUds8y0VaYEgRzenrnwDlZeEbV83t4elFL2MMexMdOC3~qNZHzJVEarXv6nD23emgaBXFAU0WNUSOIj2zkTsSe7GBezwL8JWTyb5khEdAC1KdBCmeFeWXa7Ef~-m92ggSQNV1t9oOc-1FKHw6aRZItE274LMA~jSdqwXx1Y4mTJQYye5TV1Qi7~B5XV1D3LYew6123i9aRZD9O~7PmbIR~C7ixpEzSa6qVLr0FfUO22ul12w__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/uploads/multi_view_image_01a0e3e7-d450-77b3-9d3a-3d1d238121ce_part_1.png?Expires=1790789216&Signature=dr7IRv0k~FLZzBEy6V-JojBWN1nxD7uxkgQDf26kUiMSHu2NQp1oqiAHnMMOTv99Ucpjgbt4-twA18YsDc2XjdTbGVyAhlj1FE7pym5LOPB1rXnn5ZRy8ZNRlLFNguiw2KOtqbKyf5tnUFqVK3~1KbU~x7VbHyUzoQ9RdI392ngIPBngy-lPrs3Es4hqeNW3-TYeGp9fkoy~7Bz-V4i0lw1LSOGeZ22z5-GQ1xVRxgXHepNHZ~91cXTfOYQ8qrI7UdFpXoRBXc4LyBoPncMI0t55mmrGE4RAG0OVLbecN8Y37pTRQCbWeSsW4Lgo-WxAnzHNRI9L9XG1jpkgL7n9RA__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "https://assets.meshy.ai/aad84b64-a1f3-4864-8630-92f37293701e/uploads/multi_view_image_01a0e3e7-d450-77b3-9d3a-3d1d238121ce_part_2.png?Expires=1790789216&Signature=aFr6wPio~8yhUy-kQqZJIxNqj6PrJbYYN3OLKDVL40umF2TjPH8smeY5ZIuNO-PiFxN8C~Gj1ENSiEVhk5dDrFblwDDUgs6ppef6dhaB8YuW1A0P8X-XLqGznEqq6Bbz1W-W4tQ4irFzfNo6Joi4-SrEIzRk96AHdTyohQVOlpN8BU3arEEFBdfskGx0y1Yr7oXEnTXpnaYWqEI7ZmHfY-DCfA9SpgN~8SQb-kNTlcQw6VM1L234JS1rQzA9x~Wyeq-oSQZoZ6K~I4yD0CaT9Q9iKqTcrcm6LbG3VcXuPrKjmxqa5o60P4oiQDL55SX2B7~Mz02KEeNtQNy9JqNXiw__&Key-Pair-Id=K1VGYTHIYLM9UM"
+  ],
+  "consumed_credits": 9
+}
