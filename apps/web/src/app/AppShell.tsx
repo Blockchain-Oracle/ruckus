@@ -147,7 +147,7 @@ function HubMenu() {
             t('hub.welcome.title')
           )}
         </h1>
-        <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)] compact:text-base [@media(max-height:480px)]:hidden">
+        <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)] compact:text-base [@media(max-height:620px)]:hidden">
           {game ? t(game.taglineKey) : t('hub.welcome.body')}
         </p>
         {game && modes && <ModeBar modes={modes} betName={game.wager} />}
