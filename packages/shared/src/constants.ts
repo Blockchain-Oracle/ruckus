@@ -1,6 +1,9 @@
 /** Bump when the client↔server message or schema contract changes; checked on room join. */
-/** 3: seats carry playerId/takeoverOf (reclaim on return); start messages carry `you`. */
-export const PROTOCOL_VERSION = 3;
+/**
+ * 3: seats carry playerId/takeoverOf (reclaim on return); start messages carry `you`.
+ * 4: soccer seats carry team + botLevel; matchStart carries teams (2v1 and friends).
+ */
+export const PROTOCOL_VERSION = 4;
 
 /** Contract name is `RuckusGame`; the host derives this id via `canonicalCasinoGameId`. */
 export const CASINO_GAME_ID = 'ruckus';

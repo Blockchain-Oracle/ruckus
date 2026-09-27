@@ -7,7 +7,7 @@ import { schema, t } from '@colyseus/schema';
  */
 export const SoccerSeat = schema(
   {
-    /** Lobby slot 0–3 (team = slot % 2); SOCCER_WATCHER for spectators. */
+    /** Seat id 0–3 (compacted to sim slots at kickoff); SOCCER_WATCHER for spectators. */
     slot: t.uint8(),
     kind: t.string().default('human'),
     sessionId: t.string().default(''),
@@ -19,6 +19,10 @@ export const SoccerSeat = schema(
     playerId: t.string().default(''),
     /** Set while a labelled bot holds a dropped player's seat; they take it back on return. */
     takeoverOf: t.string().default(''),
+    /** 0 Tomato, 1 Violet, −1 not on a team (watching). Players pick; the host seats bots. */
+    team: t.int8().default(-1),
+    /** Bots only: SOCCER_BOT_LEVELS key. */
+    botLevel: t.string().default('pro'),
   },
   'SoccerSeat',
 );
@@ -41,11 +45,21 @@ export const SOCCER_SEAT = { human: 'human', bot: 'bot', waiting: 'waiting' } as
 export const SOCCER_WATCHER = 255;
 export const SOCCER_SEATS = 4;
 export const SOCCER_MIN_TO_START = 2;
+export const SOCCER_PER_TEAM = 2;
+/** Bot skill per level (the sim's 0–100 difficulty); the same scale local practice uses. */
+export const SOCCER_BOT_LEVELS = { rookie: 30, pro: 65, legend: 100 } as const;
+export type SoccerBotLevel = keyof typeof SOCCER_BOT_LEVELS;
 
 export const SOCCER_MSG = {
   ready: 'ready',
+  /** { team } — a player moves to a side with room. */
+  setTeam: 'setTeam',
+  /** host: { team, level } */
   addBot: 'addBot',
+  /** host: { slot } */
   removeBot: 'removeBot',
+  /** host: { slot, level } */
+  setBotLevel: 'setBotLevel',
   start: 'start',
   /** client → server bytes: [seq u32 LE][h i8][jump u8] */
   input: 'i',
@@ -68,7 +82,8 @@ export type SoccerJoinOptions = {
 /** A match begins: every client builds the identical world, then follows snapshots. */
 export type SoccerMatchStart = {
   seed: number;
-  perTeam: 1 | 2;
+  /** Per sim slot: 0 Tomato or 1 Violet (1v1, 2v1, 2v2…). */
+  teams: (0 | 1)[];
   /** Per sim slot: bot difficulty, or −1 for a human seat. */
   bots: number[];
   names: string[];

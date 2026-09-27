@@ -1,14 +1,16 @@
 import { type Client, Room, ServerError } from 'colyseus';
 
 import {
+  SOCCER_BOT_LEVELS,
   SOCCER_INPUT_BYTES,
-  SOCCER_MIN_TO_START,
   SOCCER_MSG,
+  SOCCER_PER_TEAM,
   SOCCER_PHASE,
   SOCCER_SEAT,
   SOCCER_SEATS,
   SOCCER_SNAPSHOT_HEADER_BYTES,
   SOCCER_WATCHER,
+  type SoccerBotLevel,
   type SoccerJoinOptions,
   type SoccerMatchEnd,
   type SoccerMatchStart,
@@ -16,7 +18,15 @@ import {
   SoccerSeat,
 } from '@arena/protocol/soccer';
 import { PROTOCOL_VERSION } from '@arena/shared';
-import { newWorld, packedLength, packWorld, tick, type World } from '@arena/sim-soccer';
+import {
+  newWorld,
+  packedLength,
+  packWorld,
+  type Team,
+  tick,
+  validLayout,
+  type World,
+} from '@arena/sim-soccer';
 
 import { PROTOCOL_MISMATCH, releaseCode, uniqueCode } from '../codes.ts';
 import {
@@ -74,8 +84,35 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
       const seat = this.seatOf(client);
       if (seat && this.state.phase === SOCCER_PHASE.lobby) seat.ready = Boolean(ready);
     });
-    this.onMessage(SOCCER_MSG.addBot, (client) => this.hostOnly(client, () => this.addBot()));
-    this.onMessage(SOCCER_MSG.removeBot, (client) => this.hostOnly(client, () => this.removeBot()));
+    this.onMessage(SOCCER_MSG.setTeam, (client, msg: { team?: unknown }) => {
+      const seat = this.seatOf(client);
+      const team = asTeam(msg?.team);
+      if (!seat || team === null || this.state.phase !== SOCCER_PHASE.lobby) return;
+      if (
+        seat.kind !== SOCCER_SEAT.human ||
+        seat.team === team ||
+        this.teamSize(team) >= SOCCER_PER_TEAM
+      )
+        return;
+      seat.team = team;
+    });
+    this.onMessage(SOCCER_MSG.addBot, (client, msg: { team?: unknown; level?: unknown }) =>
+      this.hostOnly(client, () => {
+        const team = asTeam(msg?.team);
+        if (team !== null) this.addBot(team, asLevel(msg?.level));
+      }),
+    );
+    this.onMessage(SOCCER_MSG.removeBot, (client, msg: { slot?: unknown }) =>
+      this.hostOnly(client, () => this.removeBot(Number(msg?.slot))),
+    );
+    this.onMessage(SOCCER_MSG.setBotLevel, (client, msg: { slot?: unknown; level?: unknown }) =>
+      this.hostOnly(client, () => {
+        const bot = this.state.seats.find(
+          (s) => s.kind === SOCCER_SEAT.bot && !s.takeoverOf && s.slot === Number(msg?.slot),
+        );
+        if (bot) bot.botLevel = asLevel(msg?.level);
+      }),
+    );
     this.onMessage(SOCCER_MSG.start, (client) => this.hostOnly(client, () => this.startMatch()));
     this.setSimulationInterval(() => this.step(), TICK_MS);
   }
@@ -99,10 +136,12 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
       if (p) p.bot = -1;
       if (wasHost || !this.state.hostSessionId) this.state.hostSessionId = client.sessionId;
     } else {
-      const slot = inPlay ? -1 : this.freeSlot();
+      const team = inPlay ? null : this.openTeam();
+      const slot = team === null ? -1 : this.freeSlot();
       const seat = new SoccerSeat();
       seat.slot = slot < 0 ? SOCCER_WATCHER : slot;
       seat.kind = seat.slot === SOCCER_WATCHER ? SOCCER_SEAT.waiting : SOCCER_SEAT.human;
+      seat.team = seat.kind === SOCCER_SEAT.human && team !== null ? team : -1;
       seat.sessionId = client.sessionId;
       seat.name = name;
       seat.playerId = playerId;
@@ -179,23 +218,37 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     return `Bot · ${name}`;
   }
 
-  private addBot(slot = this.freeSlot()) {
-    if (slot < 0) return;
+  /** Players on a side (humans and bots; not watchers). */
+  private teamSize(team: Team) {
+    return this.state.seats.filter((s) => s.kind !== SOCCER_SEAT.waiting && s.team === team).length;
+  }
+
+  /** The side a newcomer joins: the smaller one with room (Tomato on a tie), or none. */
+  private openTeam(): Team | null {
+    const [a, b] = [this.teamSize(0), this.teamSize(1)];
+    if (a >= SOCCER_PER_TEAM && b >= SOCCER_PER_TEAM) return null;
+    if (a >= SOCCER_PER_TEAM) return 1;
+    if (b >= SOCCER_PER_TEAM) return 0;
+    return b < a ? 1 : 0;
+  }
+
+  /** Host only: a labelled bot on the side they chose, at the level they chose. */
+  private addBot(team: Team, level: SoccerBotLevel) {
+    const slot = this.freeSlot();
+    if (slot < 0 || this.teamSize(team) >= SOCCER_PER_TEAM) return;
     const seat = new SoccerSeat();
     seat.slot = slot;
     seat.kind = SOCCER_SEAT.bot;
     seat.name = this.botName();
+    seat.team = team;
+    seat.botLevel = level;
     seat.ready = true;
     this.state.seats.push(seat);
   }
 
-  private removeBot() {
-    for (let i = this.state.seats.length - 1; i >= 0; i--) {
-      if (this.state.seats[i]?.kind === SOCCER_SEAT.bot) {
-        this.state.seats.splice(i, 1);
-        return;
-      }
-    }
+  private removeBot(slot: number) {
+    const i = this.state.seats.findIndex((s) => s.kind === SOCCER_SEAT.bot && s.slot === slot);
+    if (i >= 0) this.state.seats.splice(i, 1);
   }
 
   /**
@@ -224,34 +277,27 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
   }
 
   /**
-   * Two players make a 1v1; three or four make a 2v2, with a labelled bot filling the gap. Lobby
-   * slot parity is the team (even Tomato, odd Violet); seats are renumbered to sim slots so the
-   * teams stay as the lobby showed them, rebalanced only if one side is over-full.
+   * The line-up the lobby shows is the line-up that plays: 1v1, 2v1, 2v2, whatever the players
+   * picked and the host seated. Nobody is moved and no bot is added behind their backs. Seats are
+   * compacted to sim slots; each client learns its own from the start message.
    */
   private startMatch() {
-    const playing = () => this.state.seats.filter((s) => s.kind !== SOCCER_SEAT.waiting);
-    if (playing().length < SOCCER_MIN_TO_START) return;
-    const perTeam: 1 | 2 = playing().length <= 2 ? 1 : 2;
-    const sorted = [...playing()].sort((a, b) => a.slot - b.slot);
-    const teams: Seat[][] = [[], []];
-    for (const s of sorted) teams[s.slot % 2]?.push(s);
-    // Rebalance an over-full side (e.g. both players sat on Tomato).
-    while ((teams[0]?.length ?? 0) > perTeam) teams[1]?.push(teams[0]?.pop() as Seat);
-    while ((teams[1]?.length ?? 0) > perTeam) teams[0]?.push(teams[1]?.pop() as Seat);
-    for (let team = 0; team < 2; team++) {
-      teams[team]?.forEach((s, i) => {
-        s.slot = team + i * 2;
-      });
-      // Fill a short side with a labelled bot (a 3-player room plays 2v2).
-      for (let i = teams[team]?.length ?? 0; i < perTeam; i++) this.addBot(team + i * 2);
-    }
-    const seats = [...playing()].sort((a, b) => a.slot - b.slot);
+    const seats = this.state.seats
+      .filter((s) => s.kind !== SOCCER_SEAT.waiting)
+      .sort((a, b) => a.slot - b.slot);
+    const teams = seats.map((s) => s.team as Team);
+    if (!validLayout(teams)) return;
+    seats.forEach((s, i) => {
+      s.slot = i;
+    });
     this.seed = Math.imul(this.seed ^ (this.state.matches + 1), 2654435761) >>> 0 || 1;
-    const bots = seats.map((s) => (s.kind === SOCCER_SEAT.bot ? BOT_DIFFICULTY : -1));
-    this.world = newWorld(this.seed, perTeam, bots);
+    const bots = seats.map((s) =>
+      s.kind === SOCCER_SEAT.bot ? SOCCER_BOT_LEVELS[asLevel(s.botLevel)] : -1,
+    );
+    this.world = newWorld(this.seed, teams, bots);
     this.packed = new Float64Array(packedLength(seats.length));
     this.latestInputs.clear();
-    this.current = { seed: this.seed, perTeam, bots, names: seats.map((s) => s.name), you: -1 };
+    this.current = { seed: this.seed, teams, bots, names: seats.map((s) => s.name), you: -1 };
     this.state.phase = SOCCER_PHASE.playing;
     // Per client, with its slot: seats were just renumbered and the state patch lags behind.
     for (const client of this.clients) this.sendStart(client);
@@ -262,7 +308,7 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     const [a, b] = w.score;
     const winner: -1 | 0 | 1 = a === b ? -1 : a > b ? 0 : 1;
     for (const s of this.state.seats)
-      if (s.kind !== SOCCER_SEAT.waiting && winner >= 0 && s.slot % 2 === winner) s.wins += 1;
+      if (s.kind !== SOCCER_SEAT.waiting && winner >= 0 && s.team === winner) s.wins += 1;
     this.state.phase = SOCCER_PHASE.over;
     this.state.matches += 1;
     this.broadcast(SOCCER_MSG.matchEnd, { score: [a, b], winner } satisfies SoccerMatchEnd);
@@ -278,9 +324,11 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     for (const s of this.state.seats) {
       if (s.kind !== SOCCER_SEAT.waiting) continue;
       const slot = this.freeSlot();
-      if (slot < 0) break;
+      const team = this.openTeam();
+      if (slot < 0 || team === null) break;
       s.kind = SOCCER_SEAT.human;
       s.slot = slot;
+      s.team = team;
     }
     for (const s of this.state.seats) s.ready = s.kind === SOCCER_SEAT.bot;
   }
@@ -337,3 +385,7 @@ export class SoccerRoom extends Room<{ state: InstanceType<typeof SoccerRoomStat
     }
   }
 }
+
+const asTeam = (v: unknown): Team | null => (v === 0 || v === 1 ? v : null);
+const asLevel = (v: unknown): SoccerBotLevel =>
+  typeof v === 'string' && v in SOCCER_BOT_LEVELS ? (v as SoccerBotLevel) : 'pro';
