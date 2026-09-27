@@ -1,9 +1,10 @@
-import { useThree } from '@react-three/fiber';
-import { useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useRef } from 'react';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import {
   ACESFilmicToneMapping,
   EquirectangularReflectionMapping,
+  type Fog,
   NeutralToneMapping,
   PCFSoftShadowMap,
   type Texture,
@@ -17,6 +18,12 @@ const EXPOSURE = 0.95;
 /** The HDRI lights reflections but stays dim: the pendant over the table is the key light. */
 const ENV_INTENSITY = 0.35;
 const LAMP_Y = SURFACE_Y + 1.05;
+/** Fog as tuned for the play camera (m); it rides out with the camera on tall screens. */
+const FOG_NEAR_M = 4;
+const FOG_FAR_M = 11;
+/** How far past the camera-to-table distance the fog starts and ends. */
+const FOG_NEAR_PAST_M = -1.5;
+const FOG_FAR_PAST_M = 5;
 
 let hdr: Promise<Texture> | null = null;
 export const loadPoolEnvironment = () => {
@@ -59,7 +66,7 @@ export function Room({ showLamp }: { showLamp: boolean }) {
   return (
     <>
       <color attach="background" args={[COLORS.room]} />
-      <fog attach="fog" args={[COLORS.room, 4, 11]} />
+      <RoomFog />
       <hemisphereLight args={['#c9d6ff', '#2a1a12', 0.35]} />
       {/* The pendant: a long shade over the table, warm key light with soft shadows. */}
       <spotLight
@@ -107,4 +114,21 @@ export function Room({ showLamp }: { showLamp: boolean }) {
       </mesh>
     </>
   );
+}
+
+/**
+ * The room fades into fog, but the attract camera pulls back to fit the table on tall screens
+ * (~3× farther in portrait), which sank the whole table into a fixed fog. The fog rides with the
+ * camera distance instead, never tighter than the play-camera tuning.
+ */
+function RoomFog() {
+  const fog = useRef<Fog>(null);
+  useFrame(({ camera }) => {
+    const f = fog.current;
+    if (!f) return;
+    const d = camera.position.length();
+    f.near = Math.max(FOG_NEAR_M, d + FOG_NEAR_PAST_M);
+    f.far = Math.max(FOG_FAR_M, d + FOG_FAR_PAST_M);
+  });
+  return <fog ref={fog} attach="fog" args={[COLORS.room, FOG_NEAR_M, FOG_FAR_M]} />;
 }
