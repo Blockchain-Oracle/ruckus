@@ -1,5 +1,6 @@
 import { HALF_L, HALF_W } from '@arena/sim-pool';
 
+import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
 
 import { poolPose } from './match/camera.ts';
@@ -64,3 +65,57 @@ export const rig: CameraRig = {
 };
 
 export const TABLE_HALF = { x: HALF_L, z: HALF_W } as const;
+
+/** The pendant's height over the cloth. */
+export const LAMP_Y = SURFACE_Y + 1.05;
+const LAMP_WARM = '#ffd9a0';
+
+/**
+ * A dim billiard hall: the pendant over the table is the key light (the one shadow), the hall HDR
+ * only lights reflections, and the fog rides out with the attract camera on tall screens.
+ */
+export const LOOK = {
+  background: COLORS.room,
+  fog: { color: COLORS.room, near: 4, far: 11, follow: { nearPast: -1.5, farPast: 5 } },
+  hemisphere: { sky: '#c9d6ff', ground: '#2a1a12', intensity: 0.35 },
+  key: {
+    kind: 'spot',
+    position: [0, LAMP_Y + 0.6, 0],
+    color: '#ffe2b0',
+    intensity: 26,
+    angle: 0.95,
+    penumbra: 0.75,
+    distance: 6,
+    decay: 1.2,
+    shadow: { mapSize: 2048, bias: -0.00012, normalBias: 0.015 },
+  },
+  fills: [
+    {
+      kind: 'point',
+      position: [-0.75, LAMP_Y, 0],
+      color: LAMP_WARM,
+      intensity: 1.6,
+      distance: 2.4,
+      decay: 1.6,
+    },
+    {
+      kind: 'point',
+      position: [0.75, LAMP_Y, 0],
+      color: LAMP_WARM,
+      intensity: 1.6,
+      distance: 2.4,
+      decay: 1.6,
+    },
+    { kind: 'directional', position: [-2.5, 2.6, 3], color: '#9fc2ff', intensity: 0.35 },
+    { kind: 'directional', position: [3, 3.2, -3.5], color: '#bcd6ff', intensity: 0.45 },
+  ],
+  environment: { source: 'custom', intensity: 0.35 },
+  toneMapping: 'aces',
+  exposure: 0.95,
+  post: {
+    // Above the balls' specular peaks: a glint, not a bulb. The shade (HDR) still blooms.
+    bloom: { strength: 0.3, radius: 0.4, threshold: 3 },
+    vignette: 0.55,
+    saturation: 1.04,
+  },
+} as const satisfies StadiumLook;
