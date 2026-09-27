@@ -1,15 +1,16 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { Color, Fog } from 'three/webgpu';
+import type { Fog } from 'three/webgpu';
 
 import type { SimEvent } from '@arena/sim-runner';
 
 import { useSettings } from '@/app/stores/settings.ts';
+import { StadiumRig } from '@/engine/look/StadiumRig.tsx';
 import type { GameSceneProps } from '@/engine/types.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 
 import { keepWindBed, playRunnerEvents, setWindBed } from './audio/sfx.ts';
-import { COLORS } from './config.ts';
+import { FOG_M, LOOK } from './config.ts';
 import { controlsSeen } from './hud/controlsSeen.ts';
 import { attachKeys, readInput } from './input/keys.ts';
 import { RunnerDriver } from './match/driver.ts';
@@ -38,8 +39,8 @@ import { closeCallTheWipeout } from './wager/controller.ts';
 import { useWipeoutBet } from './wager/store.ts';
 
 const ATTRACT_SEED = 0xda5;
-/** DAG Dasher's fog (30 → 150 m); the Fog debuff pulls it in to 5 → 35 m. */
-const FOG = { near: 30, far: 150, fogNear: 5, fogFar: 35 } as const;
+/** The Fog debuff pulls the rig's fog (FOG_M) in to 5 → 35 m. */
+const FOGGED_M = { near: 5, far: 35 } as const;
 const FOG_RATE = 3;
 
 /**
@@ -58,18 +59,6 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
   const clock = useRef(0);
   const reducedMotion = useSettings((s) => s.reducedMotion);
   const scene = useThree((s) => s.scene);
-  const fog = useMemo(() => new Fog(COLORS.fog, FOG.near, FOG.far), []);
-
-  useEffect(() => {
-    const bg = scene.background;
-    const prevFog = scene.fog;
-    scene.background = new Color(COLORS.sky);
-    scene.fog = fog;
-    return () => {
-      scene.background = bg;
-      scene.fog = prevFog;
-    };
-  }, [scene, fog]);
 
   useEffect(() => {
     setDriver(driver);
@@ -132,10 +121,13 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
     focusView.shakeX = shake.x;
     focusView.shakeY = shake.y;
     // The Fog debuff closes the night in around you.
-    const fogged = w.runners[focus]?.power === 'fog';
-    const k = 1 - Math.exp(-FOG_RATE * dt);
-    fog.near += ((fogged ? FOG.fogNear : FOG.near) - fog.near) * k;
-    fog.far += ((fogged ? FOG.fogFar : FOG.far) - fog.far) * k;
+    const fog = scene.fog as Fog | null;
+    if (fog) {
+      const to = w.runners[focus]?.power === 'fog' ? FOGGED_M : FOG_M;
+      const k = 1 - Math.exp(-FOG_RATE * dt);
+      fog.near += (to.near - fog.near) * k;
+      fog.far += (to.far - fog.far) * k;
+    }
   };
 
   const world = () => driver.world;
@@ -144,11 +136,7 @@ export function RunnerScene({ phase, generation }: GameSceneProps) {
   return (
     <group>
       <Tick onFrame={onFrame} />
-      <ambientLight color="#00d9ff" intensity={0.35} />
-      <hemisphereLight args={['#6a5cff', '#07060f', 0.6]} />
-      <directionalLight position={[5, 10, 5]} intensity={1.6} />
-      <pointLight position={[-5, 5, -10]} color="#9945ff" intensity={30} distance={50} />
-      <pointLight position={[0, 3, 5]} color="#00d9ff" intensity={12} distance={30} />
+      <StadiumRig look={LOOK} />
       <City focusS={focusS} />
       <Road focusS={focusS} finishM={() => driver.world.finishM} />
       <Barriers world={world} focus={focus} focusS={focusS} />

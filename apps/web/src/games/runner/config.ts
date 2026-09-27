@@ -1,5 +1,6 @@
 import { LANE_WIDTH_M } from '@arena/sim-runner';
 
+import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
 
 import { CAMERA, runnerPose } from './match/camera.ts';
@@ -72,6 +73,26 @@ export const PLATFORM_COLORS = {
   extended: '#00ddaa',
   mega: '#ffdd00',
 } as const;
+
+/**
+ * DAG Dasher's night: teal and violet neon over a dark grid. Everything is neon here, so the bloom
+ * threshold sits near the strips' own luminance (cyan is ~0.57 linear) where the stadium games keep it at 1.
+ */
+export const FOG_M = { near: 30, far: 150 } as const;
+export const LOOK = {
+  background: COLORS.sky,
+  fog: { color: COLORS.fog, near: FOG_M.near, far: FOG_M.far },
+  hemisphere: { sky: '#6a5cff', ground: '#07060f', intensity: 0.6 },
+  key: { kind: 'directional', position: [5, 10, 5], color: '#ffffff', intensity: 1.6 },
+  fills: [
+    { kind: 'ambient', color: '#00d9ff', intensity: 0.35 },
+    { kind: 'point', position: [-5, 5, -10], color: '#9945ff', intensity: 30, distance: 50 },
+    { kind: 'point', position: [0, 3, 5], color: '#00d9ff', intensity: 12, distance: 30 },
+  ],
+  toneMapping: 'neutral',
+  exposure: 1,
+  post: { bloom: { strength: 0.7, radius: 0.55, threshold: 0.45 }, vignette: 0.5, saturation: 1.1 },
+} as const satisfies StadiumLook;
 
 /** The character model stands this tall (the sim's body is 1 m; bodies read better a bit taller). */
 export const RUNNER_HEIGHT_VISUAL_M = 1.45;
