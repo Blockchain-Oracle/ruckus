@@ -2,7 +2,7 @@ import type { GameModule } from '@/engine/types.ts';
 
 import { loadPoolSfx } from './audio/sfx.ts';
 import { rig } from './config.ts';
-import { PoolHubActions } from './hud/HubActions.tsx';
+import { poolModes } from './hud/modes.ts';
 import { PoolOverlay } from './hud/Overlay.tsx';
 import { loadPoolEnvironment } from './render/Room.tsx';
 import { PoolScene } from './Scene.tsx';
@@ -12,5 +12,5 @@ export const pool: GameModule = {
   rig,
   preload: () => Promise.all([loadPoolEnvironment(), loadPoolSfx()]),
   Overlay: PoolOverlay,
-  HubActions: PoolHubActions,
+  modes: poolModes,
 };

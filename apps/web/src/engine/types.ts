@@ -39,14 +39,28 @@ export type CameraRig = {
 
 export type GameSceneProps = { phase: Phase; generation: number };
 
+export type GameModes = {
+  /** Play with friends: open the room lobby. */
+  friends(): void;
+  /** Bet: open the game's VRF round (named by the registry's `wager`). */
+  bet(): void;
+  /** An extra first action shown above Play (Neon Dash's "Beat NAME" challenge link). */
+  Extra?: ComponentType;
+  /** Mode options as chips on the game card (team size, bot level). */
+  Options?: ComponentType;
+};
+
 /** The lazily loaded half of a registry entry: everything that pulls three.js or game code. */
 export type GameModule = {
   Scene: ComponentType<GameSceneProps>;
   rig: CameraRig;
   /** Textures and data the scene reads synchronously; awaited before the scrim lifts. */
   preload?: () => Promise<unknown>;
-  /** Extra hub buttons next to Play (e.g. a wager entry point). */
-  HubActions?: ComponentType;
+  /**
+   * The ADR-010 modes' entry points. Play is the shell's own (the dolly into a local match); the
+   * shell renders every button, so all four games say the same thing in the same place.
+   */
+  modes: GameModes;
   /** The game's own section in the hub settings sheet (controls, camera, character). */
   Settings?: ComponentType;
   /** Always-mounted DOM layer while this game is selected: sheets, HUDs, result cards. */

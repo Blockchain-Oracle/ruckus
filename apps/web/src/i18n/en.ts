@@ -1,6 +1,8 @@
 /** English catalog. Keys are dotted by screen; other locales must satisfy `typeof en`. */
 export const en = {
   'hub.play': 'Play',
+  'mode.friends': 'Play with friends',
+  'mode.bet': 'Bet',
   'hub.quickPlay': 'Quick Play',
   'hub.practice': 'Practice',
   'hub.back': 'Back',

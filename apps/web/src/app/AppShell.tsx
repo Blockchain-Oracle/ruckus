@@ -14,6 +14,7 @@ import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
 import { Logo } from '@/ui/Logo.tsx';
 
 import { ArenaLanding } from './ArenaLanding.tsx';
+import { ModeBar } from './ModeBar.tsx';
 import { useShell } from './stores/shell.ts';
 import { useUi } from './stores/ui.ts';
 
@@ -101,10 +102,9 @@ function HubMenu() {
   const t = useT();
   const gameId = useGameMachine((s) => s.gameId);
   const select = useGameMachine((s) => s.select);
-  const send = useGameMachine((s) => s.send);
   const games = visibleGames();
   const game = findGame(gameId);
-  const HubActions = getLoadedGame(gameId)?.HubActions;
+  const modes = getLoadedGame(gameId)?.modes;
   const booting = useShell((s) => s.booting);
   const openSheet = useUi((s) => s.openSheet);
   // Mounted on first open and kept, so the sheet's close animation can play.
@@ -126,7 +126,7 @@ function HubMenu() {
       animate={{ opacity: 1, y: 0, transition: ENTER }}
       exit={{ opacity: 0, y: 16, transition: EXIT }}
     >
-      <section className="max-w-xl">
+      <section className="max-w-2xl">
         {/* On a phone the title is the game switcher: one tap opens every cabinet in a sheet. */}
         <h1 className="font-display text-4xl leading-tight sm:text-5xl [@media(max-height:480px)]:text-3xl">
           {game && games.length > 1 ? (
@@ -150,35 +150,18 @@ function HubMenu() {
         <p className="mt-2 max-w-sm text-lg text-cream-dim [text-shadow:0_2px_12px_rgb(0_0_0/0.8)] compact:text-base [@media(max-height:480px)]:hidden">
           {game ? t(game.taglineKey) : t('hub.welcome.body')}
         </p>
-        {game && (
-          <div className="pointer-events-auto mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4 compact:mt-4 [@media(max-height:480px)]:mt-3 [@media(max-height:480px)]:flex-row [@media(max-height:480px)]:*:h-12 [@media(max-height:480px)]:*:text-lg">
-            <Button
-              variant="tomato"
-              size="lg"
-              sound="ui.confirm"
-              onClick={() => send('entering')}
-              className="max-sm:h-14 max-sm:w-full max-sm:text-xl"
-            >
-              {t('hub.play')}
-            </Button>
-            {/* Phones: the game's extras share one row under Play (3 → the first spans it). */}
-            {HubActions && (
-              <div className="contents compact:*:h-12 compact:*:px-5 compact:*:text-base max-sm:grid max-sm:grid-cols-2 max-sm:gap-3 max-sm:*:min-w-0 max-sm:*:px-3 max-sm:*:leading-tight max-sm:*:whitespace-normal max-[400px]:*:text-[13px] max-[400px]:*:tracking-normal max-[400px]:[&_svg]:hidden max-sm:[&>:first-child:nth-last-child(3)]:col-span-2 max-sm:[&>:only-child]:col-span-2">
-                <HubActions />
-              </div>
-            )}
-            {games.length > 1 && (
-              <Button
-                variant="ink"
-                size="lg"
-                sound="ui.back"
-                onClick={() => choose(null)}
-                className="compact:hidden"
-              >
-                {t('hub.back')}
-              </Button>
-            )}
-          </div>
+        {game && modes && <ModeBar modes={modes} betName={game.wager} />}
+        {/* Desktop only: phones reach every game through the title's switcher sheet. */}
+        {game && games.length > 1 && (
+          <Button
+            variant="ink"
+            size="sm"
+            sound="ui.back"
+            onClick={() => choose(null)}
+            className="pointer-events-auto mt-3 compact:hidden"
+          >
+            {t('hub.allGames')}
+          </Button>
         )}
       </section>
       {/* A picker of one just repeats the headline; it earns its place with the second game. */}

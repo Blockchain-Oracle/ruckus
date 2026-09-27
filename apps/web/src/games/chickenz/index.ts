@@ -8,14 +8,14 @@ import { rig } from './config.ts';
 import { ChickenzSettings } from './hud/ChickenzSettings.tsx';
 import { ChickenzScene } from './Scene.tsx';
 import { loadSprites } from './sprites.ts';
-import { ChickenzHubActions } from './wager/HubActions.tsx';
+import { chickenzModes } from './wager/modes.ts';
 import { ChickenzOverlay } from './wager/Overlay.tsx';
 
 export const chickenz: GameModule = {
   Scene: ChickenzScene,
   rig,
   preload: () => Promise.all([loadSprites(), loadChickenz(wasmUrl), loadChickenzSfx()]),
-  HubActions: ChickenzHubActions,
+  modes: chickenzModes,
   Overlay: ChickenzOverlay,
   Settings: ChickenzSettings,
 };
