@@ -22,6 +22,15 @@ for (const c of ['run', 'shoot', 'kick', 'win']) {
   await p.waitForTimeout(900);
   await p.screenshot({ path: `${out}/lab-${c}.png` });
 }
+// The motion layer and the hand socket: a stand-in blaster, a flap and a lean while shooting.
+await p.getByRole('button', { name: 'shoot', exact: true }).click();
+for (const k of ['prop', 'flap', 'lean'])
+  await p.getByRole('button', { name: k, exact: true }).click();
+await p.waitForTimeout(700);
+await p.screenshot({ path: `${out}/lab-layer.png` });
+await p.getByRole('button', { name: 'squash', exact: true }).click();
+await p.waitForTimeout(60);
+await p.screenshot({ path: `${out}/lab-squash.png` });
 console.info('fps', await p.locator('text=/fps/').first().textContent());
 console.info('errors', errs.slice(0, 5));
 await b.close();
