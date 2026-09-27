@@ -6,6 +6,7 @@ import { findGame, visibleGames } from '@/games/registry.ts';
 import { getAudio } from '@/lib/audio/index.ts';
 import { LOBBY_TRACK, playMusic } from '@/lib/audio/music.ts';
 import { ErrorBoundary } from '@/ui/ErrorBoundary.tsx';
+import { WorldLabels } from '@/ui/game/WorldLabels.tsx';
 
 import { AppShell } from './AppShell.tsx';
 import { useShell } from './stores/shell.ts';
@@ -69,6 +70,7 @@ export function Hub() {
           </Suspense>
         </ErrorBoundary>
       </div>
+      <WorldLabels />
       <Scrim />
       <AppShell />
       {graphicsFailed && (

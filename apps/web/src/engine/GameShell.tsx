@@ -1,4 +1,4 @@
-import { Canvas, extend } from '@react-three/fiber';
+import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { Suspense } from 'react';
 import * as THREE from 'three/webgpu';
 
@@ -10,6 +10,7 @@ import { DPR_MIN } from './config.ts';
 import { isInteractive, useGameMachine } from './gameMachine.ts';
 import { createRenderer } from './renderer.ts';
 import { WelcomeScene, welcomeRig } from './WelcomeScene.tsx';
+import { setLabelCamera } from './worldLabels.ts';
 
 // The webgpu build's classes (node materials, WebGPURenderer-aware objects) back every JSX element.
 extend(THREE as unknown as Parameters<typeof extend>[0]);
@@ -47,8 +48,15 @@ export default function GameShell({ onReady }: { onReady?: () => void }) {
           )}
         </Suspense>
         <CameraDirector rig={rig} />
+        <LabelCamera />
         <AdaptiveDpr />
       </Canvas>
     </div>
   );
+}
+
+/** Hands the camera to the DOM name-chip layer (ui/game/WorldLabels) every frame. */
+function LabelCamera() {
+  useFrame(({ camera }) => setLabelCamera(camera));
+  return null;
 }

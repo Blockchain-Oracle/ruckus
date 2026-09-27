@@ -147,6 +147,11 @@ export function Standings({ w, you, names }: { w: World; you: number; names: str
             >
               {names[i] ?? SLOTS[i]?.name}
             </span>
+            {i === you && (
+              <span className="rounded-full bg-cream px-1.5 font-display text-[10px] text-ink">
+                YOU
+              </span>
+            )}
             {gap > 0 && <span className="text-cream-dim tabular-nums">−{gap} m</span>}
           </li>
         );

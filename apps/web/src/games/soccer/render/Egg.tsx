@@ -1,12 +1,18 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { type Group, MathUtils, type Mesh, type MeshBasicMaterial } from 'three/webgpu';
+import { type Group, MathUtils, type Mesh, type MeshBasicMaterial, Vector3 } from 'three/webgpu';
 
 import { PLAYER_RADIUS, playerRadius } from '@arena/sim-soccer';
 
+import { removeLabel, setLabel } from '@/engine/worldLabels.ts';
+
 import { COLORS, KITS, PX } from '../config.ts';
 import type { SoccerDriver } from '../match/driver.ts';
+import { useSoccer } from '../match/store.ts';
 import { EGG_TALL, eggGeometry, outlineMaterial, toonGradient } from './toon.ts';
+
+/** World units between the top of the egg and its name chip's tip. */
+const LABEL_GAP = 0.18;
 
 const OUTLINE_SCALE = 1.07;
 /** Squash/stretch spring (per s²) and damping: a quick wobble that settles in ~0.3 s. */
@@ -40,6 +46,9 @@ export function Egg({ slot, driver, you }: Props) {
   const team = (slot % 2) as 0 | 1;
   const kit = KITS[team];
   const partner = slot >= 2;
+  const labelId = `soccer:${slot}`;
+  const labelAt = useMemo(() => new Vector3(), []);
+  useEffect(() => () => removeLabel(labelId), [labelId]);
   const geo = useMemo(
     () => eggGeometry(partner ? kit.partner : kit.body, kit.band),
     [kit, partner],
@@ -54,7 +63,6 @@ export function Egg({ slot, driver, you }: Props) {
   const boots = useRef<(Mesh | null)[]>([]);
   const ice = useRef<Mesh>(null);
   const ghosts = useRef<(Mesh | null)[]>([]);
-  const marker = useRef<Group>(null);
   const spring = useRef({
     s: 0,
     v: 0,
@@ -71,6 +79,8 @@ export function Egg({ slot, driver, you }: Props) {
     const g = root.current;
     if (!g) return;
     g.visible = Boolean(p);
+    const name = useSoccer.getState().names[slot];
+    if (!p || !name) removeLabel(labelId);
     if (!p) return;
     const st = spring.current;
     const dt = Math.min(delta, 0.05);
@@ -145,10 +155,11 @@ export function Egg({ slot, driver, you }: Props) {
       (gh.material as MeshBasicMaterial).opacity = 0.32 - i * 0.09;
     });
 
-    const m = marker.current;
-    if (m) {
-      m.visible = you;
-      m.position.y = r * (EGG_TALL * 2 - 1) + 0.28 + Math.sin(st.t * 4) * 0.05;
+    // Who is who: a name chip over every egg in a match, YOU on yours (ui/game/WorldLabels).
+    if (name) {
+      g.getWorldPosition(labelAt);
+      labelAt.y += r * (EGG_TALL * 2 - 1) + LABEL_GAP;
+      setLabel(labelId, { text: name, color: partner ? kit.partner : kit.body, you }, labelAt);
     }
   });
 
@@ -227,12 +238,6 @@ export function Egg({ slot, driver, you }: Props) {
         <icosahedronGeometry args={[1, 1]} />
         <meshBasicMaterial color={COLORS.ice} transparent opacity={0.38} depthWrite={false} />
       </mesh>
-      <group ref={marker} visible={false}>
-        <mesh rotation={[0, 0, Math.PI]}>
-          <coneGeometry args={[0.13, 0.2, 3]} />
-          <meshBasicMaterial color="#ffc23a" />
-        </mesh>
-      </group>
     </group>
   );
 }

@@ -43,6 +43,9 @@ export function ScoreBug({ w, names, you }: { w: World; names: string[]; you: nu
           >
             {teamLabel(team)}
           </span>
+          {you >= 0 && you % 2 === team && (
+            <span className="rounded-full bg-gold px-1.5 text-[10px] text-ink">YOU</span>
+          )}
           <span className="tabular min-w-[1.5ch] text-center text-2xl text-cream sm:text-3xl">
             {w.score[team]}
           </span>

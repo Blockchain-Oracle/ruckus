@@ -1,16 +1,29 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { AdditiveBlending, type Group, type Mesh, type MeshBasicMaterial } from 'three/webgpu';
+import {
+  AdditiveBlending,
+  type Group,
+  type Mesh,
+  type MeshBasicMaterial,
+  Vector3,
+} from 'three/webgpu';
 
 import { BASE_SPEED_MPS, coastSpeed, type SimEvent, speedOf } from '@arena/sim-runner';
 
-import { LANE_GLIDE_MPS, laneX, SLOTS, zAt } from '../config.ts';
+import { removeLabel, setLabel } from '@/engine/worldLabels.ts';
+
+import { LANE_GLIDE_MPS, laneX, RUNNER_HEIGHT_VISUAL_M, SLOTS, zAt } from '../config.ts';
 import type { RunnerDriver } from '../match/driver.ts';
 import { focusView } from '../match/runtime.ts';
+import { useRunner } from '../match/store.ts';
 import { useRunnerPrefs } from '../prefs.ts';
 import { RunnerBody } from './character.ts';
 
 const MAX_RUNNERS = 4;
+/** Metres above a runner's head where its name chip's tip sits. */
+const LABEL_GAP_M = 0.35;
+const labelAt = new Vector3();
+const labelId = (i: number) => `runner:${i}`;
 /** Lean into a lane change (KK rolled by −dx·0.3; a body reads better with less). */
 const LEAN = 0.09;
 /** How long the stumble plays after a hit, and the slam's roll after touching down. */
@@ -50,6 +63,12 @@ export function Runners({
 
   useEffect(
     () => () => {
+      for (let i = 0; i < MAX_RUNNERS; i++) removeLabel(labelId(i));
+    },
+    [],
+  );
+  useEffect(
+    () => () => {
       for (const b of bodies) b.dispose();
     },
     [bodies],
@@ -77,6 +96,8 @@ export function Runners({
       if (!holder || !b) return;
       const hideGhost = !ghosts && i !== focus && d.humanSlot >= 0;
       holder.visible = Boolean(r) && !hideGhost;
+      const name = useRunner.getState().names[i];
+      if (!r || !holder.visible || !name) removeLabel(labelId(i));
       if (!r || !holder.visible) return;
       for (const k of ['hit', 'jump'] as const) b[k] += delta;
       if (b.slam >= 0) b.slam += delta;
@@ -89,6 +110,16 @@ export function Runners({
       const pose = d.poseOf(i);
       holder.position.set(b.x, pose.y, zAt(pose.s, focusS));
       holder.rotation.z = -Math.sign(b.x - b.lastX) * (b.x === target ? 0 : LEAN);
+      // Who is who: every racer's name over their head, YOU on yours (ui/game/WorldLabels).
+      if (name) {
+        holder.getWorldPosition(labelAt);
+        labelAt.y += RUNNER_HEIGHT_VISUAL_M + LABEL_GAP_M;
+        setLabel(
+          labelId(i),
+          { text: name, color: SLOTS[i]?.color ?? '#fff1d6', you: i === d.humanSlot },
+          labelAt,
+        );
+      }
       body.setGhost(i !== focus);
       if (i !== focus) {
         // Near you a ghost melts away (Mario Kart style), so it never paints over your body.
