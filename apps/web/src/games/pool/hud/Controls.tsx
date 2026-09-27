@@ -2,8 +2,7 @@ import { QuestionIcon, XIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 
 import { isCompact } from '@/lib/platform.ts';
-
-import { useCoarse } from './useCoarse.ts';
+import { useCoarse } from '@/ui/game/useCoarse.ts';
 
 const MOUSE = [
   ['Aim', 'Click or drag on the table. Your line stays put until you click the table again.'],
@@ -29,9 +28,10 @@ const WAGER_STEPS = [
 /** How to play, on the table: open by default the first time, then one tap away. */
 export function ControlsCard({ wager = false }: { wager?: boolean }) {
   const coarse = useCoarse();
+  // Play's first run gets the shared pre-match card, so the full card waits behind "?". The bet
+  // round has no pre-match card: its steps open once, except on phones where the panel says it all.
   const [open, setOpen] = useState(() => {
-    // On a phone the wager panel already says all this; the card would only bury the table.
-    if (wager && isCompact()) return false;
+    if (!wager || isCompact()) return false;
     try {
       return window.localStorage.getItem('ruckus.pool.controlsSeen') !== '1';
     } catch {

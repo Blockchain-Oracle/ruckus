@@ -1,11 +1,11 @@
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
 
 import { Button } from '@/ui/Button.tsx';
+import { useCoarse } from '@/ui/game/useCoarse.ts';
 
 import { startRace } from '../match/flow.ts';
 import { tutorial, useTutorial } from '../tutorial/director.ts';
 import { LESSONS } from '../tutorial/lessons.ts';
-import { useCoarse } from './useCoarse.ts';
 
 /** The current lesson, bottom centre above the controls: what to do, how it went, a way out. */
 export function LessonCard() {

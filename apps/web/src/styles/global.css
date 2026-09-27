@@ -132,3 +132,13 @@ body:not(:has([data-arena-landing])) #chain-jam-badge {
   bottom: 0;
   left: env(safe-area-inset-left);
 }
+
+/* The pre-match card's Play fill: the auto-start countdown (ui/game/PreMatchCard.tsx). */
+@keyframes prematch-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

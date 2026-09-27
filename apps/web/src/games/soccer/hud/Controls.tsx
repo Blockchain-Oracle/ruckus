@@ -1,10 +1,10 @@
 import { QuestionIcon, XIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 
-import { Button } from '@/ui/Button.tsx';
+import { PreMatchCard, type PreMatchIntro } from '@/ui/game/PreMatchCard.tsx';
+import { useCoarse } from '@/ui/game/useCoarse.ts';
 
 import { markControlsSeen } from './controlsSeen.ts';
-import { useCoarse } from './useCoarse.ts';
 
 const MOUSE = [
   ['Move', 'A / D or ← / →'],
@@ -47,44 +47,34 @@ function Rows() {
   );
 }
 
-/**
- * First visit: How to play stands between Play and the kickoff. It must fit any screen: capped at
- * the viewport height with only the rules scrolling, and the two choices always visible below.
- */
+const INTRO: PreMatchIntro = {
+  title: 'Egg Soccer',
+  goal: 'Most goals in 90 seconds wins.',
+  keys: [
+    ['A / D', 'Run'],
+    ['W', 'Jump'],
+    ['Run into it', 'Kick'],
+  ],
+  touch: [
+    ['Slide left', 'Run'],
+    ['Flick up', 'Jump'],
+    ['Run into it', 'Kick'],
+  ],
+};
+
+/** First visit: the shared pre-match card (ADR-010); the full rules stay behind "?". */
 export function IntroCard({ onGo, onLearn }: { onGo: () => void; onLearn: () => void }) {
   const choose = (then: () => void) => () => {
     markControlsSeen();
     then();
   };
   return (
-    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/55 p-3">
-      <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md min-w-0 flex-col rounded-2xl border-2 border-teal bg-ink-2 p-4 text-xs shadow-[0_20px_60px_rgb(0_0_0/0.6)] sm:p-5 sm:text-sm">
-        <div className="mb-2 shrink-0 font-display text-xl text-teal sm:mb-3 sm:text-2xl">
-          HOW TO PLAY
-        </div>
-        <div className="min-h-0 overflow-y-auto overscroll-contain pr-1 [@media(max-height:500px)]:pb-4 [@media(max-height:500px)]:[mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
-          <Rows />
-        </div>
-        <div className="mt-3 grid shrink-0 grid-cols-2 gap-2 sm:mt-4 sm:gap-3">
-          <Button
-            variant="teal"
-            sound="ui.confirm"
-            className="w-full min-w-0 px-2 text-sm sm:text-base"
-            onClick={choose(onLearn)}
-          >
-            Quick lesson
-          </Button>
-          <Button
-            variant="tomato"
-            sound="ui.confirm"
-            className="w-full min-w-0 px-2 text-sm sm:text-base"
-            onClick={choose(onGo)}
-          >
-            Kick off
-          </Button>
-        </div>
-      </div>
-    </div>
+    <PreMatchCard
+      intro={INTRO}
+      playLabel="Kick off"
+      onPlay={choose(onGo)}
+      onTutorial={choose(onLearn)}
+    />
   );
 }
 

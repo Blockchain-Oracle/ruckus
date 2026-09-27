@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const COARSE = '(pointer: coarse)';
 
-/** Touch-first device (drives the touch wording in lessons). */
+/** Touch-first device: drives touch wording and on-screen controls in every game. */
 export function useCoarse() {
   const [coarse, setCoarse] = useState(() => window.matchMedia(COARSE).matches);
   useEffect(() => {

@@ -4,6 +4,7 @@ import { MATCH_SECONDS, TICK_HZ } from '@arena/sim-soccer';
 
 import { useUi } from '@/app/stores/ui.ts';
 import { FullscreenButton } from '@/ui/FullscreenButton.tsx';
+import { useCoarse } from '@/ui/game/useCoarse.ts';
 
 import { startLessons, startMatch } from '../match/flow.ts';
 import { getDriver } from '../match/runtime.ts';
@@ -14,7 +15,6 @@ import { LessonCard } from './Lesson.tsx';
 import { Results } from './Results.tsx';
 import { PowerChips, ScoreBug } from './ScoreBug.tsx';
 import { TouchPad } from './TouchPad.tsx';
-import { useCoarse } from './useCoarse.ts';
 import { useTick } from './useTick.ts';
 
 const HUD_HZ = 12;

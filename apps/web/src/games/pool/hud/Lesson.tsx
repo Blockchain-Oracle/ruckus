@@ -1,45 +1,41 @@
-import { Button } from '@/ui/Button.tsx';
+import { PreMatchCard, type PreMatchIntro } from '@/ui/game/PreMatchCard.tsx';
+import { useCoarse } from '@/ui/game/useCoarse.ts';
 
 import { getDirector } from '../match/runtime.ts';
 import { usePool } from '../match/store.ts';
 import { markTutorialDone } from '../match/tutorial.ts';
 import { LESSONS } from '../tutorial/lessons.ts';
-import { useCoarse } from './useCoarse.ts';
 
-/** First visit: take the one-minute lesson, or go straight to a rack. */
+const INTRO: PreMatchIntro = {
+  title: '8-Ball',
+  goal: 'Sink your group (solids or stripes), then call the 8.',
+  keys: [
+    ['Click', 'Aim'],
+    ['Drag the cue', 'Power'],
+    ['Let go', 'Shoot'],
+  ],
+  touch: [
+    ['Tap table', 'Aim'],
+    ['Pull the cue', 'Power'],
+    ['Let go', 'Shoot'],
+  ],
+};
+
+/** First run: the shared pre-match card (ADR-010) in place of "New to the table?". */
 export function TutorialOffer() {
   const offer = usePool((s) => s.offerTutorial);
   if (!offer) return null;
   return (
-    <div className="pointer-events-auto absolute inset-0 z-30 grid place-items-center bg-ink/60 px-4">
-      <div className="flex w-full min-w-0 max-w-sm flex-col items-center gap-4 rounded-2xl border-2 border-line bg-ink-2 p-5 text-center sm:p-6 shadow-[0_20px_60px_rgb(0_0_0/0.6)]">
-        <div className="font-display text-2xl text-cream sm:text-3xl">New to the table?</div>
-        <p className="text-cream-dim">
-          A one-minute lesson: aim, power, spin, ball in hand, calling the 8.
-        </p>
-        {/* Equal halves that may shrink: two nowrap labels used to push the card off a phone. */}
-        <div className="grid w-full grid-cols-2 gap-3 *:h-auto *:min-h-12 *:min-w-0 *:px-3 *:py-2 *:leading-tight *:whitespace-normal">
-          <Button
-            variant="tomato"
-            sound="ui.confirm"
-            onClick={() => getDirector()?.startTutorial()}
-          >
-            Take the lesson
-          </Button>
-          <Button
-            sound="ui.back"
-            onClick={() => {
-              markTutorialDone();
-              usePool.getState().set({ offerTutorial: false });
-              const d = getDirector();
-              d?.startMatch(d.playerName);
-            }}
-          >
-            Skip
-          </Button>
-        </div>
-      </div>
-    </div>
+    <PreMatchCard
+      intro={INTRO}
+      onTutorial={() => getDirector()?.startTutorial()}
+      onPlay={() => {
+        markTutorialDone();
+        usePool.getState().set({ offerTutorial: false });
+        const d = getDirector();
+        d?.startMatch(d.playerName);
+      }}
+    />
   );
 }
 
