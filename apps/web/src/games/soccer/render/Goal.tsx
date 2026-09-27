@@ -4,10 +4,11 @@ import type { Group } from 'three/webgpu';
 
 import { CROSSBAR_THICKNESS, GOAL_DEPTH, GOAL_HEIGHT, HALF_WIDTH } from '@arena/sim-soccer';
 
+import { toonGradient } from '@/engine/look/toon.ts';
+
 import { COLORS, DEPTH, W } from '../config.ts';
 import type { SoccerFx } from './fx.ts';
 import { netTexture } from './textures.ts';
-import { outlineMaterial, toonGradient } from './toon.ts';
 
 const MOUTH_H = W(GOAL_HEIGHT);
 const BAR_T = W(CROSSBAR_THICKNESS);
@@ -46,14 +47,7 @@ export function Goal({ side, fx }: { side: 1 | -1; fx: SoccerFx }) {
       {/* Crossbar: the solid box above the mouth, with a painted front face. */}
       <mesh position={[mouthX + DEEP / 2, MOUTH_H + BAR_T / 2, 0]}>
         <boxGeometry args={[DEEP, BAR_T, NET_WIDE]} />
-        <meshToonMaterial color={COLORS.goal} gradientMap={toonGradient()} />
-      </mesh>
-      <mesh
-        position={[mouthX + DEEP / 2, MOUTH_H + BAR_T / 2, 0]}
-        scale={[1.04, 1.12, 1.01]}
-        material={outlineMaterial()}
-      >
-        <boxGeometry args={[DEEP, BAR_T, NET_WIDE]} />
+        <meshToonMaterial color={COLORS.goal} gradientMap={toonGradient('hard')} />
       </mesh>
       {/* Hazard stripes on the bar's front so it reads as a thing you can bounce off. */}
       {[0, 1, 2].map((i) => (
@@ -69,7 +63,7 @@ export function Goal({ side, fx }: { side: 1 | -1; fx: SoccerFx }) {
       {[DEPTH.goalBack, DEPTH.goalFront].map((z) => (
         <mesh key={z} position={[mouthX + POST_R, MOUTH_H / 2, z]}>
           <cylinderGeometry args={[POST_R, POST_R, MOUTH_H, 10]} />
-          <meshToonMaterial color={COLORS.goal} gradientMap={toonGradient()} />
+          <meshToonMaterial color={COLORS.goal} gradientMap={toonGradient('hard')} />
         </mesh>
       ))}
       {/* Back net (billows) and side nets. */}

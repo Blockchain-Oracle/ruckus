@@ -1,8 +1,10 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo } from 'react';
-import { AdditiveBlending, type Texture } from 'three/webgpu';
+import { AdditiveBlending, Color, type Texture } from 'three/webgpu';
 
-import { COLORS, DEPTH, PITCH_HALF, ROOF } from '../config.ts';
+import { StadiumRig } from '@/engine/look/StadiumRig.tsx';
+
+import { COLORS, DEPTH, LOOK, PITCH_HALF, ROOF } from '../config.ts';
 import { Crowd, TIERS } from './Crowd.tsx';
 import type { SoccerFx } from './fx.ts';
 import { boardTexture, glowTexture, grassTexture, skyTexture } from './textures.ts';
@@ -12,6 +14,8 @@ const GRASS_DEPTH = DEPTH.pitchFront - (DEPTH.standsFront - 0.2);
 const BOARD = { h: 0.62, scrollPerS: 0.018 } as const;
 const TOWER = { x: 11.5, z: -9.5, h: 12.5 } as const;
 const BANK = { cols: 4, rows: 3, cell: 0.42 } as const;
+/** Lamps are light sources: HDR, so they (and only they) clear the bloom threshold. */
+const LAMP_HDR = 3;
 
 /**
  * Night stadium, side-on: mowed pitch, a scrolling LED ribbon, tiered stands with the crowd,
@@ -29,6 +33,8 @@ export function Stadium({ fx }: { fx: SoccerFx }) {
     [],
   );
 
+  const lamp = useMemo(() => new Color(COLORS.flood).multiplyScalar(LAMP_HDR), []);
+
   useFrame((_, delta) => {
     tex.board.offset.x = (tex.board.offset.x + delta * BOARD.scrollPerS) % 1;
   });
@@ -38,11 +44,7 @@ export function Stadium({ fx }: { fx: SoccerFx }) {
 
   return (
     <>
-      <color attach="background" args={[COLORS.sky]} />
-      <fog attach="fog" args={[COLORS.sky, 26, 60]} />
-      <hemisphereLight args={['#c8c4ff', '#1c3a1f', 1.1]} />
-      <directionalLight position={[-4, 10, 9]} intensity={2.6} color={COLORS.flood} />
-      <directionalLight position={[6, 6, 4]} intensity={0.8} color="#b9a8ff" />
+      <StadiumRig look={LOOK} />
 
       {/* Sky dome backdrop. */}
       <mesh position={[0, 9, -34]}>
@@ -117,7 +119,7 @@ export function Stadium({ fx }: { fx: SoccerFx }) {
               return (
                 <mesh key={i} position={[cx * BANK.cell, cy * BANK.cell, 0.1]}>
                   <planeGeometry args={[BANK.cell * 0.78, BANK.cell * 0.78]} />
-                  <meshBasicMaterial color={COLORS.flood} toneMapped={false} />
+                  <meshBasicMaterial color={lamp} />
                 </mesh>
               );
             })}

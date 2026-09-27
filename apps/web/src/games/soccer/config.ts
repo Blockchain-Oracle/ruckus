@@ -1,5 +1,6 @@
 import { CEILING, HALF_WIDTH } from '@arena/sim-soccer';
 
+import type { StadiumLook } from '@/engine/look/stadium.ts';
 import type { CameraRig } from '@/engine/types.ts';
 
 import { soccerPose } from './match/camera.ts';
@@ -50,6 +51,23 @@ export const COLORS = {
   ice: '#9fe8ff',
   flood: '#fff4d6',
 } as const;
+
+/** Night stadium under floodlights; the floodlight lamps and LED boards are what bloom. */
+export const LOOK = {
+  background: COLORS.sky,
+  fog: { color: COLORS.sky, near: 26, far: 60 },
+  hemisphere: { sky: '#c8c4ff', ground: '#1c3a1f', intensity: 1.1 },
+  key: { kind: 'directional', position: [-4, 10, 9], color: COLORS.flood, intensity: 2.6 },
+  fills: [{ kind: 'directional', position: [6, 6, 4], color: '#b9a8ff', intensity: 0.8 }],
+  toneMapping: 'neutral',
+  exposure: 1,
+  post: {
+    bloom: { strength: 0.45, radius: 0.4, threshold: 1 },
+    vignette: 0.4,
+    saturation: 1.06,
+    outline: { color: COLORS.outline, thickness: 0.013 },
+  },
+} as const satisfies StadiumLook;
 
 /** Stage depth layout (world z): pitch runs back to the ad boards, then the stands climb away. */
 export const DEPTH = {

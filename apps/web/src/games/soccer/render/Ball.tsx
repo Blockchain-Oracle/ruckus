@@ -4,11 +4,12 @@ import { type Group, MathUtils, type Mesh, type MeshBasicMaterial } from 'three/
 
 import { ballRadius, playerRadius } from '@arena/sim-soccer';
 
+import { toonGradient } from '@/engine/look/toon.ts';
+
 import { PX } from '../config.ts';
 import type { SoccerDriver } from '../match/driver.ts';
-import { footballTexture, outlineMaterial, toonGradient } from './toon.ts';
+import { footballTexture } from './toon.ts';
 
-const OUTLINE_SCALE = 1.1;
 /** Contact shadows fade out and spread as things rise (world units of height). */
 const SHADOW_FADE_H = 3.2;
 const SHADOW_ALPHA = 0.42;
@@ -49,10 +50,7 @@ export function Ball({ driver }: { driver: () => SoccerDriver }) {
     <group ref={g}>
       <mesh ref={spin} castShadow>
         <sphereGeometry args={[1, 32, 20]} />
-        <meshToonMaterial map={footballTexture()} gradientMap={toonGradient()} />
-      </mesh>
-      <mesh scale={OUTLINE_SCALE} material={outlineMaterial()}>
-        <sphereGeometry args={[1, 24, 16]} />
+        <meshToonMaterial map={footballTexture()} gradientMap={toonGradient('hard')} />
       </mesh>
       <mesh ref={glow} visible={false}>
         <sphereGeometry args={[1, 20, 14]} />

@@ -4,17 +4,17 @@ import { type Group, MathUtils, type Mesh, type MeshBasicMaterial, Vector3 } fro
 
 import { PLAYER_RADIUS, playerRadius } from '@arena/sim-soccer';
 
+import { toonGradient } from '@/engine/look/toon.ts';
 import { removeLabel, setLabel } from '@/engine/worldLabels.ts';
 
 import { COLORS, KITS, PX } from '../config.ts';
 import type { SoccerDriver } from '../match/driver.ts';
 import { useSoccer } from '../match/store.ts';
-import { EGG_TALL, eggGeometry, outlineMaterial, toonGradient } from './toon.ts';
+import { EGG_TALL, eggGeometry } from './toon.ts';
 
 /** World units between the top of the egg and its name chip's tip. */
 const LABEL_GAP = 0.18;
 
-const OUTLINE_SCALE = 1.07;
 /** Squash/stretch spring (per s²) and damping: a quick wobble that settles in ~0.3 s. */
 const SPRING_K = 260;
 const SPRING_DAMP = 14;
@@ -186,13 +186,12 @@ export function Egg({ slot, driver, you, team, partner }: Props) {
       ))}
       <group ref={body}>
         <mesh geometry={geo} castShadow>
-          <meshToonMaterial vertexColors gradientMap={toonGradient()} />
+          <meshToonMaterial vertexColors gradientMap={toonGradient('hard')} />
         </mesh>
-        <mesh geometry={geo} scale={OUTLINE_SCALE} material={outlineMaterial()} />
         {partner && (
           <mesh position={[0, EGG_TALL * 0.55, 0]} rotation={[Math.PI / 2 - 0.2, 0, 0]}>
             <torusGeometry args={[0.9, 0.085, 8, 32]} />
-            <meshToonMaterial color={kit.band} gradientMap={toonGradient()} />
+            <meshToonMaterial color={kit.band} gradientMap={toonGradient('hard')} />
           </mesh>
         )}
         <group ref={face} position={[0, 0.18, 0]}>
@@ -237,7 +236,7 @@ export function Egg({ slot, driver, you, team, partner }: Props) {
           rotation={[0, 0, Math.PI / 2]}
         >
           <capsuleGeometry args={[0.1, 0.16, 4, 10]} />
-          <meshToonMaterial color={kit.dark} gradientMap={toonGradient()} />
+          <meshToonMaterial color={kit.dark} gradientMap={toonGradient('hard')} />
         </mesh>
       ))}
       <mesh ref={ice} visible={false}>

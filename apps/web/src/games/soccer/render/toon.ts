@@ -1,38 +1,13 @@
 import {
-  BackSide,
   BufferAttribute,
   CanvasTexture,
   Color,
-  DataTexture,
   LatheGeometry,
-  MeshBasicMaterial,
-  NearestFilter,
-  RedFormat,
   SRGBColorSpace,
   Vector2,
 } from 'three/webgpu';
 
 import { COLORS } from '../config.ts';
-
-/** Three flat bands: the cartoon read Eggy's flat-shaded mascots have, lit by our floodlights. */
-const TONES = [90, 170, 255] as const;
-let gradient: DataTexture | null = null;
-export function toonGradient() {
-  if (gradient) return gradient;
-  gradient = new DataTexture(new Uint8Array(TONES), TONES.length, 1, RedFormat);
-  gradient.minFilter = NearestFilter;
-  gradient.magFilter = NearestFilter;
-  gradient.generateMipmaps = false;
-  gradient.needsUpdate = true;
-  return gradient;
-}
-
-/** Inverted hull: the same mesh, back faces only, pushed out. A thick ink line at any angle. */
-let outline: MeshBasicMaterial | null = null;
-export function outlineMaterial() {
-  outline ??= new MeshBasicMaterial({ color: COLORS.outline, side: BackSide });
-  return outline;
-}
 
 /** Egg height over its width; the body circle is the sim's, the extra rises above it. */
 export const EGG_TALL = 1.18;
