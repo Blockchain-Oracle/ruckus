@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import type { Mesh } from 'three/webgpu';
 
-import { WELCOME_LOOK } from './config.ts';
+import { WELCOME_LOOK } from './look/config.ts';
 import { StadiumRig } from './look/StadiumRig.tsx';
 import type { CameraRig } from './types.ts';
 

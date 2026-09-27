@@ -17,13 +17,13 @@ import {
   type Camera,
   Color,
   NeutralToneMapping,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   RenderPipeline,
   type Scene,
   type WebGPURenderer,
 } from 'three/webgpu';
 
-import { POST } from '../config.ts';
+import { POST } from './config.ts';
 import { type Tier, useLookQuality } from './quality.ts';
 import type { StadiumLook } from './stadium.ts';
 import { flash, useStadium } from './store.ts';
@@ -98,7 +98,7 @@ export function StadiumPost() {
     renderer.toneMappingExposure = look?.exposure ?? 1;
     renderer.shadowMap.enabled =
       tier === 'high' && look?.key?.kind === 'spot' && look.key.shadow !== undefined;
-    renderer.shadowMap.type = PCFSoftShadowMap;
+    renderer.shadowMap.type = PCFShadowMap;
     grade.saturation.value = look?.post.saturation ?? 1;
     grade.vignette.value = look?.post.vignette ?? 0;
   }, [renderer, look, tier, grade]);

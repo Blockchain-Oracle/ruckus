@@ -61,7 +61,6 @@ export function StadiumRig({
       {look.key ? <Key light={look.key} /> : null}
       {look.fills?.map((f, i) => (
         // Fills are static per look, so the index is a stable key.
-        // biome-ignore lint/suspicious/noArrayIndexKey: static list
         <Fill key={i} light={f} />
       ))}
     </>

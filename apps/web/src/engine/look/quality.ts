@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { LOOK_PARAM, TIER_DOWN_SLOW_WINDOWS, TIER_UP_FAST_WINDOWS } from '../config.ts';
+import { LOOK_PARAM, TIER_DOWN_SLOW_WINDOWS, TIER_UP_FAST_WINDOWS } from './config.ts';
 
 /**
  * How much post a device gets. high: MSAA + ½-res bloom + shadows. low: no MSAA, ¼-res bloom, no
