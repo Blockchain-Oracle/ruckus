@@ -37,7 +37,7 @@ export function PowerCue({ enabled }: { enabled: boolean }) {
 
   return (
     <div
-      className="pointer-events-auto absolute top-1/2 right-4 flex h-[min(280px,56vh)] w-14 sm:w-16 -translate-y-1/2 touch-none select-none flex-col items-center rounded-full border-2 border-line bg-ink/80 py-3 sm:right-8"
+      className="pointer-events-auto absolute top-1/2 right-4 flex h-[min(280px,56vh)] w-14 sm:w-16 -translate-y-1/2 touch-none select-none flex-col items-center rounded-full border-2 border-line bg-ink/80 py-3 sm:right-8 [@media(max-height:500px)]:top-auto [@media(max-height:500px)]:bottom-3 [@media(max-height:500px)]:h-[46vh] [@media(max-height:500px)]:translate-y-0"
       aria-label="Power: pull down and release to shoot"
       role="slider"
       aria-valuemin={0}

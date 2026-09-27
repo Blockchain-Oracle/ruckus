@@ -24,11 +24,12 @@ const PHONES = [
   { id: 'android-land', device: devices['Galaxy S8 landscape'], ios: false },
 ] as const;
 
+// ADR-010: every game's gold button is "Bet", subtitled with its round.
 const GAMES = [
-  { id: 'chickenz', wager: /Back a Bird/i },
-  { id: 'pool', wager: /Call Your Shot/i },
-  { id: 'soccer', wager: /Call the Finish/i },
-  { id: 'runner', wager: /Call the Wipeout/i },
+  { id: 'chickenz', wager: /^Bet/i },
+  { id: 'pool', wager: /^Bet/i },
+  { id: 'soccer', wager: /^Bet/i },
+  { id: 'runner', wager: /^Bet/i },
 ] as const;
 
 type Step = { name: string; run(page: Page, ios: boolean): Promise<boolean> };
@@ -46,7 +47,7 @@ const steps = (wager: RegExp): Step[] => [
   { name: 'hub', run: async () => true },
   { name: 'switcher', run: (p) => tap(p, /Switch game/) },
   { name: 'settings', run: (p) => tap(p, /^Settings$/) },
-  { name: 'online', run: (p) => tap(p, /Online/) },
+  { name: 'online', run: (p) => tap(p, /Play with friends/) },
   { name: 'wager', run: (p) => tap(p, wager) },
   {
     name: 'play',
@@ -62,7 +63,9 @@ const steps = (wager: RegExp): Step[] => [
       if (!(await tap(p, /^Play$/))) return false;
       await p.waitForTimeout(SETTLE_MS);
       // Any first-run card (lesson offer, how-to, rotate hint) covers the HUD: take the match.
-      await tap(p, /^(skip|kick off|start the race|play anyway)$/i);
+      // The pre-match card (Play / Kick off / Start) and the rotate hint cover the HUD: go in.
+      await tap(p, /^(play anyway)$/i);
+      await tap(p, /^(play|kick off|start)$/i);
       await p.waitForTimeout(SETTLE_MS);
       const ok = await tap(p, ios ? /Play full screen/ : /^Fullscreen$/);
       if (ok && !ios)
