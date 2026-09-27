@@ -109,6 +109,7 @@
  * outside the landing it slots between the canvas (z 0) and the UI shell (z 10): visible over the
  * game, never on top of a button or sheet. The landing's backdrop is opaque, so there it stays up.
  */
+/* Bottom-row controls on phones keep left of the badge's footprint (~9.5rem wide, 14px inset). */
 body:not(:has([data-arena-landing])) #chain-jam-badge {
   z-index: 5;
 }

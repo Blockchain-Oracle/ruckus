@@ -121,6 +121,8 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
   const payout = fight ? Number(formatUnits(fight.payout, decimals)) : 0;
   const multiplier = wager > 0 ? payout / wager : 0;
   const tier = tierFor(multiplier);
+  const net = payout - wager;
+  const won = tier !== 'loss';
   const outcome = fight?.outcomeClass ?? 3;
 
   useEffect(() => {
@@ -132,13 +134,14 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
           ? 'wager.bigwin'
           : 'wager.win',
     );
-    if (payout > 0) playWager('wager.coins');
+    // Coins only for a real gain: a partial return is still a loss (no celebration).
+    if (won) playWager('wager.coins');
     const duration = RESULT_COUNT_UP_MS[tier];
     const started = performance.now();
     let raf = 0;
     const tick = () => {
       const t = duration > 0 ? Math.min(1, (performance.now() - started) / duration) : 1;
-      setShown(countUpValue(0, payout, t));
+      setShown(countUpValue(0, won ? net : payout, t));
       if (t < 1) raf = requestAnimationFrame(tick);
       else if (!revealed.current) {
         // The host hides winnings until reveal, so the balance ticks up exactly as the count lands.
@@ -148,7 +151,7 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [fight, payout, tier, onReveal]);
+  }, [fight, payout, net, won, tier, onReveal]);
 
   const done = () => {
     if (fight && !revealed.current) onReveal(fight.sessionId);
@@ -164,7 +167,7 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
 
   return (
     <m.div
-      className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/40 px-4"
+      className="pointer-events-auto absolute inset-0 grid place-items-center bg-ink/40 p-3"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { duration: 0.2 } }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
@@ -172,27 +175,33 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
       <m.div
         role="dialog"
         aria-label="Round result"
-        className="flex w-full max-w-md flex-col items-center gap-4 rounded-2xl border-2 border-line bg-ink-2 p-6 text-center shadow-[0_20px_60px_rgb(0_0_0/0.6)]"
+        className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md min-w-0 flex-col items-center gap-3 overflow-y-auto rounded-2xl border-2 border-line bg-ink-2 p-5 text-center shadow-[0_20px_60px_rgb(0_0_0/0.6)] sm:gap-4 sm:p-6"
         initial={{ scale: 0.6, y: 30 }}
         animate={{ scale: 1, y: 0, transition: { type: 'spring', stiffness: 420, damping: 22 } }}
       >
-        <HeroPortrait hero={hero} className={outcome === 3 ? 'w-20 grayscale' : 'w-20'} />
+        <HeroPortrait
+          hero={hero}
+          className={`w-16 sm:w-20 [@media(max-height:480px)]:hidden ${outcome === 3 ? 'grayscale' : ''}`}
+        />
         <div
-          className={`font-display text-5xl ${outcome <= 1 ? 'text-gold' : outcome === 2 ? 'text-teal' : 'text-cream-dim'}`}
+          className={`font-display text-4xl sm:text-5xl ${outcome <= 1 ? 'text-gold' : outcome === 2 ? 'text-teal' : 'text-cream-dim'}`}
         >
           {RESULT_TITLES[outcome]}
         </div>
         <p className="text-cream-dim">{RESULT_LINES[outcome]?.(HERO_NAMES[hero])}</p>
-        <div
-          className={`tabular font-display text-4xl ${payout > 0 ? 'text-gold' : 'text-cream-dim'}`}
-        >
-          {payout > 0 ? `+${fmt(shown)}` : fmt(0)}{' '}
+        {/* Net result first: gold only when you are up on the stake (losses never look like wins). */}
+        <div className={`tabular font-display text-4xl ${won ? 'text-gold' : 'text-cream-dim'}`}>
+          {won ? `+${fmt(shown)}` : `−${fmt(wager - payout)}`}{' '}
           <span className="font-pixel text-base">{unit}</span>
         </div>
         <div className="tabular text-sm text-cream-dim">
-          {fmt(wager)} {unit} × {multiplier.toFixed(1)}
+          {won
+            ? `${fmt(wager)} × ${multiplier.toFixed(1)} = ${fmt(payout)} ${unit}`
+            : payout > 0
+              ? `Returned ${fmt(payout)} of your ${fmt(wager)} ${unit} (${multiplier.toFixed(1)}×)`
+              : `Stake ${fmt(wager)} ${unit}`}
         </div>
-        <div className="mt-2 flex gap-3">
+        <div className="mt-1 grid w-full grid-cols-2 gap-3 *:min-w-0 *:px-3">
           <Button variant="gold" sound="ui.confirm" onClick={again}>
             <ArrowCounterClockwiseIcon weight="bold" /> Back again
           </Button>
@@ -201,7 +210,7 @@ function ResultCard({ onReveal }: { onReveal: (sessionId: string) => void }) {
           </Button>
         </div>
         {fight && (
-          <p className="font-pixel text-[10px] uppercase tracking-wider text-cream-dim/70">
+          <p className="font-pixel text-[10px] break-all uppercase tracking-wider text-cream-dim/70">
             Fight seed {fight.seed} · bank v1 · replay it anytime
           </p>
         )}

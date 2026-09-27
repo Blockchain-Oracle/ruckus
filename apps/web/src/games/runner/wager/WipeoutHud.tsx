@@ -134,7 +134,7 @@ export function WipeoutHud({ onLeave }: { onLeave: () => void }) {
           type="button"
           onClick={() => getDriver()?.skipToEnd()}
           // Bottom centre: the jam badge owns the bottom-right corner and would swallow the tap.
-          className="pointer-events-auto absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border-2 border-line bg-ink/85 px-3 py-1.5 text-xs text-cream hover:border-cream-dim"
+          className="pointer-events-auto absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center max-sm:left-4 max-sm:translate-x-0 gap-1.5 rounded-full border-2 border-line bg-ink/85 px-3 py-1.5 text-xs text-cream hover:border-cream-dim"
         >
           <FastForwardIcon weight="bold" /> Skip to the end
         </button>

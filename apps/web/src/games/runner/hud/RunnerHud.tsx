@@ -32,8 +32,8 @@ function challengeFriend(name: string) {
   if (!d || !me || me.finished < 0) return;
   void shareChallenge(d.recording(), name, raceClock(me.finished - COUNTDOWN_S * TICK_HZ));
 }
-/** The control reminder stays up for the opening seconds of each race. */
-const HINT_TICKS = 18 * TICK_HZ;
+/** A reminder only: the pre-match card teaches the controls, so the line clears in 6 s. */
+const HINT_TICKS = 6 * TICK_HZ;
 const roundBtn =
   'pointer-events-auto grid size-10 place-items-center rounded-full border-2 border-line bg-ink/85 text-cream hover:border-cream-dim';
 

@@ -30,7 +30,8 @@ export const CELEBRATION_TIERS = {
     duckDb: 0,
   },
   small: {
-    minMultiplier: 0.0001,
+    // Any profit at all; tierFor never lets a return at or below the stake reach here.
+    minMultiplier: 1,
     countUpS: 0.5,
     trauma: 0,
     hitStopMs: 0,
@@ -79,7 +80,13 @@ const ORDER = [
   'loss',
 ] as const satisfies readonly CelebrationTier[];
 
+/**
+ * Tiers are about *net* result: a partial return (Chickenz runner-up pays 0.4×) is still a loss,
+ * so it must never get coins, gold or a celebration. Losses disguised as wins are a player-
+ * protection problem in real-money play, not a styling choice.
+ */
 export function tierFor(multiplier: number): CelebrationTier {
+  if (!(multiplier > 1)) return 'loss';
   return ORDER.find((t) => multiplier >= CELEBRATION_TIERS[t].minMultiplier) ?? 'loss';
 }
 

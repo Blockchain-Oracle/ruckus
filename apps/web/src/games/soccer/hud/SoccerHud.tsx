@@ -48,7 +48,7 @@ export function SoccerHud({ onLeave }: { onLeave: () => void }) {
 
       {!coarse && (
         <div
-          className="absolute inset-x-0 bottom-5 text-center text-xs text-cream transition-opacity duration-700 [text-shadow:1px_1px_0_#000]"
+          className="absolute inset-x-0 bottom-5 text-center text-xs text-cream transition-opacity max-sm:pr-[9.5rem] max-sm:pl-4 max-sm:text-left duration-700 [text-shadow:1px_1px_0_#000]"
           style={{ opacity: (firstMinute && status === 'playing') || lessons ? 0.9 : 0 }}
         >
           A / D or ← → move · W, ↑ or Space jump (hold for higher) · run into the ball to kick
