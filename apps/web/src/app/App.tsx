@@ -14,6 +14,10 @@ const ConnectivityPanel = lazy(() =>
   })),
 );
 
+const ChickenLab = lazy(() =>
+  import('@/features/chicken-lab/ChickenLab.tsx').then((m) => ({ default: m.ChickenLab })),
+);
+
 const DEBUG_PARAM = 'debug';
 
 export function App() {
@@ -22,6 +26,13 @@ export function App() {
     return (
       <Suspense fallback={null}>
         <CasinoDebugPanel />
+      </Suspense>
+    );
+  }
+  if (import.meta.env.DEV && debug === 'chicken') {
+    return (
+      <Suspense fallback={null}>
+        <ChickenLab />
       </Suspense>
     );
   }

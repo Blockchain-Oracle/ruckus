@@ -24,6 +24,7 @@
     "runner-tutorial": "tsx src/runner-tutorial.ts",
     "capture-previews": "tsx src/capture-previews.ts ../../assets-src/hub/previews",
     "capture-stills": "tsx src/capture-stills.ts",
+    "chicken-lab": "tsx src/chicken-lab.ts",
     "readme-art": "tsx src/render-readme-art.ts"
   },
   "devDependencies": {
