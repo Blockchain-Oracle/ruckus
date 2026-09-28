@@ -20,6 +20,13 @@ const ChickenLab = import.meta.env.DEV
       import('@/features/chicken-lab/ChickenLab.tsx').then((m) => ({ default: m.ChickenLab })),
     )
   : null;
+const PortraitStudio = import.meta.env.DEV
+  ? lazy(() =>
+      import('@/features/chicken-lab/PortraitStudio.tsx').then((m) => ({
+        default: m.PortraitStudio,
+      })),
+    )
+  : null;
 
 const DEBUG_PARAM = 'debug';
 
@@ -36,6 +43,13 @@ export function App() {
     return (
       <Suspense fallback={null}>
         <ChickenLab />
+      </Suspense>
+    );
+  }
+  if (PortraitStudio && debug === 'portrait') {
+    return (
+      <Suspense fallback={null}>
+        <PortraitStudio />
       </Suspense>
     );
   }

@@ -26,7 +26,8 @@
     "capture-previews": "tsx src/capture-previews.ts ../../assets-src/hub/previews",
     "capture-stills": "tsx src/capture-stills.ts",
     "chicken-lab": "tsx src/chicken-lab.ts",
-    "readme-art": "tsx src/render-readme-art.ts"
+    "readme-art": "tsx src/render-readme-art.ts",
+    "capture-portraits": "tsx src/capture-portraits.ts"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
