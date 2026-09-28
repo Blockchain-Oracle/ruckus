@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit -p .",
     "previews": "node src/encode-previews.ts ../../assets-src/hub/previews/raw ../../apps/web/src/assets/previews",
     "chicken": "node src/chicken-character.ts ../../assets-src/chicken/src ../../apps/web/src/assets/models/chicken.glb",
-    "audio:hub": "node src/audio-sprite.ts ../../assets-src/hub/ui/sprite.json ../../apps/web/src/assets/audio/hub-ui"
+    "audio:hub": "node src/audio-sprite.ts ../../assets-src/hub/ui/sprite.json ../../apps/web/src/assets/audio/hub-ui",
+    "chicken:fan": "node src/chicken-fan.ts ../../apps/web/src/assets/models/chicken.glb ../../apps/web/src/assets/models/chicken-fan.glb"
   },
   "devDependencies": {
     "@arena/tsconfig": "workspace:*",
