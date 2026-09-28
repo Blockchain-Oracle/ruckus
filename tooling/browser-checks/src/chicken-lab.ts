@@ -31,6 +31,12 @@ await p.screenshot({ path: `${out}/lab-layer.png` });
 await p.getByRole('button', { name: 'squash', exact: true }).click();
 await p.waitForTimeout(60);
 await p.screenshot({ path: `${out}/lab-squash.png` });
+// The crowd: 250 VAT fans in one draw, through the three moods.
+for (const m of ['calm', 'excited', 'party']) {
+  await p.getByRole('button', { name: m, exact: true }).click();
+  await p.waitForTimeout(2500);
+  await p.screenshot({ path: `${out}/lab-crowd-${m}.png` });
+}
 console.info('fps', await p.locator('text=/fps/').first().textContent());
-console.info('errors', errs.slice(0, 5));
+console.info('errors', errs.slice(0, 5).join('\n---\n'));
 await b.close();

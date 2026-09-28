@@ -55,6 +55,8 @@ type ToonOptions = {
   map?: Texture | null;
   /** Player colour; the white areas of `map` are multiplied by it. */
   tint?: string;
+  /** A per-vertex/instance tint (the crowd's fan colours); wins over `tint`. */
+  tintNode?: Node<'color'>;
   rim?: string;
 };
 
@@ -63,9 +65,15 @@ type ToonOptions = {
  * player colour (one GLB serves every player), and a stepped rim light. TSL, so it runs the same on
  * WebGPU and the WebGL2 fallback.
  */
-export function makeToonMaterial({ map = null, tint, rim = '#c9b6ff' }: ToonOptions = {}) {
+export function makeToonMaterial({
+  map = null,
+  tint,
+  tintNode,
+  rim = '#c9b6ff',
+}: ToonOptions = {}) {
   const mat = new MeshToonNodeMaterial({ gradientMap: toonGradient() });
   const tintColor = uniform(new Color(tint ?? '#ffffff'));
+  const tintBy = tintNode ?? tintColor;
   if (map) {
     const base = texture(map);
     const hi = max(base.r, max(base.g, base.b));
@@ -75,9 +83,9 @@ export function makeToonMaterial({ map = null, tint, rim = '#c9b6ff' }: ToonOpti
     const mask = smoothstep(TINT_SAT_SOFT, TINT_SAT_MAX, sat)
       .oneMinus()
       .mul(smoothstep(TINT_LUM_MIN, TINT_LUM_FULL, hi));
-    mat.colorNode = tint ? mix(base.rgb, base.rgb.mul(tintColor), mask) : base.rgb;
+    mat.colorNode = tint || tintNode ? mix(base.rgb, base.rgb.mul(tintBy), mask) : base.rgb;
   } else {
-    mat.colorNode = tintColor;
+    mat.colorNode = tintBy;
   }
   const fresnel = pow(dot(normalView, positionViewDirection).oneMinus().clamp(), float(RIM_POWER));
   // NodeMaterial.setupLighting reads emissiveNode for every node material; the typings only

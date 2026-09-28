@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three/webgpu';
 
 import { ChickenBody, type ChickenClip, loadChicken } from '@/engine/characters/chicken.ts';
+import { ChickenCrowd, type Mood, type Seat } from '@/engine/characters/crowd.ts';
 import { StadiumPost } from '@/engine/look/StadiumPost.tsx';
 import { StadiumRig } from '@/engine/look/StadiumRig.tsx';
 import type { StadiumLook } from '@/engine/look/stadium.ts';
@@ -47,6 +48,51 @@ const LAB_LOOK = {
 } as const satisfies StadiumLook;
 
 type Layer = { flap: boolean; lean: boolean; prop: boolean };
+
+/** 10 tiers × 25 seats: about the front stand a scene will show. */
+const STAND = {
+  rows: 10,
+  cols: 25,
+  gapM: 0.55,
+  rowDepthM: 0.6,
+  rowRiseM: 0.35,
+  frontZ: -2.4,
+} as const;
+const FAN_TINTS = [...PLAYER_COLORS, '#fff1d6'];
+
+function standSeats(): Seat[] {
+  const seats: Seat[] = [];
+  for (let r = 0; r < STAND.rows; r++)
+    for (let c = 0; c < STAND.cols; c++)
+      seats.push({
+        x: (c - (STAND.cols - 1) / 2) * STAND.gapM + (r % 2) * STAND.gapM * 0.5,
+        y: r * STAND.rowRiseM,
+        z: STAND.frontZ - r * STAND.rowDepthM,
+        facing: 0,
+        heightM: 0.5,
+      });
+  return seats;
+}
+
+function Crowd({ mood }: { mood: Mood }) {
+  const [crowd, setCrowd] = useState<ChickenCrowd | null>(null);
+  useEffect(() => {
+    let live = true;
+    let made: ChickenCrowd | null = null;
+    void ChickenCrowd.create(standSeats(), FAN_TINTS).then((c) => {
+      made = c;
+      if (live) setCrowd(c);
+      else c.dispose();
+    });
+    return () => {
+      live = false;
+      made?.dispose();
+    };
+  }, []);
+  useEffect(() => crowd?.setMood(mood), [crowd, mood]);
+  useFrame((_, dt) => crowd?.update(dt));
+  return crowd ? <primitive object={crowd.mesh} /> : null;
+}
 
 /** A stand-in blaster for tuning the hand socket; the real props come with each game (S39). */
 function makeBlaster() {
@@ -145,6 +191,7 @@ export function ChickenLab() {
   const [fps, setFps] = useState(0);
   const [layer, setLayer] = useState<Layer>({ flap: false, lean: false, prop: false });
   const [squashKey, setSquashKey] = useState(0);
+  const [mood, setMood] = useState<Mood | null>(null);
   const toggle = (k: keyof Layer) => setLayer((l) => ({ ...l, [k]: !l[k] }));
   return (
     <div className="fixed inset-0 bg-ink">
@@ -155,6 +202,7 @@ export function ChickenLab() {
           <circleGeometry args={[4.2, 48]} />
           <meshStandardMaterial color="#24163a" />
         </mesh>
+        {mood && <Crowd mood={mood} />}
         <Chickens clip={clip} layer={layer} squashKey={squashKey} onFps={setFps} />
       </Canvas>
       <div className="fixed inset-x-0 bottom-0 flex flex-wrap justify-center gap-2 p-3">
@@ -173,6 +221,16 @@ export function ChickenLab() {
         <button type="button" onClick={() => setSquashKey((n) => n + 1)} className={chip(false)}>
           squash
         </button>
+        {(['calm', 'excited', 'party'] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => setMood((cur) => (cur === m ? null : m))}
+            className={chip(mood === m)}
+          >
+            {m}
+          </button>
+        ))}
       </div>
       <div className="fixed top-3 left-3 rounded-full bg-ink-2 px-3 py-1 font-pixel text-xs text-teal">
         {fps} fps
